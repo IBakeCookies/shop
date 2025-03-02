@@ -28,3 +28,8 @@ src/lib/paraglide
 
 # 
 .storybook
+/storybook-static/
+
+
+.idea
+/project.inlang/project_id

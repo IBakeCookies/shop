@@ -23,18 +23,18 @@
 								class="max-h-100 max-w-full self-center"
 							/>
 
-							<ul class="flex absolute top-full left-full -translate-x-full">
+							<ul class="absolute top-full left-full flex -translate-x-full">
 								{#each product.product_item as item}
-									<li 
-										class="p-3 mr-3" 
-										style="background-color:{item.color.color_translation.at(0)?.name}">
-									</li>
+									<li
+										class="mr-3 p-3"
+										style="background-color:{item.color.color_translation.at(0)?.name}"
+									></li>
 								{/each}
 							</ul>
 						</div>
 					</div>
 
-					<div class="p-8 font-bold bg-stone-100">
+					<div class="bg-stone-100 p-8 font-bold">
 						<!-- <ul class="flex">
 							{#each product.items as item}
 								<li class="p-2 rounded-xl mr-4" style="background-color:{item.color.translation.at(0)?.name}"></li>
@@ -42,10 +42,10 @@
 						</ul> -->
 
 						<div class="flex items-center justify-between">
-							<h2 class="text-xl flex items-center">
+							<h2 class="flex items-center text-xl">
 								{product.product_translation.at(0)?.name}
 							</h2>
-	
+
 							<money class="ml-4">
 								€ {product.product_item.at(0)?.price}
 							</money>

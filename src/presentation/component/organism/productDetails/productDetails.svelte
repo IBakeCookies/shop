@@ -18,12 +18,20 @@
 		}, 500);
 	}
 
-	const sizes = new Set<string>(product.product_item.flatMap((item) => item.product_variation.map((variation) => variation.size_option.size_reference.name)));
+	const sizes = new Set<string>(
+		product.product_item.flatMap((item) =>
+			item.product_variation.map((variation) => variation.size_option.size_reference.name)
+		)
+	);
 </script>
 
 <article class={cn('grid grid-cols-5 items-start', restProps.class)}>
 	<div class="sticky top-[8rem] col-span-3">
-		<img src="/{product.slug}/index.jpg" alt={product.product_translation.at(0)?.name} class="max-h-full max-w-full" />
+		<img
+			src="/{product.slug}/index.jpg"
+			alt={product.product_translation.at(0)?.name}
+			class="max-h-full max-w-full"
+		/>
 	</div>
 
 	<div class="col-span-2 border-r border-l border-stone-200">
@@ -70,18 +78,16 @@
 
 				<fieldset class="border-l border-stone-200 p-8 text-2xl font-bold">
 					<input type="number" class="max-w-20" value="1" required />
-				</fieldset>	
+				</fieldset>
 			</div>
-		
+
 			<fieldset class="flex items-center border-t border-stone-200">
 				<div class="p-8 text-2xl font-bold">
 					€ {product.product_item.at(0)?.price}
 				</div>
 
 				<div class="flex-1 border-l border-stone-200 p-8">
-					<Button class="w-full" isLoading={isAddingToCart}>
-						Add to cart
-					</Button>
+					<Button class="w-full" isLoading={isAddingToCart}>Add to cart</Button>
 				</div>
 			</fieldset>
 		</form>
