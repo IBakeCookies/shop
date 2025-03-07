@@ -1,25 +1,32 @@
 <script lang="ts">
 	import type { ClassValue } from 'clsx';
 	import type { Snippet } from 'svelte';
+	import type { HTMLButtonAttributes, HTMLAnchorAttributes } from 'svelte/elements';
 	import { cn } from '@presentation/utils/style';
 	import Icon from '@iconify/svelte';
 
-	interface Props {
+	type Props = {
+		href?: string;
 		iconL?: string;
 		iconR?: string;
 		events?: string[];
-		children: Snippet<[]>;
-		variant?: 'primary' | 'secondary';
 		isLoading?: boolean;
-	}
+		variant?: 'primary' | 'secondary';
+		disabled?: boolean;
+		modifier?: ClassValue;
+		children: Snippet;
+	} & (HTMLAnchorAttributes | HTMLButtonAttributes);
 
 	const {
+		href,
 		iconL,
 		iconR,
 		events,
 		isLoading,
-		children,
 		variant = 'primary',
+		disabled,
+		modifier,
+		children,
 		...restProps
 	}: Props = $props();
 
@@ -36,17 +43,18 @@
 	});
 </script>
 
-<button
+<svelte:element
 	{...restProps}
+	this={href ? 'a' : 'button'}
 	class={cn(
 		'a-button flex cursor-pointer items-center justify-center rounded px-8 py-3 disabled:bg-zinc-500',
 		currentVariant,
-		restProps.class,
+		modifier,
 		{
-			'cursor-not-allowed': isLoading
+			'cursor-not-allowed': isLoading || disabled
 		}
 	)}
-	disabled={isLoading}
+	disabled={isLoading || disabled}
 >
 	{#if iconL}
 		<Icon icon={iconL} class="mr-4 h-6 w-6" />
@@ -61,4 +69,4 @@
 	{#if isLoading}
 		<Icon icon="bi:arrow-repeat" class="ml-4 h-6 w-6 animate-spin" />
 	{/if}
-</button>
+</svelte:element>

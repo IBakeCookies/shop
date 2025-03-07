@@ -1,56 +1,24 @@
 <script lang="ts">
-	import type { PageProps } from './$types';
-
-	const { data }: PageProps = $props();
-
-	$inspect(data);
+	import ProductListing from '@organism/productListing/productListing.svelte';
+	import { productsStore } from '@store/productsStore.svelte';
 </script>
 
-<section class="p-10">
-	<h1 class="mb-10 text-3xl font-bold">Revar Alpha 60 Clothing</h1>
+<section class="p-8">
+	<h1 class="mb-8 text-3xl font-bold">Revar Alpha Clothing</h1>
 
-	{#if !data.products?.length}
+	{#if !productsStore.products.length}
 		<p>No products found</p>
 	{:else}
-		<div class="grid grid-cols-1 gap-8 lg:grid-cols-3">
-			{#each data.products as product}
-				<a href="/products/{product.slug}" class="flex flex-col border border-stone-200">
-					<div class="py-10">
-						<div class="relative">
-							<img
-								src="/{product.slug}/index.jpg"
-								alt={product.slug}
-								class="max-h-100 max-w-full self-center"
-							/>
-
-							<ul class="absolute top-full left-full flex -translate-x-full">
-								{#each product.product_item as item}
-									<li
-										class="mr-3 p-3"
-										style="background-color:{item.color.color_translation.at(0)?.name}"
-									></li>
-								{/each}
-							</ul>
-						</div>
-					</div>
-
-					<div class="bg-stone-100 p-8 font-bold">
-						<!-- <ul class="flex">
-							{#each product.items as item}
-								<li class="p-2 rounded-xl mr-4" style="background-color:{item.color.translation.at(0)?.name}"></li>
-							{/each}
-						</ul> -->
-
-						<div class="flex items-center justify-between">
-							<h2 class="flex items-center text-xl">
-								{product.product_translation.at(0)?.name}
-							</h2>
-
-							<money class="ml-4">
-								€ {product.product_item.at(0)?.price}
-							</money>
-						</div>
-					</div>
+		<div class="grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-4">
+			{#each productsStore.products as product}
+				<a href="/products/{product.slug}">
+					<ProductListing
+						image={product.image}
+						colors={product.colors}
+						name={product.name}
+						price={product.price}
+						salePrice={product.salePrice}
+					></ProductListing>
 				</a>
 			{/each}
 		</div>

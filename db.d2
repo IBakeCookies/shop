@@ -1,0 +1,110 @@
+language: "LANGUAGE"
+material: "MATERIAL"
+material_translation: "MATERIAL_TRANSLATION"
+fabric_type: "FABRIC_TYPE"
+fabric_type_translation: "FABRIC_TYPE_TRANSLATION"
+fabric: "FABRIC"
+fabric_composition: "FABRIC_COMPOSITION"
+fabric_feature: "FABRIC_FEATURE"
+fabric_feature_translation: "FABRIC_FEATURE_TRANSLATION"
+fabric_feature_map: "FABRIC_FEATURE_MAP"
+product_feature: "PRODUCT_FEATURE"
+product_feature_translation: "PRODUCT_FEATURE_TRANSLATION"
+product_feature_map: "PRODUCT_FEATURE_MAP"
+product_part: "PRODUCT_PART"
+product_part_translation: "PRODUCT_PART_TRANSLATION"
+product_fabric_part: "PRODUCT_FABRIC_PART"
+product_care: "PRODUCT_CARE"
+attribute_type: "ATTRIBUTE_TYPE"
+attribute_option: "ATTRIBUTE_OPTION"
+brand: "BRAND"
+color: "COLOR"
+product_category: "PRODUCT_CATEGORY"
+product: "PRODUCT"
+product_translation: "PRODUCT_TRANSLATION"
+product_attribute: "PRODUCT_ATTRIBUTE"
+product_item: "PRODUCT_ITEM"
+product_image: "PRODUCT_IMAGE"
+size_reference: "SIZE_REFERENCE"
+size_category: "SIZE_CATEGORY"
+size_option: "SIZE_OPTION"
+product_variation: "PRODUCT_VARIATION"
+review: "REVIEW"
+rating_type: "RATING_TYPE"
+review_rating_type: "REVIEW_RATING_TYPE"
+color_translation: "COLOR_TRANSLATION"
+brand_translation: "BRAND_TRANSLATION"
+product_category_translation: "PRODUCT_CATEGORY_TRANSLATION"
+size_category_translation: "SIZE_CATEGORY_TRANSLATION"
+attribute_type_translation: "ATTRIBUTE_TYPE_TRANSLATION"
+attribute_option_translation: "ATTRIBUTE_OPTION_TRANSLATION"
+
+language -> material_translation: {label: "translated in"}
+material -> material_translation: {label: "has"}
+
+language -> fabric_type_translation: {label: "in language"}
+fabric_type -> fabric_type_translation: {label: "translated in"}
+fabric_type -> fabric: {label: "categorizes"}
+
+language -> fabric_feature_translation: {label: "in language"}
+fabric_feature -> fabric_feature_translation: {label: "translated in"}
+
+fabric -> fabric_composition: {label: "composed of"}
+material -> fabric_composition: {label: "used in"}
+
+fabric -> fabric_feature_map: {label: "has features"}
+fabric_feature -> fabric_feature_map: {label: "applied to"}
+
+language -> product_feature_translation: {label: "in language"}
+product_feature -> product_feature_translation: {label: "translated in"}
+product -> product_feature_map: {label: "has features"}
+product_feature -> product_feature_map: {label: "mapped to"}
+
+language -> product_part_translation: {label: "in language"}
+product_part -> product_part_translation: {label: "translated in"}
+product -> product_fabric_part: {label: "has part"}
+product_part -> product_fabric_part: {label: "used in"}
+fabric -> product_fabric_part: {label: "fabric for"}
+
+language -> product_care: {label: "in language"}
+product -> product_care: {label: "has care instructions"}
+
+attribute_type -> attribute_option: {label: "defines options"}
+language -> attribute_type_translation: {label: "in language"}
+attribute_type -> attribute_type_translation: {label: "translated in"}
+attribute_option -> attribute_option_translation: {label: "translated in"}
+language -> attribute_option_translation: {label: "in language"}
+
+brand -> product: {label: "brands"}
+product_category -> product: {label: "contains"}
+
+language -> product_translation: {label: "in language"}
+product -> product_translation: {label: "translated in"}
+
+product -> product_attribute: {label: "has attribute"}
+attribute_option -> product_attribute: {label: "selected in"}
+
+product -> product_item: {label: "has item"}
+color -> product_item: {label: "used in"}
+product_item -> product_image: {label: "has images"}
+
+size_reference -> size_option: {label: "refers to"}
+size_category -> size_option: {label: "categorizes"}
+product_item -> product_variation: {label: "has variation"}
+size_option -> product_variation: {label: "applied to"}
+
+product -> review: {label: "reviewed by"}
+review -> review_rating_type: {label: "has ratings"}
+rating_type -> review_rating_type: {label: "defined by"}
+
+language -> color_translation: {label: "in language"}
+color -> color_translation: {label: "translated in"}
+
+language -> brand_translation: {label: "in language"}
+brand -> brand_translation: {label: "translated in"}
+
+language -> product_category_translation: {label: "in language"}
+product_category -> product_category_translation: {label: "translated in"}
+
+language -> size_category_translation: {label: "in language"}
+size_category -> size_category_translation: {label: "translated in"}

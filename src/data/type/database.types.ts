@@ -200,6 +200,149 @@ export type Database = {
 					}
 				];
 			};
+			fabric_type: {
+				Row: {
+					id: number;
+					name: string;
+				};
+				Insert: {
+					id?: number;
+					name: string;
+				};
+				Update: {
+					id?: number;
+					name?: string;
+				};
+				Relationships: [];
+			};
+			fabric_type_composition: {
+				Row: {
+					fabric_type_variation_id: number;
+					material_id: number;
+					percentage: number;
+				};
+				Insert: {
+					fabric_type_variation_id: number;
+					material_id: number;
+					percentage: number;
+				};
+				Update: {
+					fabric_type_variation_id?: number;
+					material_id?: number;
+					percentage?: number;
+				};
+				Relationships: [
+					{
+						foreignKeyName: 'fabric_type_composition_fabric_type_variation_id_fkey';
+						columns: ['fabric_type_variation_id'];
+						isOneToOne: false;
+						referencedRelation: 'fabric_type_variation';
+						referencedColumns: ['id'];
+					},
+					{
+						foreignKeyName: 'fabric_type_composition_material_id_fkey';
+						columns: ['material_id'];
+						isOneToOne: false;
+						referencedRelation: 'material';
+						referencedColumns: ['id'];
+					}
+				];
+			};
+			fabric_type_features: {
+				Row: {
+					fabric_type_id: number;
+					material_feature_id: number;
+				};
+				Insert: {
+					fabric_type_id: number;
+					material_feature_id: number;
+				};
+				Update: {
+					fabric_type_id?: number;
+					material_feature_id?: number;
+				};
+				Relationships: [
+					{
+						foreignKeyName: 'fabric_type_features_fabric_type_id_fkey';
+						columns: ['fabric_type_id'];
+						isOneToOne: false;
+						referencedRelation: 'fabric_type';
+						referencedColumns: ['id'];
+					},
+					{
+						foreignKeyName: 'fabric_type_features_material_feature_id_fkey';
+						columns: ['material_feature_id'];
+						isOneToOne: false;
+						referencedRelation: 'material_feature';
+						referencedColumns: ['id'];
+					}
+				];
+			};
+			fabric_type_translation: {
+				Row: {
+					about: string | null;
+					care_instructions: string;
+					fabric_type_id: number;
+					language_id: number;
+				};
+				Insert: {
+					about?: string | null;
+					care_instructions: string;
+					fabric_type_id: number;
+					language_id: number;
+				};
+				Update: {
+					about?: string | null;
+					care_instructions?: string;
+					fabric_type_id?: number;
+					language_id?: number;
+				};
+				Relationships: [
+					{
+						foreignKeyName: 'fabric_type_translation_fabric_type_id_fkey';
+						columns: ['fabric_type_id'];
+						isOneToOne: false;
+						referencedRelation: 'fabric_type';
+						referencedColumns: ['id'];
+					},
+					{
+						foreignKeyName: 'fabric_type_translation_language_id_fkey';
+						columns: ['language_id'];
+						isOneToOne: false;
+						referencedRelation: 'language';
+						referencedColumns: ['id'];
+					}
+				];
+			};
+			fabric_type_variation: {
+				Row: {
+					fabric_type_id: number | null;
+					id: number;
+					name: string | null;
+					weight: number | null;
+				};
+				Insert: {
+					fabric_type_id?: number | null;
+					id?: number;
+					name?: string | null;
+					weight?: number | null;
+				};
+				Update: {
+					fabric_type_id?: number | null;
+					id?: number;
+					name?: string | null;
+					weight?: number | null;
+				};
+				Relationships: [
+					{
+						foreignKeyName: 'fabric_type_variation_fabric_type_id_fkey';
+						columns: ['fabric_type_id'];
+						isOneToOne: false;
+						referencedRelation: 'fabric_type';
+						referencedColumns: ['id'];
+					}
+				];
+			};
 			language: {
 				Row: {
 					code: string;
@@ -217,6 +360,158 @@ export type Database = {
 					name?: string;
 				};
 				Relationships: [];
+			};
+			material: {
+				Row: {
+					id: number;
+				};
+				Insert: {
+					id?: number;
+				};
+				Update: {
+					id?: number;
+				};
+				Relationships: [];
+			};
+			material_feature: {
+				Row: {
+					id: number;
+				};
+				Insert: {
+					id?: number;
+				};
+				Update: {
+					id?: number;
+				};
+				Relationships: [];
+			};
+			material_feature_translation: {
+				Row: {
+					language_id: number;
+					material_feature_id: number;
+					name: string;
+				};
+				Insert: {
+					language_id: number;
+					material_feature_id: number;
+					name: string;
+				};
+				Update: {
+					language_id?: number;
+					material_feature_id?: number;
+					name?: string;
+				};
+				Relationships: [
+					{
+						foreignKeyName: 'material_feature_translation_language_id_fkey';
+						columns: ['language_id'];
+						isOneToOne: false;
+						referencedRelation: 'language';
+						referencedColumns: ['id'];
+					},
+					{
+						foreignKeyName: 'material_feature_translation_material_feature_id_fkey';
+						columns: ['material_feature_id'];
+						isOneToOne: false;
+						referencedRelation: 'material_feature';
+						referencedColumns: ['id'];
+					}
+				];
+			};
+			material_features: {
+				Row: {
+					material_feature_id: number;
+					material_id: number;
+				};
+				Insert: {
+					material_feature_id: number;
+					material_id: number;
+				};
+				Update: {
+					material_feature_id?: number;
+					material_id?: number;
+				};
+				Relationships: [
+					{
+						foreignKeyName: 'material_features_material_feature_id_fkey';
+						columns: ['material_feature_id'];
+						isOneToOne: false;
+						referencedRelation: 'material_feature';
+						referencedColumns: ['id'];
+					},
+					{
+						foreignKeyName: 'material_features_material_id_fkey';
+						columns: ['material_id'];
+						isOneToOne: false;
+						referencedRelation: 'material';
+						referencedColumns: ['id'];
+					}
+				];
+			};
+			material_translation: {
+				Row: {
+					care_instructions: string | null;
+					language_id: number;
+					material_id: number;
+					name: string;
+				};
+				Insert: {
+					care_instructions?: string | null;
+					language_id: number;
+					material_id: number;
+					name: string;
+				};
+				Update: {
+					care_instructions?: string | null;
+					language_id?: number;
+					material_id?: number;
+					name?: string;
+				};
+				Relationships: [
+					{
+						foreignKeyName: 'material_translation_language_id_fkey';
+						columns: ['language_id'];
+						isOneToOne: false;
+						referencedRelation: 'language';
+						referencedColumns: ['id'];
+					},
+					{
+						foreignKeyName: 'material_translation_material_id_fkey';
+						columns: ['material_id'];
+						isOneToOne: false;
+						referencedRelation: 'material';
+						referencedColumns: ['id'];
+					}
+				];
+			};
+			material_variation: {
+				Row: {
+					id: number;
+					material_id: number;
+					name: string | null;
+					weight: number | null;
+				};
+				Insert: {
+					id?: number;
+					material_id: number;
+					name?: string | null;
+					weight?: number | null;
+				};
+				Update: {
+					id?: number;
+					material_id?: number;
+					name?: string | null;
+					weight?: number | null;
+				};
+				Relationships: [
+					{
+						foreignKeyName: 'material_variation_material_id_fkey';
+						columns: ['material_id'];
+						isOneToOne: false;
+						referencedRelation: 'material';
+						referencedColumns: ['id'];
+					}
+				];
 			};
 			product: {
 				Row: {
@@ -355,6 +650,137 @@ export type Database = {
 					}
 				];
 			};
+			product_composition: {
+				Row: {
+					component_id: number;
+					fabric_type_variation_id: number | null;
+					material_variation_id: number | null;
+					percentage: number;
+					product_id: number;
+					product_part_id: number;
+				};
+				Insert: {
+					component_id?: number;
+					fabric_type_variation_id?: number | null;
+					material_variation_id?: number | null;
+					percentage: number;
+					product_id: number;
+					product_part_id: number;
+				};
+				Update: {
+					component_id?: number;
+					fabric_type_variation_id?: number | null;
+					material_variation_id?: number | null;
+					percentage?: number;
+					product_id?: number;
+					product_part_id?: number;
+				};
+				Relationships: [
+					{
+						foreignKeyName: 'product_composition_fabric_type_variation_id_fkey';
+						columns: ['fabric_type_variation_id'];
+						isOneToOne: false;
+						referencedRelation: 'fabric_type_variation';
+						referencedColumns: ['id'];
+					},
+					{
+						foreignKeyName: 'product_composition_material_variation_id_fkey';
+						columns: ['material_variation_id'];
+						isOneToOne: false;
+						referencedRelation: 'material_variation';
+						referencedColumns: ['id'];
+					},
+					{
+						foreignKeyName: 'product_composition_product_id_fkey';
+						columns: ['product_id'];
+						isOneToOne: false;
+						referencedRelation: 'product';
+						referencedColumns: ['id'];
+					},
+					{
+						foreignKeyName: 'product_composition_product_part_id_fkey';
+						columns: ['product_part_id'];
+						isOneToOne: false;
+						referencedRelation: 'product_part';
+						referencedColumns: ['id'];
+					}
+				];
+			};
+			product_feature: {
+				Row: {
+					id: number;
+				};
+				Insert: {
+					id?: number;
+				};
+				Update: {
+					id?: number;
+				};
+				Relationships: [];
+			};
+			product_feature_translation: {
+				Row: {
+					language_id: number;
+					name: string;
+					product_feature_id: number;
+				};
+				Insert: {
+					language_id: number;
+					name: string;
+					product_feature_id: number;
+				};
+				Update: {
+					language_id?: number;
+					name?: string;
+					product_feature_id?: number;
+				};
+				Relationships: [
+					{
+						foreignKeyName: 'product_feature_translation_language_id_fkey';
+						columns: ['language_id'];
+						isOneToOne: false;
+						referencedRelation: 'language';
+						referencedColumns: ['id'];
+					},
+					{
+						foreignKeyName: 'product_feature_translation_product_feature_id_fkey';
+						columns: ['product_feature_id'];
+						isOneToOne: false;
+						referencedRelation: 'product_feature';
+						referencedColumns: ['id'];
+					}
+				];
+			};
+			product_features: {
+				Row: {
+					product_feature_id: number;
+					product_id: number;
+				};
+				Insert: {
+					product_feature_id: number;
+					product_id: number;
+				};
+				Update: {
+					product_feature_id?: number;
+					product_id?: number;
+				};
+				Relationships: [
+					{
+						foreignKeyName: 'product_features_product_feature_id_fkey';
+						columns: ['product_feature_id'];
+						isOneToOne: false;
+						referencedRelation: 'product_feature';
+						referencedColumns: ['id'];
+					},
+					{
+						foreignKeyName: 'product_features_product_id_fkey';
+						columns: ['product_id'];
+						isOneToOne: false;
+						referencedRelation: 'product';
+						referencedColumns: ['id'];
+					}
+				];
+			};
 			product_image: {
 				Row: {
 					filename: string;
@@ -429,26 +855,71 @@ export type Database = {
 					}
 				];
 			};
+			product_part: {
+				Row: {
+					id: number;
+				};
+				Insert: {
+					id?: number;
+				};
+				Update: {
+					id?: number;
+				};
+				Relationships: [];
+			};
+			product_part_translation: {
+				Row: {
+					language_id: number;
+					name: string;
+					product_part_id: number;
+				};
+				Insert: {
+					language_id: number;
+					name: string;
+					product_part_id: number;
+				};
+				Update: {
+					language_id?: number;
+					name?: string;
+					product_part_id?: number;
+				};
+				Relationships: [
+					{
+						foreignKeyName: 'product_part_translation_language_id_fkey';
+						columns: ['language_id'];
+						isOneToOne: false;
+						referencedRelation: 'language';
+						referencedColumns: ['id'];
+					},
+					{
+						foreignKeyName: 'product_part_translation_product_part_id_fkey';
+						columns: ['product_part_id'];
+						isOneToOne: false;
+						referencedRelation: 'product_part';
+						referencedColumns: ['id'];
+					}
+				];
+			};
 			product_translation: {
 				Row: {
-					about: string;
-					care_instructions: string;
+					about: string | null;
+					care_instructions: string | null;
 					description: string;
 					language_id: number;
 					name: string;
 					product_id: number;
 				};
 				Insert: {
-					about: string;
-					care_instructions: string;
+					about?: string | null;
+					care_instructions?: string | null;
 					description: string;
 					language_id: number;
 					name: string;
 					product_id: number;
 				};
 				Update: {
-					about?: string;
-					care_instructions?: string;
+					about?: string | null;
+					care_instructions?: string | null;
 					description?: string;
 					language_id?: number;
 					name?: string;

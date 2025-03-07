@@ -91,6 +91,7 @@ const customTwMerge = extendTailwindMerge({
 	}
 });
 
-export function cn(...inputs: ClassValue[]): ClassValue {
+// @todo fix components class="cn()" issue. The correct return here is :ClassValue
+export function cn(...inputs: ClassValue[]): any {
 	return customTwMerge(clsx(inputs));
 }

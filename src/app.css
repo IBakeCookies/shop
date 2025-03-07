@@ -1,1 +1,84 @@
 @import 'tailwindcss';
+
+@layer utilities {
+	:root {
+		@media (prefers-color-scheme: dark) {
+			/* --color-white: theme('colors.black');
+			--color-black: theme('colors.white');
+			--color-stone-50: theme('colors.stone.950');
+			--color-stone-100: theme('colors.stone.900');
+			--color-stone-200: theme('colors.stone.800');
+			--color-stone-300: theme('colors.stone.700');
+			--color-stone-400: theme('colors.stone.600');
+			--color-stone-500: theme('colors.stone.500');
+			--color-stone-600: theme('colors.stone.400');
+			--color-stone-700: theme('colors.stone.300');
+			--color-stone-800: theme('colors.stone.200');
+			--color-stone-900: theme('colors.stone.100');
+			--color-stone-950: theme('colors.stone.50'); */
+		}
+	}
+}
+
+@theme {
+	/* --*: initial; */
+
+	/* --font-sans:
+		ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
+		'Noto Color Emoji';
+	--font-serif: ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
+	--font-mono:
+		ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New',
+		monospace;
+
+	--spacing: 0.25rem; */
+	/* --spacing-box-xs: var(--spacing-1);
+	--spacing-box-sm: var(--spacing-2);
+	--spacing-box: var(--spacing-4);
+	--spacing-box-md: var(--spacing-6);
+	--spacing-box-lg: var(--spacing-8); */
+
+	/* --breakpoint-sm: 40rem;
+	--breakpoint-md: 48rem;
+	--breakpoint-lg: 64rem;
+	--breakpoint-xl: 80rem;
+	--breakpoint-2xl: 96rem;
+
+	--color-black: #000;
+	--color-white: #fff;
+
+	--color-danger: var(--color-red-500);
+	--color-danger-foreground: var(--color-red-800);
+	--color-danger-background: var(--color-red-100);
+	--color-danger-border: var(--color-red-500);
+
+	--color-success: var(--color-green-500);
+	--color-success-foreground: var(--color-green-800);
+	--color-success-background: var(--color-green-100);
+	--color-success-border: var(--color-green-500);
+
+	--color-warning: var(--color-yellow-500);
+	--color-warning-foreground: var(--color-yellow-800);
+	--color-warning-background: var(--color-yellow-100);
+	--color-warning-border: var(--color-yellow-500);
+
+	--color-info: var(--color-blue-500);
+	--color-info-foreground: var(--color-blue-800);
+	--color-info-background: var(--color-blue-100);
+	--color-info-border: var(--color-blue-500);
+
+	--color-state: var(--color-stone-500);
+	--color-state-foreground: var(--color-stone-800);
+	--color-state-background: var(--color-stone-100);
+	--color-state-border: var(--color-stone-500);
+
+	--font-weight-thin: 100;
+	--font-weight-extralight: 200;
+	--font-weight-light: 300;
+	--font-weight-normal: 400;
+	--font-weight-medium: 500;
+	--font-weight-semibold: 600;
+	--font-weight-bold: 700;
+	--font-weight-extrabold: 800;
+	--font-weight-black: 900; */
+}
