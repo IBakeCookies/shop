@@ -10,7 +10,6 @@
 
 	const userItems = [{ name: 'Login', href: '/login' }];
 </script>
-
 		
 <nav class="sticky top-0 z-10 border-b border-stone-200 bg-white/20 p-8 backdrop-blur-sm">
 	<ul class="mx-auto grid max-w-[120rem] grid-cols-3 items-center">

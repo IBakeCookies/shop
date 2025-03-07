@@ -23,8 +23,6 @@
 		<Nav></Nav>
 
 		<main class="flex w-full flex-1 flex-col">
-			{@render children()}
-		</main>
 
 		<Footer></Footer>
 	</div>
