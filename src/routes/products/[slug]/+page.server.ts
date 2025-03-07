@@ -10,7 +10,9 @@
 // };
 
 export const actions = {
-	addItemToCart: async ({ cookies, request }) => {
-		const data = await request.formData();
-	}
+    addItemToCart: async ({ request }) => {
+        const data = await request.formData();
+
+        console.log(data);
+    },
 };

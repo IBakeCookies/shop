@@ -14,10 +14,10 @@ export type ReadAllProductsOutput = QueryData<ReturnType<typeof readAllProducts>
 export type ReadAllProductsSingleOutput = ReadAllProductsOutput[number];
 
 export const readAllProducts = () =>
-	supabase
-		.from('product')
-		.select(
-			`
+    supabase
+        .from('product')
+        .select(
+            `
 				id,
 				slug,
 				...brand_id (brand:name),
@@ -34,10 +34,10 @@ export const readAllProducts = () =>
 				product_translation (
 					name
 				)
-			`
-		)
-		.eq('product_item.color_id.color_translation.language_id', 1)
-		.eq('product_translation.language_id', 1);
+			`,
+        )
+        .eq('product_item.color_id.color_translation.language_id', 1)
+        .eq('product_translation.language_id', 1);
 
 // export async function readAllProducts()  {
 // 	try {
@@ -89,10 +89,10 @@ export const readAllProducts = () =>
 export type ReadProductBySlugOutput = QueryData<ReturnType<typeof readProductBySlug>>;
 
 export const readProductBySlug = (slug: string) =>
-	supabase
-		.from('product')
-		.select(
-			`
+    supabase
+        .from('product')
+        .select(
+            `
 				id,
 				slug,
 				product_item (
@@ -150,17 +150,17 @@ export const readProductBySlug = (slug: string) =>
 						)
 					)
 				)
-			`
-		)
-		.eq('product_item.color_id.color_translation.language_id', 1)
-		.eq('product_translation.language_id', 1)
-		.eq(
-			'product_composition.fabric_type_variation.fabric_type.fabric_type_translation.language_id',
-			1
-		)
-		.eq(
-			'product_composition.fabric_type_variation.fabric_type_composition.material.material_translation.language_id',
-			1
-		)
-		.eq('slug', slug)
-		.single();
+			`,
+        )
+        .eq('product_item.color_id.color_translation.language_id', 1)
+        .eq('product_translation.language_id', 1)
+        .eq(
+            'product_composition.fabric_type_variation.fabric_type.fabric_type_translation.language_id',
+            1,
+        )
+        .eq(
+            'product_composition.fabric_type_variation.fabric_type_composition.material.material_translation.language_id',
+            1,
+        )
+        .eq('slug', slug)
+        .single();

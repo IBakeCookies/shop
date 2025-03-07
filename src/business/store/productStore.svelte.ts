@@ -4,167 +4,175 @@ import { readProductBySlug } from '@data/repository/productRepository';
 type ProductComposition = ReadProductBySlugOutput['product_composition'][number];
 
 interface ProductColor {
-	id: number;
-	name: string;
-	salePrice: number;
+    id: number;
+    name: string;
+    salePrice: number;
 }
 
 interface ProductSize {
-	id: number;
-	name: string;
+    id: number;
+    name: string;
 }
 
 interface ProductVariations {
-	[key: string]: unknown;
+    [key: string]: unknown;
 }
 
 class ProductStore {
-	product = $state.raw({
-		name: '',
-		description: '',
-		careInstructions: '',
-		fabricCareInstructions: [] as string[],
-		fabricFeatures: [] as string[],
-		productComposition: [] as ProductComposition[],
-		about: '',
-		image: { src: '', alt: '' },
-		colors: [] as ProductColor[],
-		sizes: [] as ProductSize[],
-		price: 0,
-		variations: {} as ProductVariations
-	});
+    product = $state.raw({
+        name: '',
+        description: '',
+        careInstructions: '',
+        fabricCareInstructions: [] as string[],
+        fabricFeatures: [] as string[],
+        productComposition: [] as ProductComposition[],
+        about: '',
+        image: {
+            src: '',
+            alt: '',
+        },
+        colors: [] as ProductColor[],
+        sizes: [] as ProductSize[],
+        price: 0,
+        variations: {} as ProductVariations,
+    });
 
-	constructor(data = this.product) {
-		Object.assign(this.product, data);
-	}
+    constructor(data = this.product) {
+        Object.assign(this.product, data);
+    }
 
-	async getProduct(slug: string) {
-		const { data, error } = await readProductBySlug(slug);
+    async getProduct(slug: string) {
+        const { data, error } = await readProductBySlug(slug);
 
-		if (!data || error) {
-			return;
-		}
+        if (!data || error) {
+            return;
+        }
 
-		console.log({ data });
+        console.log({
+            data,
+        });
 
-		const name = data.product_translation.at(0)?.name || '';
-		const fabricCareInstructions = [
-			...new Set(
-				data.product_composition.map(
-					(composition) =>
-						composition.fabric_type_variation?.fabric_type?.fabric_type_translation?.at(0)
-							?.care_instructions || ''
-				) || ['']
-			)
-		];
+        const name = data.product_translation.at(0)?.name || '';
 
-		this.product = {
-			name,
-			description: data.product_translation.at(0)?.description || '',
-			careInstructions: data.product_translation.at(0)?.care_instructions || '',
-			fabricCareInstructions,
-			fabricFeatures: this.getFabricFeatures(data),
-			productComposition: data.product_composition,
-			about: data.product_translation.at(0)?.about || '',
-			image: {
-				src: `/${data.slug}/index.webp`,
-				alt: name
-			},
-			colors: this.getColors(data),
-			sizes: this.getSizes(data),
-			price: data.product_item.at(0)?.price || 0,
-			variations: this.getVariations(data)
-		};
-	}
+        const fabricCareInstructions = [
+            ...new Set(
+                data.product_composition.map(
+                    (composition) =>
+                        composition.fabric_type_variation?.fabric_type?.fabric_type_translation?.at(
+                            0,
+                        )?.care_instructions || '',
+                ) || [''],
+            ),
+        ];
 
-	private getColors(product: ReadProductBySlugOutput) {
-		return product.product_item
-			.map((item) => ({
-				id: item.color_id,
-				name: item.color.at(0)?.name || '',
-				salePrice: item.sale_price || 0
-			}))
-			.sort((a, b) => ('' + a.name).localeCompare(b.name));
-	}
+        this.product = {
+            name,
+            description: data.product_translation.at(0)?.description || '',
+            careInstructions: data.product_translation.at(0)?.care_instructions || '',
+            fabricCareInstructions,
+            fabricFeatures: this.getFabricFeatures(data),
+            productComposition: data.product_composition,
+            about: data.product_translation.at(0)?.about || '',
+            image: {
+                src: `/${data.slug}/index.webp`,
+                alt: name,
+            },
+            colors: this.getColors(data),
+            sizes: this.getSizes(data),
+            price: data.product_item.at(0)?.price || 0,
+            variations: this.getVariations(data),
+        };
+    }
 
-	private getSizes(product: ReadProductBySlugOutput) {
-		const seen = new Set();
-		const result: ProductSize[] = [];
+    private getColors(product: ReadProductBySlugOutput) {
+        return product.product_item
+            .map((item) => ({
+                id: item.color_id,
+                name: item.color.at(0)?.name || '',
+                salePrice: item.sale_price || 0,
+            }))
+            .sort((a, b) => `${a.name}`.localeCompare(b.name));
+    }
 
-		for (const item of product.product_item) {
-			for (const variation of item.product_variation) {
-				const sizeName = variation.size_reference.name;
+    private getSizes(product: ReadProductBySlugOutput) {
+        const seen = new Set();
+        const result: ProductSize[] = [];
 
-				if (!seen.has(sizeName)) {
-					seen.add(sizeName);
+        for (const item of product.product_item) {
+            for (const variation of item.product_variation) {
+                const sizeName = variation.size_reference.name;
 
-					result.push({
-						id: variation.size_reference.id,
-						name: sizeName
-					});
-				}
-			}
-		}
+                if (!seen.has(sizeName)) {
+                    seen.add(sizeName);
 
-		return result.sort((a, b) => a.id - b.id);
-	}
+                    result.push({
+                        id: variation.size_reference.id,
+                        name: sizeName,
+                    });
+                }
+            }
+        }
 
-	private getVariations(product: ReadProductBySlugOutput) {
-		return product.product_item.reduce((acc, item) => {
-			const colorId = item.color_id;
-			const sizes = item.product_variation.reduce((acc, variation) => {
-				const sizeId = variation.size_reference.id;
+        return result.sort((a, b) => a.id - b.id);
+    }
 
-				// @ts-ignore
-				acc[sizeId] = variation.stock;
+    private getVariations(product: ReadProductBySlugOutput) {
+        return product.product_item.reduce((acc, item) => {
+            const colorId = item.color_id;
 
-				return acc;
-			}, {});
+            const sizes = item.product_variation.reduce((acc, variation) => {
+                const sizeId = variation.size_reference.id;
 
-			// @ts-ignore
-			acc[colorId] = sizes;
+                // @ts-ignore
+                acc[sizeId] = variation.stock;
 
-			return acc;
-		}, {});
-	}
+                return acc;
+            }, {});
 
-	private getFabricFeatures(product: ReadProductBySlugOutput) {
-		const result: string[] = [];
+            // @ts-ignore
+            acc[colorId] = sizes;
 
-		for (let i = 0; i < product.product_composition.length; i++) {
-			const composition = product.product_composition.at(i);
+            return acc;
+        }, {});
+    }
 
-			if (!composition) {
-				return result;
-			}
+    private getFabricFeatures(product: ReadProductBySlugOutput) {
+        const result: string[] = [];
 
-			const variation = composition.fabric_type_variation;
+        for (let i = 0; i < product.product_composition.length; i++) {
+            const composition = product.product_composition.at(i);
 
-			if (!variation) {
-				return result;
-			}
+            if (!composition) {
+                return result;
+            }
 
-			const features = variation.fabric_type?.fabric_type_features;
+            const variation = composition.fabric_type_variation;
 
-			if (!features) {
-				return result;
-			}
+            if (!variation) {
+                return result;
+            }
 
-			for (let j = 0; j < features.length; j++) {
-				const featureItem = features.at(j);
+            const features = variation.fabric_type?.fabric_type_features;
 
-				if (!featureItem) {
-					continue;
-				}
+            if (!features) {
+                return result;
+            }
 
-				const feature = featureItem.material_feature_translation.at(0)?.name;
+            for (let j = 0; j < features.length; j++) {
+                const featureItem = features.at(j);
 
-				result.push(feature || '');
-			}
-		}
+                if (!featureItem) {
+                    continue;
+                }
 
-		return result;
-	}
+                const feature = featureItem.material_feature_translation.at(0)?.name;
+
+                result.push(feature || '');
+            }
+        }
+
+        return result;
+    }
 }
 
 export const productStore = new ProductStore();

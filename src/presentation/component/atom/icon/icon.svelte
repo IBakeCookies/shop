@@ -1,9 +1,9 @@
 <script lang="ts">
-	import type { ClassValue } from 'clsx';
+    import type { ClassValue } from 'clsx';
 
-	let { icon, style }: { icon: string; style?: ClassValue } = $props();
+    let { icon, style }: { icon: string; style?: ClassValue } = $props();
 </script>
 
 <svg class="icon {style}">
-	<use xlink:href="#{icon}" />
+    <use xlink:href="#{icon}" />
 </svg>
