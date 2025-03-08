@@ -11,6 +11,7 @@ const config = {
     kit: {
         adapter: adapter(),
         alias: {
+            '@src': './src',
             '@data': './src/data',
             '@store': './src/business/store',
             '@presentation': './src/presentation',

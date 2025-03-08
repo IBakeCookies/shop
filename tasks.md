@@ -48,3 +48,7 @@
 - Lighthouse google score MUST be > 80
 - Add a webp version of the images
 - Add a lazy loading to the images
+
+## Security
+
+- dont allow store hydration on the server

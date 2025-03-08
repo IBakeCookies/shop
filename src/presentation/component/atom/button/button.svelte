@@ -40,7 +40,7 @@
         }
 
         if (variant === 'secondary') {
-            return 'px-8 py-3 border-1 border-stone-200 text-stone-90 bg-white/20 backdrop-blur-sm hover:bg-stone-200';
+            return 'px-8 py-3 border-1 border-stone-200 text-stone-90 bg-white/70 backdrop-blur-sm hover:bg-stone-200';
         }
 
         return '';
@@ -52,7 +52,7 @@
     {...restProps}
     {href}
     class={cn(
-        'a-button flex cursor-pointer items-center justify-center transition-colors disabled:bg-zinc-500',
+        'a-button inline-flex cursor-pointer items-center justify-center transition-colors disabled:bg-zinc-500',
         currentVariant,
         modifier,
         {

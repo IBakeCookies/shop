@@ -1,13 +1,16 @@
 <script lang="ts">
     import type { Snippet } from 'svelte';
     import type { HTMLAttributes } from 'svelte/elements';
+    import type { ClassValue } from 'clsx';
+    import { cn } from '@presentation/utils/style';
 
     type Props = {
-        type: 'success' | 'info' | 'warning' | 'error' | 'state';
+        type: 'success' | 'info' | 'warning' | 'error' | 'state' | 'state-dark';
         children: Snippet;
+        modifier?: ClassValue;
     } & HTMLAttributes<any>;
 
-    let { type = 'state', children, ...restProps }: Props = $props();
+    let { type = 'state', children, modifier, ...props }: Props = $props();
 
     const style = $derived.by(() => {
         if (type === 'success') {
@@ -30,12 +33,18 @@
             return 'bg-stone-100 text-stone-900 border-stone-200';
         }
 
+        if (type === 'state-dark') {
+            return 'bg-stone-900 text-stone-100 border-stone-800';
+        }
+
         return '';
     });
 </script>
 
-<div {...restProps} class="alert border-b px-8 py-1 {style}">
-    {@render children()}
+<div {...props} class={cn('alert border-b px-8 py-1', modifier, style)}>
+    <div class="mx-auto max-w-screen-2xl">
+        {@render children()}
+    </div>
 
     <!-- <div class="box-s max-w-container mx-auto flex items-start {borderColorStyle(type)} {$$props.class || ''}">    
         <Icon class="icon-sm mr-box-s {stateIconColorStyle(type)}" icon={IconType[type]} />

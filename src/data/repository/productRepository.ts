@@ -95,6 +95,16 @@ export const readProductBySlug = (slug: string) =>
             `
 				id,
 				slug,
+				attribute_option (
+					attribute_option_translation (
+						name
+					),
+					...attribute_type (
+						attribute_type_translation (
+							name
+						)
+					)
+				),
 				product_item (
 					id,
 					price,
@@ -162,5 +172,7 @@ export const readProductBySlug = (slug: string) =>
             'product_composition.fabric_type_variation.fabric_type_composition.material.material_translation.language_id',
             1,
         )
+        .eq('attribute_option.attribute_option_translation.language_id', 1)
+        .eq('attribute_option.attribute_type.attribute_type_translation.language_id', 1)
         .eq('slug', slug)
         .single();

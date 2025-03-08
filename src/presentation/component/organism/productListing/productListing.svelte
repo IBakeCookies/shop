@@ -1,18 +1,20 @@
 <script lang="ts">
     import { cn } from '@presentation/utils/style';
-
+    import Money from '@atom/money/money.svelte';
     interface Props {
         image: {
             src: string;
             alt: string;
         };
-        colors: string[];
+        variants: {
+            salePrice: number;
+            colorName: string;
+        }[];
         name: string;
         price: number;
-        salePrice?: number;
     }
 
-    const { salePrice, image, colors, name, price, ...restProps }: Props = $props();
+    const { image, variants, name, price, ...restProps }: Props = $props();
 </script>
 
 <div
@@ -27,24 +29,15 @@
     </div>
 
     <div class="mt-auto border-t border-stone-200 font-bold">
-        <ul class="flex px-8 py-4">
-            {#each colors as color}
-                <li
-                    title={color}
-                    aria-label={color}
-                    class="mr-3 rounded-xl border-2 border-stone-300 p-2"
-                    style="background-color:{color}"
-                ></li>
-            {/each}
-        </ul>
-
-        <div class="text-md flex items-center justify-between border-t border-stone-200">
-            <h2 class="flex items-center px-8 py-4">
+        <div class="text-md grid grid-cols-12">
+            <h2 class="col-span-9 p-4">
                 {name}
             </h2>
 
-            <div class="ml-4 border-l border-stone-200 px-8 py-4">
-                {#if salePrice}
+            <div
+                class="col-span-3 flex items-center justify-center self-stretch border-l border-stone-200 p-4"
+            >
+                <!-- {#if salePrice}
                     <money class="block text-red-600">
                         €&nbsp;{salePrice}
                     </money>
@@ -56,8 +49,31 @@
                     class:text-stone-600={salePrice}
                 >
                     €&nbsp;{price}
-                </money>
+                </money> -->
+
+                <Money value={price}></Money>
             </div>
         </div>
+
+        <ul class="flex border-t border-stone-200 p-4">
+            {#each variants as variant (variant.colorName)}
+                <li
+                    title={variant.colorName}
+                    aria-label={variant.colorName}
+                    class="relative mr-3 rounded-xl border-2 border-stone-300 p-2"
+                    style="background-color:{variant.colorName}"
+                >
+                    {#if variant.salePrice}
+                        <!-- <money class="block text-red-600">
+                        €&nbsp;{variant.salePrice}
+                    </money> -->
+
+                        <span class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-full">
+                            %
+                        </span>
+                    {/if}
+                </li>
+            {/each}
+        </ul>
     </div>
 </div>

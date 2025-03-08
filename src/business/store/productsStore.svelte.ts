@@ -7,40 +7,21 @@ interface Product {
     brand: string;
     slug: string;
     price: number;
-    salePrice: number;
+    variants: {
+        salePrice: number;
+        colorName: string;
+    }[];
     image: {
         src: string;
         alt: string;
     };
-    colors: string[];
 }
 
-const products = $state<Product[]>([]);
+class ProductsStore {
+    products: Readonly<Product[]> = $state.raw([]);
 
-function transformProduct(product: ReadAllProductsSingleOutput): Product {
-    const name = product.product_translation.at(0)?.name || '';
-    const slug = product.slug || '';
-
-    return {
-        id: product.id,
-        name,
-        brand: product.brand || '',
-        slug,
-        price: product.product_item.at(0)?.price || 0,
-        salePrice: product.product_item.find((item) => item.sale_price)?.sale_price || 0,
-        image: {
-            src: `/${slug}/index.webp`,
-            alt: name,
-        },
-        colors: product.product_item.flatMap((item) => item.color.at(0)?.name || '') || [],
-    };
-}
-
-export const productsStore = {
-    products,
-
-    async getProducts() {
-        if (products.length) {
+    async getProducts(): Promise<void> {
+        if (this.products.length) {
             return;
         }
 
@@ -50,6 +31,31 @@ export const productsStore = {
             return;
         }
 
-        products.push(...data.map(transformProduct));
-    },
-};
+        this.products = data.map(this.transformProduct);
+    }
+
+    transformProduct(product: ReadAllProductsSingleOutput): Product {
+        const name = product.product_translation.at(0)?.name || '';
+        const slug = product.slug || '';
+
+        return {
+            id: product.id,
+            name,
+            brand: product.brand || '',
+            slug,
+            price: product.product_item.at(0)?.price || 0,
+            variants: product.product_item.map((item) => {
+                return {
+                    salePrice: item.sale_price || 0,
+                    colorName: item.color.at(0)?.name || '',
+                };
+            }),
+            image: {
+                src: `/${slug}/index.webp`,
+                alt: name,
+            },
+        };
+    }
+}
+
+export const productsStore = new ProductsStore();

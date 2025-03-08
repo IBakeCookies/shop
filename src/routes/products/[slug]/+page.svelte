@@ -1,13 +1,12 @@
 <script lang="ts">
+    import { SvelteSet } from 'svelte/reactivity';
+    import { enhance } from '$app/forms';
     import { productStore } from '@store/productStore.svelte';
+    import { eventStore } from '@store/evenStore.svelte';
+    import { pageStore } from '@store/pageStore.svelte';
     import Button from '@atom/button/button.svelte';
     import Radio from '@atom/radio/radio.svelte';
-    import { eventStore } from '@store/evenStore.svelte';
     // import { cartStore } from '@store/cartStore.svelte';
-    import { enhance } from '$app/forms';
-    import { SvelteSet } from 'svelte/reactivity';
-
-    $inspect(productStore.product);
 
     const isAddingToCart = $derived(eventStore.hasAny(['add-to-cart']));
     let colorModel = $state('');
@@ -44,14 +43,12 @@
         }
     });
 
-    $inspect(disabledColors);
-
     const salePrice = $derived.by(() => {
         return productStore.product.colors.find((color) => color.id === colorModel)?.salePrice;
     });
 </script>
 
-<article class="grid grid-cols-5">
+<article class="mx-auto grid max-w-screen-2xl grid-cols-6">
     <div class="col-span-3">
         <img
             src={productStore.product.image.src}
@@ -65,8 +62,8 @@
         />
     </div>
 
-    <div class=" col-span-2 h-full border-r border-l border-stone-200">
-        <div class="sticky top-[105px]">
+    <div class="col-span-3 h-full border-r border-l border-stone-200">
+        <div class="sticky" style="top: {pageStore.navHeight}px">
             <h2 class="p-8 text-4xl font-bold">
                 {productStore.product.name}
             </h2>
@@ -79,7 +76,7 @@
                 <h4 class="font-bold">Features</h4>
 
                 <ul class="mt-4 italic">
-                    {#each productStore.product.fabricFeatures as feature}
+                    {#each productStore.product.fabricFeatures as feature (feature)}
                         <li>{feature}</li>
                     {/each}
                 </ul>
@@ -87,8 +84,8 @@
 
             <form method="POST" action="?/addItemToCart" use:enhance>
                 <div class="grid grid-cols-10 items-center border-t border-stone-200">
-                    <fieldset class="col-span-3 flex gap-6 p-8">
-                        {#each productStore.product.colors as color}
+                    <fieldset class="col-span-4 flex gap-6 p-8">
+                        {#each productStore.product.colors as color (color.id)}
                             <Radio
                                 name="color"
                                 value={color.id}
@@ -102,8 +99,8 @@
                         {/each}
                     </fieldset>
 
-                    <fieldset class="col-span-4 flex gap-8 border-l border-stone-200 p-8">
-                        {#each productStore.product.sizes as size}
+                    <fieldset class="col-span-6 flex gap-8 border-l border-stone-200 p-8">
+                        {#each productStore.product.sizes as size (size.id)}
                             {@const isDisabled = isSizeDisabled(size.id)}
 
                             <Radio
@@ -119,11 +116,11 @@
                         {/each}
                     </fieldset>
 
-                    {#if stockForSelectedVariation !== null}
+                    <!-- {#if stockForSelectedVariation !== null}
                         <div class="col-span-3 border-l border-stone-200 p-8">
                             {stockForSelectedVariation} In Stock
                         </div>
-                    {/if}
+                    {/if} -->
                 </div>
 
                 <fieldset class="flex items-center border-t border-stone-200">
@@ -155,10 +152,22 @@
             </form>
 
             <div class="border-t border-stone-200 p-8">
+                <h4 class="font-bold">Size & fit</h4>
+
+                {#if productStore.product.attributes.length}
+                    <ul class="mt-4">
+                        {#each productStore.product.attributes as attribute (attribute.attribute)}
+                            <li>{attribute.attribute}: {attribute.value}</li>
+                        {/each}
+                    </ul>
+                {/if}
+            </div>
+
+            <div class="border-t border-stone-200 p-8">
                 <h4 class="font-bold">Care instructions</h4>
 
                 {#if productStore.product.fabricCareInstructions.length}
-                    {#each productStore.product.fabricCareInstructions as careInstructions}
+                    {#each productStore.product.fabricCareInstructions as careInstructions (careInstructions)}
                         <p class="mt-4">{careInstructions}</p>
                     {/each}
                 {/if}
@@ -168,7 +177,7 @@
                 <h4 class="font-bold">Materials & Fabrics</h4>
 
                 <ul class="mt-4">
-                    {#each productStore.product.productComposition as fabric}
+                    {#each productStore.product.productComposition as fabric (fabric.id)}
                         {@const variation = fabric.fabric_type_variation}
                         {#if variation}
                             <li>
@@ -182,7 +191,7 @@
                                 {variation.name}
                                 {variation.weight} gsm
 
-                                {#each variation.fabric_type_composition as composition}
+                                {#each variation.fabric_type_composition as composition (composition.material_translation.at(0)?.name)}
                                     ({composition.percentage}%
                                     {composition.material_translation.at(0)?.name})
                                 {/each}
@@ -204,3 +213,9 @@
         </div>
     </div>
 </article>
+
+<section class="bg-stone-900 p-8 text-stone-50">
+    <article class="mx-auto max-w-screen-2xl">
+        <h2 class="text-3xl">Similar styles</h2>
+    </article>
+</section>

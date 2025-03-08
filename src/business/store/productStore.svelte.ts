@@ -18,6 +18,11 @@ interface ProductVariations {
     [key: string]: unknown;
 }
 
+interface Attribute {
+    attribute: string;
+    value: string;
+}
+
 class ProductStore {
     product = $state.raw({
         name: '',
@@ -35,22 +40,15 @@ class ProductStore {
         sizes: [] as ProductSize[],
         price: 0,
         variations: {} as ProductVariations,
+        attributes: [] as Attribute[],
     });
 
-    constructor(data = this.product) {
-        Object.assign(this.product, data);
-    }
-
-    async getProduct(slug: string) {
+    async getProduct(slug: string): Promise<void> {
         const { data, error } = await readProductBySlug(slug);
 
         if (!data || error) {
             return;
         }
-
-        console.log({
-            data,
-        });
 
         const name = data.product_translation.at(0)?.name || '';
 
@@ -78,13 +76,21 @@ class ProductStore {
                 alt: name,
             },
             colors: this.getColors(data),
+            attributes: this.getAttributes(data),
             sizes: this.getSizes(data),
             price: data.product_item.at(0)?.price || 0,
             variations: this.getVariations(data),
         };
     }
 
-    private getColors(product: ReadProductBySlugOutput) {
+    private getAttributes(product: ReadProductBySlugOutput): Attribute[] {
+        return product.attribute_option.map((option) => ({
+            attribute: option.attribute_type_translation.at(0)?.name || '',
+            value: option.attribute_option_translation.at(0)?.name || '',
+        }));
+    }
+
+    private getColors(product: ReadProductBySlugOutput): ProductColor[] {
         return product.product_item
             .map((item) => ({
                 id: item.color_id,
@@ -94,7 +100,7 @@ class ProductStore {
             .sort((a, b) => `${a.name}`.localeCompare(b.name));
     }
 
-    private getSizes(product: ReadProductBySlugOutput) {
+    private getSizes(product: ReadProductBySlugOutput): ProductSize[] {
         const seen = new Set();
         const result: ProductSize[] = [];
 
@@ -116,7 +122,7 @@ class ProductStore {
         return result.sort((a, b) => a.id - b.id);
     }
 
-    private getVariations(product: ReadProductBySlugOutput) {
+    private getVariations(product: ReadProductBySlugOutput): ProductVariations {
         return product.product_item.reduce((acc, item) => {
             const colorId = item.color_id;
 
@@ -136,7 +142,7 @@ class ProductStore {
         }, {});
     }
 
-    private getFabricFeatures(product: ReadProductBySlugOutput) {
+    private getFabricFeatures(product: ReadProductBySlugOutput): string[] {
         const result: string[] = [];
 
         for (let i = 0; i < product.product_composition.length; i++) {

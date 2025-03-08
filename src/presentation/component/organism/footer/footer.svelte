@@ -3,9 +3,9 @@
     // import Icon from '@iconify/svelte';
 </script>
 
-<footer class="border-t border-stone-200 bg-white text-stone-700">
+<footer class="border-t border-stone-200">
     <div
-        class="mx-auto grid max-w-[120rem] grid-cols-1 gap-4 p-8 py-20 lg:grid-cols-3 xl:grid-cols-4"
+        class="mx-auto grid max-w-screen-2xl grid-cols-1 gap-4 p-8 py-20 lg:grid-cols-3 xl:grid-cols-4"
     >
         <p class="order-10 font-bold lg:order-1">Made with ❤️ in Hamburg, Germany</p>
 
