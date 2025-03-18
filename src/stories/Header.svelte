@@ -3,7 +3,9 @@
     import Button from './Button.svelte';
 
     interface Props {
-        user?: { name: string };
+        user?: {
+            name: string;
+        };
         onLogin?: () => void;
         onLogout?: () => void;
         onCreateAccount?: () => void;
@@ -15,7 +17,12 @@
 <header>
     <div class="storybook-header">
         <div>
-            <svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+            <svg
+                width="32"
+                height="32"
+                viewBox="0 0 32 32"
+                xmlns="http://www.w3.org/2000/svg"
+            >
                 <g fill="none" fill-rule="evenodd">
                     <path
                         d="M10 0h12a10 10 0 0110 10v12a10 10 0 01-10 10H10A10 10 0 010 22V10A10 10 0 0110 0z"
@@ -41,7 +48,12 @@
                 <Button size="small" onClick={onLogout} label="Log out" />
             {:else}
                 <Button size="small" onClick={onLogin} label="Log in" />
-                <Button primary size="small" onClick={onCreateAccount} label="Sign up" />
+                <Button
+                    primary
+                    size="small"
+                    onClick={onCreateAccount}
+                    label="Sign up"
+                />
             {/if}
         </div>
     </div>

@@ -25,7 +25,9 @@
         });
 
         await expect(loginButton).toBeInTheDocument();
+
         await userEvent.click(loginButton);
+
         await waitFor(() => expect(loginButton).not.toBeInTheDocument());
 
         const logoutButton = canvas.getByRole('button', {

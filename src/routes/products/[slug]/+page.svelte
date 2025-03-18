@@ -1,60 +1,141 @@
 <script lang="ts">
-    import { SvelteSet } from 'svelte/reactivity';
+    import type { PageProps } from './$types';
     import { enhance } from '$app/forms';
-    import { productStore } from '@store/productStore.svelte';
-    import { eventStore } from '@store/evenStore.svelte';
+    import { fly } from 'svelte/transition';
+    import { getEventStore } from '@store/eventStore.svelte';
     import { pageStore } from '@store/pageStore.svelte';
+    import { getCartStore } from '@store/cartStore.svelte';
+    import { getNotificationStore } from '@store/notificationStore.svelte';
+    import { setProductStore } from '@store/productStore.svelte';
+    import { getFly } from '@presentation/utils/fly';
     import Button from '@atom/button/button.svelte';
     import Radio from '@atom/radio/radio.svelte';
-    // import { cartStore } from '@store/cartStore.svelte';
+    import Sale from '@atom/sale/sale.svelte';
+
+    const { data }: PageProps = $props();
+    const productStore = setProductStore();
+    const notificationStore = getNotificationStore();
+    const eventStore = getEventStore();
+    const cartStore = getCartStore();
+
+    productStore.product = data.product;
 
     const isAddingToCart = $derived(eventStore.hasAny(['add-to-cart']));
-    let colorModel = $state('');
-    let sizeModel = $state('');
-    let disabledColors = new SvelteSet<string>();
 
-    const stockForSelectedVariation: number | null = $derived.by(() => {
-        if (!colorModel || !sizeModel || !productStore.product.variations[colorModel]) {
+    let colorModel = $state(-1);
+    let sizeModel = $state(-1);
+
+    const selectedVariation = $derived.by(() => {
+        if (!colorModel || !sizeModel) {
             return null;
         }
 
-        return productStore.product.variations[colorModel][sizeModel];
+        return productStore.product.productVariation.find((variation) => {
+            return (
+                variation.colorId === colorModel &&
+                variation.size_reference.id === sizeModel
+            );
+        });
     });
 
-    function isSizeDisabled(id: number): boolean | null {
-        if (!colorModel || !productStore.product.variations[colorModel]) {
+    const availableStock: number | null = $derived.by(() => {
+        if (!selectedVariation) {
             return null;
         }
 
-        return Boolean(!productStore.product.variations[colorModel][id]);
-    }
+        return selectedVariation.stock;
+    });
 
-    $effect(() => {
-        if (!sizeModel) {
-            return;
+    const disabledSizes = $derived.by(() => {
+        const result = new Set();
+
+        if (!colorModel) {
+            return result;
         }
 
-        for (const color in productStore.product.variations) {
-            if (!productStore.product.variations[color][sizeModel]) {
-                disabledColors.add(color);
-            } else {
-                disabledColors.delete(color);
+        productStore.product.productVariation.forEach((variation) => {
+            if (variation.colorId === colorModel && variation.stock === 0) {
+                result.add(variation.size_reference.id);
             }
-        }
+        });
+
+        return result;
     });
 
-    const salePrice = $derived.by(() => {
-        return productStore.product.colors.find((color) => color.id === colorModel)?.salePrice;
+    const disabledColors = $derived.by(() => {
+        const result = new Set();
+
+        if (!sizeModel) {
+            return result;
+        }
+
+        productStore.product.productVariation.forEach((variation) => {
+            if (
+                variation.size_reference.id === sizeModel &&
+                variation.stock === 0
+            ) {
+                result.add(variation.colorId);
+            }
+        });
+
+        return result;
     });
+
+    const salePrice: number = $derived.by(() => {
+        if (!colorModel) {
+            return 0;
+        }
+
+        return (
+            productStore.product.productVariation.find(
+                (variation) => variation.colorId === colorModel,
+            )?.salePrice || 0
+        );
+    });
+
+    async function submit({
+        formElement,
+        formData,
+        action,
+        cancel,
+        submitter,
+    }) {
+        if (!selectedVariation) {
+            return cancel();
+        }
+
+        const { success, error } = await cartStore.addItem({
+            id: selectedVariation.id,
+            stock: selectedVariation.stock,
+            quantity: 1,
+        });
+
+        if (success) {
+            notificationStore.addNotification({
+                title: success,
+            });
+        }
+
+        if (error) {
+            notificationStore.addNotification({
+                title: error,
+                type: 'warning',
+            });
+
+            cancel();
+        }
+
+        return async ({ result, update }) => {
+            update();
+        };
+    }
 </script>
 
-<article class="mx-auto grid max-w-screen-2xl grid-cols-6">
+<article
+    in:fly={getFly()}
+    class="mx-auto grid max-w-screen-2xl grid-cols-1 xl:grid-cols-6"
+>
     <div class="col-span-3">
-        <img
-            src={productStore.product.image.src}
-            alt={productStore.product.image.alt}
-            class="max-w-full"
-        />
         <img
             src={productStore.product.image.src}
             alt={productStore.product.image.alt}
@@ -70,6 +151,12 @@
 
             <p class="border-t border-stone-200 p-8">
                 {productStore.product.description}
+
+                {#if productStore.product.about}
+                    <span class="mt-4 block font-bold italic">
+                        {productStore.product.about}
+                    </span>
+                {/if}
             </p>
 
             <div class="border-t border-stone-200 p-8">
@@ -77,14 +164,24 @@
 
                 <ul class="mt-4 italic">
                     {#each productStore.product.fabricFeatures as feature (feature)}
-                        <li>{feature}</li>
+                        <li>
+                            {feature}
+                        </li>
                     {/each}
                 </ul>
             </div>
 
-            <form method="POST" action="?/addItemToCart" use:enhance>
-                <div class="grid grid-cols-10 items-center border-t border-stone-200">
-                    <fieldset class="col-span-4 flex gap-6 p-8">
+            <form method="POST" action="?/addItemToCart" use:enhance={submit}>
+                {#if selectedVariation}
+                    <input
+                        type="hidden"
+                        name="productVariationId"
+                        value={selectedVariation.id}
+                    />
+                {/if}
+
+                <div class="flex items-center border-t border-stone-200">
+                    <fieldset class="flex gap-4 p-8">
                         {#each productStore.product.colors as color (color.id)}
                             <Radio
                                 name="color"
@@ -92,33 +189,35 @@
                                 id={`${color.id}`}
                                 required
                                 bind:group={colorModel}
-                                disabled={disabledColors.has(`${color.id}`)}
+                                disabled={disabledColors.has(color.id)}
+                                style={`background-color: #${color.hex};`}
+                                title={color.name}
                             >
-                                {color.name}
+                                {#if color.salePrice}
+                                    <Sale value={`€${color.salePrice}`}></Sale>
+                                {/if}
                             </Radio>
                         {/each}
                     </fieldset>
 
-                    <fieldset class="col-span-6 flex gap-8 border-l border-stone-200 p-8">
+                    <fieldset class="flex gap-4 border-l border-stone-200 p-8">
                         {#each productStore.product.sizes as size (size.id)}
-                            {@const isDisabled = isSizeDisabled(size.id)}
-
                             <Radio
                                 name="size"
                                 value={size.id}
                                 id={`${size.id}`}
                                 required
                                 bind:group={sizeModel}
-                                disabled={isDisabled}
+                                disabled={disabledSizes.has(size.id)}
                             >
                                 {size.name}
                             </Radio>
                         {/each}
                     </fieldset>
 
-                    <!-- {#if stockForSelectedVariation !== null}
+                    <!-- {#if availableStock !== null}
                         <div class="col-span-3 border-l border-stone-200 p-8">
-                            {stockForSelectedVariation} In Stock
+                            {availableStock} In Stock
                         </div>
                     {/if} -->
                 </div>
@@ -126,7 +225,9 @@
                 <fieldset class="flex items-center border-t border-stone-200">
                     <div class="p-8 text-2xl font-bold">
                         {#if salePrice}
-                            <money class="block text-red-500">€ {salePrice}</money>
+                            <money class="block text-red-500"
+                                >€&nbsp;{salePrice}</money
+                            >
                         {/if}
 
                         <money
@@ -134,7 +235,7 @@
                             class:text-stone-600={salePrice}
                             class:text-base={salePrice}
                         >
-                            € {productStore.product.price}
+                            €&nbsp;{productStore.product.price}
                         </money>
                     </div>
 
@@ -142,8 +243,8 @@
                         <Button
                             modifier="w-full"
                             isLoading={isAddingToCart}
-                            disabled={stockForSelectedVariation !== null &&
-                                stockForSelectedVariation === 0}
+                            disabled={availableStock !== null &&
+                                availableStock === 0}
                         >
                             Add to cart
                         </Button>
@@ -157,7 +258,10 @@
                 {#if productStore.product.attributes.length}
                     <ul class="mt-4">
                         {#each productStore.product.attributes as attribute (attribute.attribute)}
-                            <li>{attribute.attribute}: {attribute.value}</li>
+                            <li>
+                                {attribute.attribute}:
+                                {attribute.value}
+                            </li>
                         {/each}
                     </ul>
                 {/if}
@@ -168,7 +272,9 @@
 
                 {#if productStore.product.fabricCareInstructions.length}
                     {#each productStore.product.fabricCareInstructions as careInstructions (careInstructions)}
-                        <p class="mt-4">{careInstructions}</p>
+                        <p class="mt-4">
+                            {careInstructions}
+                        </p>
                     {/each}
                 {/if}
             </div>
@@ -181,7 +287,8 @@
                         {@const variation = fabric.fabric_type_variation}
                         {#if variation}
                             <li>
-                                {fabric.product_part_translation.at(0)?.name} made from
+                                {fabric.product_part_translation.at(0)?.name}
+                                made from
 
                                 {#if fabric.percentage !== 100}
                                     {fabric.percentage}%
@@ -189,11 +296,13 @@
 
                                 {variation.fabric_type?.name}
                                 {variation.name}
-                                {variation.weight} gsm
+                                {variation.weight}
+                                gsm
 
                                 {#each variation.fabric_type_composition as composition (composition.material_translation.at(0)?.name)}
                                     ({composition.percentage}%
-                                    {composition.material_translation.at(0)?.name})
+                                    {composition.material_translation.at(0)
+                                        ?.name})
                                 {/each}
                             </li>
                         {/if}
@@ -214,8 +323,8 @@
     </div>
 </article>
 
-<section class="bg-stone-900 p-8 text-stone-50">
+<!-- <section class="bg-stone-900 p-8 text-stone-100">
     <article class="mx-auto max-w-screen-2xl">
         <h2 class="text-3xl">Similar styles</h2>
     </article>
-</section>
+</section> -->

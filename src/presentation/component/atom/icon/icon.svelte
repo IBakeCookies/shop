@@ -1,7 +1,13 @@
 <script lang="ts">
     import type { ClassValue } from 'clsx';
 
-    let { icon, style }: { icon: string; style?: ClassValue } = $props();
+    let {
+        icon,
+        style,
+    }: {
+        icon: string;
+        style?: ClassValue;
+    } = $props();
 </script>
 
 <svg class="icon {style}">

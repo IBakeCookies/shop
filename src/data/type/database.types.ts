@@ -1,4 +1,12 @@
-export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
+export type Json =
+    | string
+    | number
+    | boolean
+    | null
+    | {
+          [key: string]: Json | undefined;
+      }
+    | Json[];
 
 export type Database = {
     public: {
@@ -29,17 +37,17 @@ export type Database = {
             attribute_option_translation: {
                 Row: {
                     attribute_option_id: number;
-                    language_id: number;
+                    language_code: string;
                     name: string;
                 };
                 Insert: {
                     attribute_option_id: number;
-                    language_id: number;
+                    language_code: string;
                     name: string;
                 };
                 Update: {
                     attribute_option_id?: number;
-                    language_id?: number;
+                    language_code?: string;
                     name?: string;
                 };
                 Relationships: [
@@ -51,11 +59,11 @@ export type Database = {
                         referencedColumns: ['id'];
                     },
                     {
-                        foreignKeyName: 'attribute_option_translation_language_id_fkey';
-                        columns: ['language_id'];
+                        foreignKeyName: 'attribute_option_translation_language_code_fkey';
+                        columns: ['language_code'];
                         isOneToOne: false;
                         referencedRelation: 'language';
-                        referencedColumns: ['id'];
+                        referencedColumns: ['code'];
                     },
                 ];
             };
@@ -74,17 +82,17 @@ export type Database = {
             attribute_type_translation: {
                 Row: {
                     attribute_type_id: number;
-                    language_id: number;
+                    language_code: string;
                     name: string;
                 };
                 Insert: {
                     attribute_type_id: number;
-                    language_id: number;
+                    language_code: string;
                     name: string;
                 };
                 Update: {
                     attribute_type_id?: number;
-                    language_id?: number;
+                    language_code?: string;
                     name?: string;
                 };
                 Relationships: [
@@ -96,11 +104,11 @@ export type Database = {
                         referencedColumns: ['id'];
                     },
                     {
-                        foreignKeyName: 'attribute_type_translation_language_id_fkey';
-                        columns: ['language_id'];
+                        foreignKeyName: 'attribute_type_translation_language_code_fkey';
+                        columns: ['language_code'];
                         isOneToOne: false;
                         referencedRelation: 'language';
-                        referencedColumns: ['id'];
+                        referencedColumns: ['code'];
                     },
                 ];
             };
@@ -123,17 +131,17 @@ export type Database = {
                 Row: {
                     brand_id: number;
                     description: string;
-                    language_id: number;
+                    language_code: string;
                 };
                 Insert: {
                     brand_id: number;
                     description: string;
-                    language_id: number;
+                    language_code: string;
                 };
                 Update: {
                     brand_id?: number;
                     description?: string;
-                    language_id?: number;
+                    language_code?: string;
                 };
                 Relationships: [
                     {
@@ -144,11 +152,11 @@ export type Database = {
                         referencedColumns: ['id'];
                     },
                     {
-                        foreignKeyName: 'brand_translation_language_id_fkey';
-                        columns: ['language_id'];
+                        foreignKeyName: 'brand_translation_language_code_fkey';
+                        columns: ['language_code'];
                         isOneToOne: false;
                         referencedRelation: 'language';
-                        referencedColumns: ['id'];
+                        referencedColumns: ['code'];
                     },
                 ];
             };
@@ -170,17 +178,17 @@ export type Database = {
             color_translation: {
                 Row: {
                     color_id: number;
-                    language_id: number;
+                    language_code: string;
                     name: string;
                 };
                 Insert: {
                     color_id: number;
-                    language_id: number;
+                    language_code: string;
                     name: string;
                 };
                 Update: {
                     color_id?: number;
-                    language_id?: number;
+                    language_code?: string;
                     name?: string;
                 };
                 Relationships: [
@@ -192,11 +200,11 @@ export type Database = {
                         referencedColumns: ['id'];
                     },
                     {
-                        foreignKeyName: 'color_translation_language_id_fkey';
-                        columns: ['language_id'];
+                        foreignKeyName: 'color_translation_language_code_fkey';
+                        columns: ['language_code'];
                         isOneToOne: false;
                         referencedRelation: 'language';
-                        referencedColumns: ['id'];
+                        referencedColumns: ['code'];
                     },
                 ];
             };
@@ -283,19 +291,19 @@ export type Database = {
                     about: string | null;
                     care_instructions: string;
                     fabric_type_id: number;
-                    language_id: number;
+                    language_code: string;
                 };
                 Insert: {
                     about?: string | null;
                     care_instructions: string;
                     fabric_type_id: number;
-                    language_id: number;
+                    language_code: string;
                 };
                 Update: {
                     about?: string | null;
                     care_instructions?: string;
                     fabric_type_id?: number;
-                    language_id?: number;
+                    language_code?: string;
                 };
                 Relationships: [
                     {
@@ -306,11 +314,11 @@ export type Database = {
                         referencedColumns: ['id'];
                     },
                     {
-                        foreignKeyName: 'fabric_type_translation_language_id_fkey';
-                        columns: ['language_id'];
+                        foreignKeyName: 'fabric_type_translation_language_code_fkey';
+                        columns: ['language_code'];
                         isOneToOne: false;
                         referencedRelation: 'language';
-                        referencedColumns: ['id'];
+                        referencedColumns: ['code'];
                     },
                 ];
             };
@@ -346,17 +354,17 @@ export type Database = {
             language: {
                 Row: {
                     code: string;
-                    id: number;
+                    direction: string;
                     name: string;
                 };
                 Insert: {
                     code: string;
-                    id?: number;
+                    direction: string;
                     name: string;
                 };
                 Update: {
                     code?: string;
-                    id?: number;
+                    direction?: string;
                     name?: string;
                 };
                 Relationships: [];
@@ -387,27 +395,27 @@ export type Database = {
             };
             material_feature_translation: {
                 Row: {
-                    language_id: number;
+                    language_code: string;
                     material_feature_id: number;
                     name: string;
                 };
                 Insert: {
-                    language_id: number;
+                    language_code: string;
                     material_feature_id: number;
                     name: string;
                 };
                 Update: {
-                    language_id?: number;
+                    language_code?: string;
                     material_feature_id?: number;
                     name?: string;
                 };
                 Relationships: [
                     {
-                        foreignKeyName: 'material_feature_translation_language_id_fkey';
-                        columns: ['language_id'];
+                        foreignKeyName: 'material_feature_translation_language_code_fkey';
+                        columns: ['language_code'];
                         isOneToOne: false;
                         referencedRelation: 'language';
-                        referencedColumns: ['id'];
+                        referencedColumns: ['code'];
                     },
                     {
                         foreignKeyName: 'material_feature_translation_material_feature_id_fkey';
@@ -451,29 +459,29 @@ export type Database = {
             material_translation: {
                 Row: {
                     care_instructions: string | null;
-                    language_id: number;
+                    language_code: string;
                     material_id: number;
                     name: string;
                 };
                 Insert: {
                     care_instructions?: string | null;
-                    language_id: number;
+                    language_code: string;
                     material_id: number;
                     name: string;
                 };
                 Update: {
                     care_instructions?: string | null;
-                    language_id?: number;
+                    language_code?: string;
                     material_id?: number;
                     name?: string;
                 };
                 Relationships: [
                     {
-                        foreignKeyName: 'material_translation_language_id_fkey';
-                        columns: ['language_id'];
+                        foreignKeyName: 'material_translation_language_code_fkey';
+                        columns: ['language_code'];
                         isOneToOne: false;
                         referencedRelation: 'language';
-                        referencedColumns: ['id'];
+                        referencedColumns: ['code'];
                     },
                     {
                         foreignKeyName: 'material_translation_material_id_fkey';
@@ -617,29 +625,29 @@ export type Database = {
             product_category_translation: {
                 Row: {
                     description: string;
-                    language_id: number;
+                    language_code: string;
                     name: string;
                     product_category_id: number;
                 };
                 Insert: {
                     description: string;
-                    language_id: number;
+                    language_code: string;
                     name: string;
                     product_category_id: number;
                 };
                 Update: {
                     description?: string;
-                    language_id?: number;
+                    language_code?: string;
                     name?: string;
                     product_category_id?: number;
                 };
                 Relationships: [
                     {
-                        foreignKeyName: 'product_category_translation_language_id_fkey';
-                        columns: ['language_id'];
+                        foreignKeyName: 'product_category_translation_language_code_fkey';
+                        columns: ['language_code'];
                         isOneToOne: false;
                         referencedRelation: 'language';
-                        referencedColumns: ['id'];
+                        referencedColumns: ['code'];
                     },
                     {
                         foreignKeyName: 'product_category_translation_product_category_id_fkey';
@@ -720,27 +728,27 @@ export type Database = {
             };
             product_feature_translation: {
                 Row: {
-                    language_id: number;
+                    language_code: string;
                     name: string;
                     product_feature_id: number;
                 };
                 Insert: {
-                    language_id: number;
+                    language_code: string;
                     name: string;
                     product_feature_id: number;
                 };
                 Update: {
-                    language_id?: number;
+                    language_code?: string;
                     name?: string;
                     product_feature_id?: number;
                 };
                 Relationships: [
                     {
-                        foreignKeyName: 'product_feature_translation_language_id_fkey';
-                        columns: ['language_id'];
+                        foreignKeyName: 'product_feature_translation_language_code_fkey';
+                        columns: ['language_code'];
                         isOneToOne: false;
                         referencedRelation: 'language';
-                        referencedColumns: ['id'];
+                        referencedColumns: ['code'];
                     },
                     {
                         foreignKeyName: 'product_feature_translation_product_feature_id_fkey';
@@ -869,27 +877,27 @@ export type Database = {
             };
             product_part_translation: {
                 Row: {
-                    language_id: number;
+                    language_code: string;
                     name: string;
                     product_part_id: number;
                 };
                 Insert: {
-                    language_id: number;
+                    language_code: string;
                     name: string;
                     product_part_id: number;
                 };
                 Update: {
-                    language_id?: number;
+                    language_code?: string;
                     name?: string;
                     product_part_id?: number;
                 };
                 Relationships: [
                     {
-                        foreignKeyName: 'product_part_translation_language_id_fkey';
-                        columns: ['language_id'];
+                        foreignKeyName: 'product_part_translation_language_code_fkey';
+                        columns: ['language_code'];
                         isOneToOne: false;
                         referencedRelation: 'language';
-                        referencedColumns: ['id'];
+                        referencedColumns: ['code'];
                     },
                     {
                         foreignKeyName: 'product_part_translation_product_part_id_fkey';
@@ -905,7 +913,7 @@ export type Database = {
                     about: string | null;
                     care_instructions: string | null;
                     description: string;
-                    language_id: number;
+                    language_code: string;
                     name: string;
                     product_id: number;
                 };
@@ -913,7 +921,7 @@ export type Database = {
                     about?: string | null;
                     care_instructions?: string | null;
                     description: string;
-                    language_id: number;
+                    language_code: string;
                     name: string;
                     product_id: number;
                 };
@@ -921,17 +929,17 @@ export type Database = {
                     about?: string | null;
                     care_instructions?: string | null;
                     description?: string;
-                    language_id?: number;
+                    language_code?: string;
                     name?: string;
                     product_id?: number;
                 };
                 Relationships: [
                     {
-                        foreignKeyName: 'product_translation_language_id_fkey';
-                        columns: ['language_id'];
+                        foreignKeyName: 'product_translation_language_code_fkey';
+                        columns: ['language_code'];
                         isOneToOne: false;
                         referencedRelation: 'language';
-                        referencedColumns: ['id'];
+                        referencedColumns: ['code'];
                     },
                     {
                         foreignKeyName: 'product_translation_product_id_fkey';
@@ -1084,27 +1092,27 @@ export type Database = {
             };
             size_category_translation: {
                 Row: {
-                    language_id: number;
+                    language_code: string;
                     name: string;
                     size_category_id: number;
                 };
                 Insert: {
-                    language_id: number;
+                    language_code: string;
                     name: string;
                     size_category_id: number;
                 };
                 Update: {
-                    language_id?: number;
+                    language_code?: string;
                     name?: string;
                     size_category_id?: number;
                 };
                 Relationships: [
                     {
-                        foreignKeyName: 'size_category_translation_language_id_fkey';
-                        columns: ['language_id'];
+                        foreignKeyName: 'size_category_translation_language_code_fkey';
+                        columns: ['language_code'];
                         isOneToOne: false;
                         referencedRelation: 'language';
-                        referencedColumns: ['id'];
+                        referencedColumns: ['code'];
                     },
                     {
                         foreignKeyName: 'size_category_translation_size_category_id_fkey';
@@ -1187,20 +1195,28 @@ type PublicSchema = Database[Extract<keyof Database, 'public'>];
 export type Tables<
     PublicTableNameOrOptions extends
         | keyof (PublicSchema['Tables'] & PublicSchema['Views'])
-        | { schema: keyof Database },
-    TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
+        | {
+              schema: keyof Database;
+          },
+    TableName extends PublicTableNameOrOptions extends {
+        schema: keyof Database;
+    }
         ? keyof (Database[PublicTableNameOrOptions['schema']]['Tables'] &
               Database[PublicTableNameOrOptions['schema']]['Views'])
         : never = never,
-> = PublicTableNameOrOptions extends { schema: keyof Database }
+> = PublicTableNameOrOptions extends {
+    schema: keyof Database;
+}
     ? (Database[PublicTableNameOrOptions['schema']]['Tables'] &
           Database[PublicTableNameOrOptions['schema']]['Views'])[TableName] extends {
           Row: infer R;
       }
         ? R
         : never
-    : PublicTableNameOrOptions extends keyof (PublicSchema['Tables'] & PublicSchema['Views'])
-      ? (PublicSchema['Tables'] & PublicSchema['Views'])[PublicTableNameOrOptions] extends {
+    : PublicTableNameOrOptions extends keyof (PublicSchema['Tables'] &
+            PublicSchema['Views'])
+      ? (PublicSchema['Tables'] &
+            PublicSchema['Views'])[PublicTableNameOrOptions] extends {
             Row: infer R;
         }
           ? R
@@ -1208,11 +1224,19 @@ export type Tables<
       : never;
 
 export type TablesInsert<
-    PublicTableNameOrOptions extends keyof PublicSchema['Tables'] | { schema: keyof Database },
-    TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
+    PublicTableNameOrOptions extends
+        | keyof PublicSchema['Tables']
+        | {
+              schema: keyof Database;
+          },
+    TableName extends PublicTableNameOrOptions extends {
+        schema: keyof Database;
+    }
         ? keyof Database[PublicTableNameOrOptions['schema']]['Tables']
         : never = never,
-> = PublicTableNameOrOptions extends { schema: keyof Database }
+> = PublicTableNameOrOptions extends {
+    schema: keyof Database;
+}
     ? Database[PublicTableNameOrOptions['schema']]['Tables'][TableName] extends {
           Insert: infer I;
       }
@@ -1227,11 +1251,19 @@ export type TablesInsert<
       : never;
 
 export type TablesUpdate<
-    PublicTableNameOrOptions extends keyof PublicSchema['Tables'] | { schema: keyof Database },
-    TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
+    PublicTableNameOrOptions extends
+        | keyof PublicSchema['Tables']
+        | {
+              schema: keyof Database;
+          },
+    TableName extends PublicTableNameOrOptions extends {
+        schema: keyof Database;
+    }
         ? keyof Database[PublicTableNameOrOptions['schema']]['Tables']
         : never = never,
-> = PublicTableNameOrOptions extends { schema: keyof Database }
+> = PublicTableNameOrOptions extends {
+    schema: keyof Database;
+}
     ? Database[PublicTableNameOrOptions['schema']]['Tables'][TableName] extends {
           Update: infer U;
       }
@@ -1246,11 +1278,19 @@ export type TablesUpdate<
       : never;
 
 export type Enums<
-    PublicEnumNameOrOptions extends keyof PublicSchema['Enums'] | { schema: keyof Database },
-    EnumName extends PublicEnumNameOrOptions extends { schema: keyof Database }
+    PublicEnumNameOrOptions extends
+        | keyof PublicSchema['Enums']
+        | {
+              schema: keyof Database;
+          },
+    EnumName extends PublicEnumNameOrOptions extends {
+        schema: keyof Database;
+    }
         ? keyof Database[PublicEnumNameOrOptions['schema']]['Enums']
         : never = never,
-> = PublicEnumNameOrOptions extends { schema: keyof Database }
+> = PublicEnumNameOrOptions extends {
+    schema: keyof Database;
+}
     ? Database[PublicEnumNameOrOptions['schema']]['Enums'][EnumName]
     : PublicEnumNameOrOptions extends keyof PublicSchema['Enums']
       ? PublicSchema['Enums'][PublicEnumNameOrOptions]
@@ -1259,13 +1299,17 @@ export type Enums<
 export type CompositeTypes<
     PublicCompositeTypeNameOrOptions extends
         | keyof PublicSchema['CompositeTypes']
-        | { schema: keyof Database },
+        | {
+              schema: keyof Database;
+          },
     CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
         schema: keyof Database;
     }
         ? keyof Database[PublicCompositeTypeNameOrOptions['schema']]['CompositeTypes']
         : never = never,
-> = PublicCompositeTypeNameOrOptions extends { schema: keyof Database }
+> = PublicCompositeTypeNameOrOptions extends {
+    schema: keyof Database;
+}
     ? Database[PublicCompositeTypeNameOrOptions['schema']]['CompositeTypes'][CompositeTypeName]
     : PublicCompositeTypeNameOrOptions extends keyof PublicSchema['CompositeTypes']
       ? PublicSchema['CompositeTypes'][PublicCompositeTypeNameOrOptions]

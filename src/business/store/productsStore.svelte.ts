@@ -1,61 +1,48 @@
-import type { ReadAllProductsSingleOutput } from '@data/repository/productRepository';
+import { getContext, setContext } from 'svelte';
 import { readAllProducts } from '@data/repository/productRepository';
+import {
+    type ProductListing,
+    transformProduct,
+} from '@src/business/transform/productListingTransform';
 
-interface Product {
-    id: number;
-    name: string;
-    brand: string;
-    slug: string;
-    price: number;
-    variants: {
-        salePrice: number;
-        colorName: string;
-    }[];
-    image: {
-        src: string;
-        alt: string;
-    };
-}
-
-class ProductsStore {
-    products: Readonly<Product[]> = $state.raw([]);
-
-    async getProducts(): Promise<void> {
-        if (this.products.length) {
-            return;
-        }
-
+export async function getProducts(): Promise<ProductListing[]> {
+    try {
         const { data, error } = await readAllProducts();
 
         if (!data || error) {
-            return;
+            return [];
         }
 
-        this.products = data.map(this.transformProduct);
-    }
+        return data.map(transformProduct);
+    } catch (error) {
+        console.error(error);
 
-    transformProduct(product: ReadAllProductsSingleOutput): Product {
-        const name = product.product_translation.at(0)?.name || '';
-        const slug = product.slug || '';
-
-        return {
-            id: product.id,
-            name,
-            brand: product.brand || '',
-            slug,
-            price: product.product_item.at(0)?.price || 0,
-            variants: product.product_item.map((item) => {
-                return {
-                    salePrice: item.sale_price || 0,
-                    colorName: item.color.at(0)?.name || '',
-                };
-            }),
-            image: {
-                src: `/${slug}/index.webp`,
-                alt: name,
-            },
-        };
+        return [];
     }
 }
 
-export const productsStore = new ProductsStore();
+const CONTEXT_KEY = Symbol();
+
+class ProductsStore {
+    products: ProductListing[] = $state.raw([]);
+
+    constructor(products?: ProductListing[]) {
+        if (products) {
+            this.products = products;
+        }
+    }
+
+    async getProducts() {
+        const data = await getProducts();
+
+        this.products = data;
+    }
+}
+
+export function setProductsStore(products?: ProductListing[]) {
+    return setContext<ProductsStore>(CONTEXT_KEY, new ProductsStore(products));
+}
+
+export function getProductsStore() {
+    return getContext<ProductsStore>(CONTEXT_KEY);
+}

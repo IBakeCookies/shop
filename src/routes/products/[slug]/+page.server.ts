@@ -1,18 +1,17 @@
-// import type { PageServerLoad } from './$types';
-// import { readProductBySlug } from '@data/repository/productRepository';
+import type { PageServerLoad, Actions } from './$types';
+import { getProduct } from '@store/productStore.svelte';
 
-// export const load: PageServerLoad = async ({ params }) => {
-// 	const product = await readProductBySlug(params.slug);
-
-// 	return {
-// 		product
-// 	};
-// };
+export const load: PageServerLoad = async ({ params }) => {
+    return {
+        product: await getProduct(params.slug),
+    };
+};
 
 export const actions = {
     addItemToCart: async ({ request }) => {
         const data = await request.formData();
+        const email = data.get('email');
 
         console.log(data);
     },
-};
+} satisfies Actions;

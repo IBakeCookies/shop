@@ -5,12 +5,20 @@
     import { cn } from '@presentation/utils/style';
 
     type Props = {
+        ref?: null | HTMLElement;
+
         type: 'success' | 'info' | 'warning' | 'error' | 'state' | 'state-dark';
         children: Snippet;
         modifier?: ClassValue;
     } & HTMLAttributes<any>;
 
-    let { type = 'state', children, modifier, ...props }: Props = $props();
+    let {
+        ref = $bindable(null),
+        type = 'state',
+        children,
+        modifier,
+        ...props
+    }: Props = $props();
 
     const style = $derived.by(() => {
         if (type === 'success') {
@@ -41,7 +49,11 @@
     });
 </script>
 
-<div {...props} class={cn('alert border-b px-8 py-1', modifier, style)}>
+<div
+    {...props}
+    bind:this={ref}
+    class={cn('alert border-b px-8 py-1', modifier, style)}
+>
     <div class="mx-auto max-w-screen-2xl">
         {@render children()}
     </div>

@@ -1,34 +1,33 @@
 <script lang="ts">
     import type { ClassValue } from 'clsx';
     import type { Snippet } from 'svelte';
-    import type { HTMLButtonAttributes, HTMLAnchorAttributes } from 'svelte/elements';
+    import type {
+        HTMLButtonAttributes,
+        HTMLAnchorAttributes,
+    } from 'svelte/elements';
     import { cn } from '@presentation/utils/style';
-    import Icon from '@iconify/svelte';
+    import type Icon from '@iconify/svelte';
 
     type Props = {
         href?: string;
-        iconL?: string;
-        iconR?: string;
-        // events?: string[];
         isLoading?: boolean;
-        variant?: 'primary' | 'secondary' | 'anchor';
+        variant?: 'primary' | 'secondary' | 'anchor' | 'icon';
         disabled?: boolean;
         modifier?: ClassValue;
-        children: Snippet;
+        children?: Snippet;
     } & (HTMLAnchorAttributes | HTMLButtonAttributes);
 
     const {
         href,
-        iconL,
-        iconR,
-        // events,
         isLoading,
         variant = 'primary',
         disabled,
         modifier,
         children,
-        ...restProps
+        ...props
     }: Props = $props();
+
+    let DynamicIcon: typeof Icon | null = $state(null);
 
     const currentVariant: string = $derived.by(() => {
         if (variant === 'anchor') {
@@ -45,11 +44,21 @@
 
         return '';
     });
+
+    $effect(() => {
+        if (!isLoading) {
+            return;
+        }
+
+        import('@iconify/svelte').then((module) => {
+            DynamicIcon = module.default;
+        });
+    });
 </script>
 
 <svelte:element
     this={href ? 'a' : 'button'}
-    {...restProps}
+    {...props}
     {href}
     class={cn(
         'a-button inline-flex cursor-pointer items-center justify-center transition-colors disabled:bg-zinc-500',
@@ -61,23 +70,15 @@
     )}
     disabled={isLoading || disabled}
 >
-    {#if iconL}
-        <Icon icon={iconL} class="mr-4 h-6 w-6" />
-    {/if}
+    {@render children?.()}
 
-    {@render children()}
-
-    {#if iconR}
-        <Icon icon={iconR} class="ml-4 h-6 w-6" />
-    {/if}
-
-    {#if isLoading}
-        <Icon icon="bi:arrow-repeat" class="ml-4 h-6 w-6 animate-spin" />
+    {#if isLoading && DynamicIcon}
+        <DynamicIcon icon="bi:arrow-repeat" class="ml-4 h-6 w-6 animate-spin" />
     {/if}
 
     {#if href}
         <span
-            class="absolute top-full left-0 h-1 w-full origin-left scale-x-0 bg-stone-900 transition-transform group-hover:scale-x-100"
+            class="absolute top-full left-0 h-[2px] w-full origin-left scale-x-0 bg-stone-900 transition-transform group-hover:scale-x-100"
         >
         </span>
     {/if}

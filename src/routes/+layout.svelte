@@ -3,36 +3,53 @@
     import { i18n } from '$lib/i18n';
     import { ParaglideJS } from '@inlang/paraglide-sveltekit';
     import { pageStore } from '@store/pageStore.svelte';
-    import Alert from '@atom/alert/alert.svelte';
+    import { setNotificationStore } from '@store/notificationStore.svelte';
+    import { setEventStore } from '@store/eventStore.svelte';
+    import { setCartStore } from '@store/cartStore.svelte';
     import Nav from '@organism/nav/nav.svelte';
     import Footer from '@organism/footer/footer.svelte';
-    // 	import { useEventStore } from '@store/evenStore.svelte';
+    import NotificationList from '@molecule/notificationList/notificationList.svelte';
+    import Newsletter from '@atom/newsletter/newsletter.svelte';
+    import Alert from '@atom/alert/alert.svelte';
+    import { onMount } from 'svelte';
 
-    // const eventStore = useEventStore();
+    setNotificationStore();
+    setEventStore();
 
-    // eventStore.add('A');
-
-    let { children } = $props();
+    const cartStore = setCartStore();
+    const { children } = $props();
 
     let navRef: null | HTMLDivElement = $state(null);
+    let alertRef: null | HTMLDivElement = $state(null);
 
     $effect(() => {
-        if (!navRef) {
-            return;
-        }
+        pageStore.navHeight = navRef?.scrollHeight || 0;
+        pageStore.alertHeight = alertRef?.scrollHeight || 0;
+    });
 
-        pageStore.navHeight = navRef.scrollHeight;
+    onMount(() => {
+        cartStore.hydrateFromStorage();
     });
 </script>
 
 <ParaglideJS {i18n}>
-    <Alert type="state-dark" modifier="text-center">Free shipping on order over €200</Alert>
+    <Alert bind:ref={alertRef} type="state-dark" modifier="text-center">
+        Free shipping on orders over €200
+    </Alert>
 
-    <Nav bind:ref={navRef}></Nav>
+    <div
+        class="notifications fixed top-40 right-0 z-101 flex flex-col items-center px-8"
+    >
+        <NotificationList />
+    </div>
+
+    <Nav bind:ref={navRef} />
 
     <div class="flex w-full flex-1 flex-col">
         {@render children()}
     </div>
 
-    <Footer></Footer>
+    <Newsletter />
+
+    <Footer />
 </ParaglideJS>

@@ -13,9 +13,12 @@ const config = {
         alias: {
             '@src': './src',
             '@data': './src/data',
+            '@business': './src/business',
             '@store': './src/business/store',
+            '@storage': './src/business/storage',
             '@presentation': './src/presentation',
             '@atom': './src/presentation/component/atom',
+            '@molecule': './src/presentation/component/molecule',
             '@organism': './src/presentation/component/organism',
         },
     },

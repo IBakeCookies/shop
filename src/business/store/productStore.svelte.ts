@@ -1,184 +1,61 @@
-import type { ReadProductBySlugOutput } from '@data/repository/productRepository';
+import { getContext, setContext } from 'svelte';
 import { readProductBySlug } from '@data/repository/productRepository';
+import {
+    type ProductDetail,
+    transformProductDetailApiToProductDetail,
+} from '@src/business/transform/productDetailTransform';
 
-type ProductComposition = ReadProductBySlugOutput['product_composition'][number];
+const placeholder: ProductDetail = {
+    name: '',
+    description: '',
+    careInstructions: '',
+    fabricCareInstructions: [],
+    fabricFeatures: [],
+    productComposition: [],
+    about: '',
+    image: {
+        src: '',
+        alt: '',
+    },
+    colors: [],
+    sizes: [],
+    price: 0,
+    attributes: [],
+    productVariation: [],
+};
 
-interface ProductColor {
-    id: number;
-    name: string;
-    salePrice: number;
-}
-
-interface ProductSize {
-    id: number;
-    name: string;
-}
-
-interface ProductVariations {
-    [key: string]: unknown;
-}
-
-interface Attribute {
-    attribute: string;
-    value: string;
-}
-
-class ProductStore {
-    product = $state.raw({
-        name: '',
-        description: '',
-        careInstructions: '',
-        fabricCareInstructions: [] as string[],
-        fabricFeatures: [] as string[],
-        productComposition: [] as ProductComposition[],
-        about: '',
-        image: {
-            src: '',
-            alt: '',
-        },
-        colors: [] as ProductColor[],
-        sizes: [] as ProductSize[],
-        price: 0,
-        variations: {} as ProductVariations,
-        attributes: [] as Attribute[],
-    });
-
-    async getProduct(slug: string): Promise<void> {
+export async function getProduct(slug: string): Promise<ProductDetail> {
+    try {
         const { data, error } = await readProductBySlug(slug);
 
         if (!data || error) {
-            return;
+            return placeholder;
         }
 
-        const name = data.product_translation.at(0)?.name || '';
+        return transformProductDetailApiToProductDetail(data);
+    } catch (err) {
+        console.error(err);
 
-        const fabricCareInstructions = [
-            ...new Set(
-                data.product_composition.map(
-                    (composition) =>
-                        composition.fabric_type_variation?.fabric_type?.fabric_type_translation?.at(
-                            0,
-                        )?.care_instructions || '',
-                ) || [''],
-            ),
-        ];
-
-        this.product = {
-            name,
-            description: data.product_translation.at(0)?.description || '',
-            careInstructions: data.product_translation.at(0)?.care_instructions || '',
-            fabricCareInstructions,
-            fabricFeatures: this.getFabricFeatures(data),
-            productComposition: data.product_composition,
-            about: data.product_translation.at(0)?.about || '',
-            image: {
-                src: `/${data.slug}/index.webp`,
-                alt: name,
-            },
-            colors: this.getColors(data),
-            attributes: this.getAttributes(data),
-            sizes: this.getSizes(data),
-            price: data.product_item.at(0)?.price || 0,
-            variations: this.getVariations(data),
-        };
-    }
-
-    private getAttributes(product: ReadProductBySlugOutput): Attribute[] {
-        return product.attribute_option.map((option) => ({
-            attribute: option.attribute_type_translation.at(0)?.name || '',
-            value: option.attribute_option_translation.at(0)?.name || '',
-        }));
-    }
-
-    private getColors(product: ReadProductBySlugOutput): ProductColor[] {
-        return product.product_item
-            .map((item) => ({
-                id: item.color_id,
-                name: item.color.at(0)?.name || '',
-                salePrice: item.sale_price || 0,
-            }))
-            .sort((a, b) => `${a.name}`.localeCompare(b.name));
-    }
-
-    private getSizes(product: ReadProductBySlugOutput): ProductSize[] {
-        const seen = new Set();
-        const result: ProductSize[] = [];
-
-        for (const item of product.product_item) {
-            for (const variation of item.product_variation) {
-                const sizeName = variation.size_reference.name;
-
-                if (!seen.has(sizeName)) {
-                    seen.add(sizeName);
-
-                    result.push({
-                        id: variation.size_reference.id,
-                        name: sizeName,
-                    });
-                }
-            }
-        }
-
-        return result.sort((a, b) => a.id - b.id);
-    }
-
-    private getVariations(product: ReadProductBySlugOutput): ProductVariations {
-        return product.product_item.reduce((acc, item) => {
-            const colorId = item.color_id;
-
-            const sizes = item.product_variation.reduce((acc, variation) => {
-                const sizeId = variation.size_reference.id;
-
-                // @ts-ignore
-                acc[sizeId] = variation.stock;
-
-                return acc;
-            }, {});
-
-            // @ts-ignore
-            acc[colorId] = sizes;
-
-            return acc;
-        }, {});
-    }
-
-    private getFabricFeatures(product: ReadProductBySlugOutput): string[] {
-        const result: string[] = [];
-
-        for (let i = 0; i < product.product_composition.length; i++) {
-            const composition = product.product_composition.at(i);
-
-            if (!composition) {
-                return result;
-            }
-
-            const variation = composition.fabric_type_variation;
-
-            if (!variation) {
-                return result;
-            }
-
-            const features = variation.fabric_type?.fabric_type_features;
-
-            if (!features) {
-                return result;
-            }
-
-            for (let j = 0; j < features.length; j++) {
-                const featureItem = features.at(j);
-
-                if (!featureItem) {
-                    continue;
-                }
-
-                const feature = featureItem.material_feature_translation.at(0)?.name;
-
-                result.push(feature || '');
-            }
-        }
-
-        return result;
+        return placeholder;
     }
 }
 
-export const productStore = new ProductStore();
+const CONTEXT_KEY = Symbol();
+
+class ProductStore {
+    product = $state.raw<ProductDetail>(placeholder);
+
+    async getProduct(slug: string) {
+        const data = await getProduct(slug);
+
+        this.product = data;
+    }
+}
+
+export function setProductStore() {
+    return setContext<ProductStore>(CONTEXT_KEY, new ProductStore());
+}
+
+export function getProductStore() {
+    return getContext<ProductStore>(CONTEXT_KEY);
+}
