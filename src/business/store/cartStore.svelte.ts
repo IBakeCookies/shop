@@ -1,14 +1,20 @@
 // import type { Tables } from '@data/type/database.types';
 import { getContext, setContext } from 'svelte';
 import { readProductVariantStockById } from '@data/repository/productRepository';
+import { readCartItemByVariantId } from '@data/repository/cartRepository';
 import { type Storage, LocalStorage } from '@storage/localStorage';
 
 const CONTEXT_KEY = Symbol();
 
 interface CartItem {
     id: number;
+    name: string;
     quantity: number;
     stock: number;
+    price: number;
+    salePrice: number;
+    size: string;
+    color: string;
 }
 
 interface addCartItemOutput {
@@ -51,6 +57,16 @@ class CartStore {
                 this.#seen.add(item.id);
             });
         }
+    }
+
+    async getCartItem(id: number) {
+        // const { data, error } = await readCartItemByVariantId(id);
+        // console.log(data);
+        // if (!data || error) {
+        //     return;
+        // }
+        // console.log(data);
+        // this.#items.push(data);
     }
 
     async addItem(item: CartItem): Promise<addCartItemOutput> {

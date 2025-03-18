@@ -1,23 +1,34 @@
-import { supabase } from '$lib/supabaseClient';
 import type { QueryData } from '@supabase/supabase-js';
+import { supabase } from '$lib/supabaseClient';
 
-export type ReadCartItems = QueryData<ReturnType<typeof readCartItems>>;
+export type ReadCartItemByVariantId = QueryData<
+    ReturnType<typeof readCartItemByVariantId>
+>;
 
-export const readCartItems = () =>
+export const readCartItemByVariantId = (id: number) =>
     supabase
-        .from('product')
+        .from('product_variation')
         .select(
             `
 				id,
-				...brand_id (brand:name),
-				product_item (
-					id,
+				stock,
+				...product_item (
 					price,
 					sale_price,
+					...color (
+						color_translation (name)
+					),
+					...product (
+						product_translation (name)
+					)
 				),
-				product_translation (
-					name
+			
+				...size_option_id (
+					size_reference (name)
 				)
 			`,
         )
-        .eq('product_translation.language_code', 'en');
+        .eq('id', id)
+		.eq('product_item.color.color_translation.language_code', 'en')
+		.eq('product_item.product.product_translation.language_code', 'en')
+        .single();

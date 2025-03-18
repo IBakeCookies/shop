@@ -108,6 +108,11 @@
             id: selectedVariation.id,
             stock: selectedVariation.stock,
             quantity: 1,
+            price: productStore.product.price,
+            salePrice: selectedVariation.salePrice,
+            color: selectedVariation.colorName,
+            size: selectedVariation.size_reference.name,
+            name: productStore.product.name,
         });
 
         if (success) {
