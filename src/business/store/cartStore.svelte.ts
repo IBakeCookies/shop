@@ -1,12 +1,12 @@
-// import type { Tables } from '@data/type/database.types';
+import type { Storage } from '@storage/storage';
+import type { EventStore } from '@store/eventStore.svelte';
+import type { NotificationStore } from '@store/notificationStore.svelte';
 import { getContext, setContext } from 'svelte';
 import { readProductVariantStockById } from '@data/repository/productRepository';
-import { readCartItemByVariantId } from '@data/repository/cartRepository';
-import { type Storage, LocalStorage } from '@storage/localStorage';
 
 const CONTEXT_KEY = Symbol();
 
-interface CartItem {
+export interface CartItem {
     id: number;
     name: string;
     quantity: number;
@@ -15,20 +15,35 @@ interface CartItem {
     salePrice: number;
     size: string;
     color: string;
+    slug: string;
 }
 
 interface addCartItemOutput {
-    success: string | null;
-    error: string | null;
+    success: string;
+    error: string;
 }
 
-const cartLocalStorage = new LocalStorage<CartItem[]>('cart');
+interface Config {
+    storage: Storage<CartItem[]>;
+    notificationStore: NotificationStore;
+    eventStore: EventStore;
+}
 
-class CartStore {
+export class CartStore {
     #storage: Storage<CartItem[]>;
+    #notificationStore: NotificationStore;
+    #eventStore: EventStore;
     #items = $state<CartItem[]>([]);
     #seen = new Set<number>();
-    #totalPrice = $state<number>(0);
+    #totalPrice = $derived.by<number>(() => {
+        let total = 0;
+
+        for (const item of this.#items) {
+            total += item.price * item.quantity;
+        }
+
+        return total;
+    });
     #totalItemsCount = $derived.by<number>(() => {
         let total = 0;
 
@@ -39,42 +54,106 @@ class CartStore {
         return total;
     });
 
-    constructor(
-        initialItems: CartItem[],
-        { storage }: { storage: Storage<CartItem[]> },
-    ) {
-        this.#items = initialItems;
+    constructor({ storage, notificationStore, eventStore }: Config) {
         this.#storage = storage;
+        this.#notificationStore = notificationStore;
+        this.#eventStore = eventStore;
+    }
+
+    get items(): CartItem[] {
+        return this.#items;
+    }
+
+    get totalItemsCount(): number {
+        return this.#totalItemsCount;
+    }
+
+    get totalPrice(): number {
+        return this.#totalPrice;
     }
 
     hydrateFromStorage(): void {
         const cartStorageItems = this.#storage.read();
 
-        if (cartStorageItems) {
-            this.#items = cartStorageItems;
-
-            cartStorageItems.forEach((item) => {
-                this.#seen.add(item.id);
-            });
+        if (!cartStorageItems) {
+            return;
         }
+
+        this.#items = cartStorageItems;
+
+        cartStorageItems.forEach((item) => {
+            this.#seen.add(item.id);
+        });
     }
 
-    async getCartItem(id: number) {
-        // const { data, error } = await readCartItemByVariantId(id);
-        // console.log(data);
-        // if (!data || error) {
-        //     return;
-        // }
-        // console.log(data);
-        // this.#items.push(data);
+    // async getCartItem(id: number) {
+    // const { data, error } = await readCartItemByVariantId(id);
+    // console.log(data);
+    // if (!data || error) {
+    //     return;
+    // }
+    // console.log(data);
+    // this.#items.push(data);
+    // }
+
+    removeItem(id: number) {
+        if (!confirm('Are you sure that you want to remove this item?')) {
+            return;
+        }
+
+        this.#items = this.#items.filter((item) => item.id !== id);
+        this.#storage.write(this.#items);
+        this.#seen.delete(id);
     }
 
-    async addItem(item: CartItem): Promise<addCartItemOutput> {
+    removeAllItems() {
+        if (!confirm('Are you sure that you want to remove all items?')) {
+            return;
+        }
+
+        this.#items = [];
+        this.#storage.write(this.#items);
+        this.#seen.clear();
+    }
+
+    async addItem(item: CartItem) {
+        this.#eventStore.addEvent('add-item-to-cart');
+
+        const { success, error } = await this.#addItem(item);
+
+        if (error) {
+            this.#notificationStore.addNotification({
+                title: error,
+                variant: 'warning-light-base',
+            });
+
+            this.#eventStore.removeEvent('add-item-to-cart');
+
+            return {
+                success,
+                error,
+            };
+        }
+
+        this.#notificationStore.addNotification({
+            title: success,
+            variant: 'success-light-base',
+        });
+
+        this.#eventStore.removeEvent('add-item-to-cart');
+
+        return {
+            success,
+            error,
+        };
+    }
+
+    async #addItem(item: CartItem): Promise<addCartItemOutput> {
         const { data, error } = await readProductVariantStockById(item.id);
 
         if (error) {
             return {
-                success: null,
+                success: '',
                 error: 'Something went wrong.',
             };
         }
@@ -84,7 +163,7 @@ class CartStore {
 
         if (item.quantity > item.stock) {
             return {
-                success: null,
+                success: '',
                 error: 'Item is not in stock anymore.',
             };
         }
@@ -96,7 +175,7 @@ class CartStore {
 
             return {
                 success: 'Item added to your cart.',
-                error: null,
+                error: '',
             };
         }
 
@@ -107,7 +186,7 @@ class CartStore {
 
             if (cartItem.quantity + item.quantity > cartItem.stock) {
                 return {
-                    success: null,
+                    success: '',
                     error: 'You already have the maximum quantity in your cart.',
                 };
             }
@@ -117,30 +196,43 @@ class CartStore {
 
             return {
                 success: 'Item added to your cart.',
-                error: null,
+                error: '',
             };
         }
 
         return {
-            success: null,
-            error: null,
+            success: '',
+            error: '',
         };
     }
 
-    get items(): CartItem[] {
-        return this.#items;
+    updateItemQuantity(id: number, quantity: number): void {
+        this.#items = this.#items.map((item) => {
+            if (item.id !== id) {
+                return item;
+            }
+
+            item.quantity = quantity;
+
+            return item;
+        });
+
+        this.#storage.write(this.#items);
     }
 
-    get totalItemsCount(): number {
-        return this.#totalItemsCount;
-    }
+    // validateCart(): void {
+    //     for (const item of this.#items) {
+    //         if (item.quantity > item.stock) {
+    //             this.#notificationStore.addNotification({
+    //                 title: 'Item is not in stock anymore.',
+    //                 variant: 'warning-light-base',
+    //             });
+    //         }
+    //     }
+    // }
 }
 
-export function setCartStore(
-    cartStore = new CartStore([], {
-        storage: cartLocalStorage,
-    }),
-): CartStore {
+export function setCartStore(cartStore: CartStore): CartStore {
     return setContext<CartStore>(CONTEXT_KEY, cartStore);
 }
 

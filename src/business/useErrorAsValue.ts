@@ -1,7 +1,8 @@
+import type { StringLength } from 'type-fest/source/internal';
+import { matrix2 } from '../../../kata-machine/src/__tests__/graph';
 import axios, { isAxiosError } from 'axios';
 import { use } from 'react';
-import { matrix2 } from '../../../kata-machine/src/__tests__/graph';
-import type { StringLength } from 'type-fest/source/internal';
+
 // interface CatFactResponse {
 //     fact: string;
 //     length: number;

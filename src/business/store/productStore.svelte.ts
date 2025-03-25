@@ -1,9 +1,7 @@
+import type { ProductDetail } from '@src/business/transform/productDetailTransform';
 import { getContext, setContext } from 'svelte';
+import { transformProductDetailApiToProductDetail } from '@src/business/transform/productDetailTransform';
 import { readProductBySlug } from '@data/repository/productRepository';
-import {
-    type ProductDetail,
-    transformProductDetailApiToProductDetail,
-} from '@src/business/transform/productDetailTransform';
 
 const placeholder: ProductDetail = {
     name: '',

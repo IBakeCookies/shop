@@ -1,58 +1,30 @@
 <script lang="ts">
+    import type { StylePath } from '@src/presentation/utils/variant';
+	import type { ClassValue } from 'svelte/elements';
     import type { Snippet } from 'svelte';
     import type { HTMLAttributes } from 'svelte/elements';
-    import type { ClassValue } from 'clsx';
+    import { getAlertVariantStyle } from '@src/presentation/utils/variant';
     import { cn } from '@presentation/utils/style';
 
     type Props = {
         ref?: null | HTMLElement;
-
-        type: 'success' | 'info' | 'warning' | 'error' | 'state' | 'state-dark';
+        variant: StylePath;
         children: Snippet;
-        modifier?: ClassValue;
+        class?: ClassValue;
     } & HTMLAttributes<any>;
 
     let {
         ref = $bindable(null),
-        type = 'state',
+        variant = 'neutral-light-base',
         children,
-        modifier,
         ...props
     }: Props = $props();
-
-    const style = $derived.by(() => {
-        if (type === 'success') {
-            return 'bg-green-100 text-green-900 border-green-200';
-        }
-
-        if (type === 'info') {
-            return 'bg-blue-100 text-white-900 border-blue-200';
-        }
-
-        if (type === 'warning') {
-            return 'bg-yellow-100 text-yellow-900 border-yellow-200';
-        }
-
-        if (type === 'error') {
-            return 'bg-red-100 text-red-900 border-red-200';
-        }
-
-        if (type === 'state') {
-            return 'bg-stone-100 text-stone-900 border-stone-200';
-        }
-
-        if (type === 'state-dark') {
-            return 'bg-stone-900 text-stone-100 border-stone-800';
-        }
-
-        return '';
-    });
 </script>
 
 <div
     {...props}
     bind:this={ref}
-    class={cn('alert border-b px-8 py-1', modifier, style)}
+    class={cn('alert px-box border-b py-1', props.class, getAlertVariantStyle(variant))}
 >
     <div class="mx-auto max-w-screen-2xl">
         {@render children()}

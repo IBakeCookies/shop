@@ -1,9 +1,7 @@
+import type { ProductListing } from '@src/business/transform/productListingTransform';
 import { getContext, setContext } from 'svelte';
+import { transformProduct } from '@src/business/transform/productListingTransform';
 import { readAllProducts } from '@data/repository/productRepository';
-import {
-    type ProductListing,
-    transformProduct,
-} from '@src/business/transform/productListingTransform';
 
 export async function getProducts(): Promise<ProductListing[]> {
     try {

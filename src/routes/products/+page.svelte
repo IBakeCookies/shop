@@ -1,14 +1,16 @@
 <script lang="ts">
     import type { PageProps } from './$types';
+    import { fly } from 'svelte/transition';
     import { setProductsStore } from '@store/productsStore.svelte';
+    import { getFly } from '@presentation/utils/fly';
     import ProductListItem from '@organism/productListItem/productListItem.svelte';
 
     let { data }: PageProps = $props();
     const productStore = setProductsStore(data.products);
 </script>
 
-<section class="mx-auto max-w-screen-2xl px-8 py-20">
-    <h1 class="mb-8 text-3xl font-bold">Revar Polartec clothing</h1>
+<section in:fly={getFly()} class="px-box mx-auto max-w-screen-2xl py-20">
+    <h1 class="mb-8 text-3xl">Revar Polartec clothing</h1>
 
     {#if !productStore.products.length}
         <p>No products found</p>
@@ -21,7 +23,7 @@
                         variants={product.variants}
                         name={product.name}
                         price={product.price}
-                    ></ProductListItem>
+                    />
                 </a>
             {/each}
         </div>

@@ -1,10 +1,10 @@
 <script lang="ts">
     import type { Stripe } from '@stripe/stripe-js';
     import { loadStripe } from '@stripe/stripe-js';
-    import { Elements, PaymentElement } from 'svelte-stripe';
-    import { PUBLIC_STRIPE_KEY } from '$env/static/public';
     import { goto } from '$app/navigation';
+    import { PUBLIC_STRIPE_KEY } from '$env/static/public';
     import { onMount } from 'svelte';
+    import { Elements, PaymentElement } from 'svelte-stripe';
 
     let stripe: Stripe | null = $state(null);
     let clientSecret: string = $state('');

@@ -16,9 +16,7 @@ export interface ProductListing {
     };
 }
 
-export function transformProduct(
-    product: ReadAllProductsSingleOutput,
-): ProductListing {
+export function transformProduct(product: ReadAllProductsSingleOutput): ProductListing {
     const name = product.product_translation.at(0)?.name || '';
     const slug = product.slug || '';
 

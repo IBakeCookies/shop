@@ -1,13 +1,10 @@
-export interface Storage<R> {
-    read: () => R | void;
-    write: (data: R) => void;
-}
+import type { Storage, StorageKey } from '@storage/storage';
 
 export class LocalStorage<R> implements Storage<R> {
     data: R | undefined;
-    key: string | undefined;
+    key: StorageKey | undefined;
 
-    constructor(key: string) {
+    constructor(key: StorageKey) {
         this.key = key;
     }
 
@@ -31,5 +28,13 @@ export class LocalStorage<R> implements Storage<R> {
         }
 
         localStorage.setItem(this.key, JSON.stringify(data));
+    }
+
+    clear() {
+        if (!this.key) {
+            return;
+        }
+
+        localStorage.removeItem(this.key);
     }
 }

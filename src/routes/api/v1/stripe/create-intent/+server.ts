@@ -1,7 +1,7 @@
-import Stripe from 'stripe';
-import { SECRET_STRIPE_KEY } from '$env/static/private';
-import { error, json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { error, json } from '@sveltejs/kit';
+import { SECRET_STRIPE_KEY } from '$env/static/private';
+import Stripe from 'stripe';
 
 const stripe = new Stripe(SECRET_STRIPE_KEY);
 

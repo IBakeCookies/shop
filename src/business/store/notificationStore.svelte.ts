@@ -1,14 +1,13 @@
+import type { StylePath } from '@src/presentation/utils/variant';
 import { getContext, setContext } from 'svelte';
 
-type NotificationType = 'success' | 'danger' | 'warning' | 'info' | 'state';
-
-interface NotificationInput {
+export interface NotificationInput {
     title: string;
     message?: string;
-    type?: NotificationType;
+    variant: StylePath;
     fade?: boolean;
     duration?: number;
-    callback?: () => void;
+    dismiss?: () => void;
 }
 
 export interface Notification extends NotificationInput {
@@ -17,7 +16,7 @@ export interface Notification extends NotificationInput {
 
     // overwrite
     duration: number;
-    type: NotificationType;
+    variant: StylePath;
     fade: boolean;
 }
 
@@ -39,43 +38,38 @@ export class NotificationStore {
     addNotification({
         title,
         message = '',
-        type = 'success',
+        variant = 'success-light-base',
         fade = true,
         duration,
-        callback,
+        dismiss,
     }: NotificationInput): void {
         const id = getNewId();
         const minDuration = 2000;
-
-        const dynamicDuration =
-            duration || minDuration + message?.length * 30 + title.length * 30;
-
+        const dynamicDuration = duration || minDuration + message?.length * 20 + title.length * 20;
         let timeoutId: null | ReturnType<typeof setTimeout> = null;
 
         if (fade) {
             timeoutId = setTimeout(() => {
-                const notificationToRemoveIndex = this.notifications.findIndex(
-                    (notification) => {
-                        return notification.id === id;
-                    },
-                );
+                const notificationToRemoveIndex = this.notifications.findIndex((notification) => {
+                    return notification.id === id;
+                });
 
                 this.notifications.splice(notificationToRemoveIndex, 1);
 
-                if (callback) {
-                    callback();
+                if (dismiss) {
+                    dismiss();
                 }
             }, dynamicDuration);
         }
 
         this.notifications.push({
             id,
-            type,
+            variant,
             title,
             message,
             fade,
             duration: dynamicDuration,
-            callback,
+            dismiss,
             timeoutId,
         });
     }
@@ -86,27 +80,22 @@ export class NotificationStore {
         );
 
         if (notificationToRemove) {
-            notificationToRemove.timeoutId &&
-                clearTimeout(notificationToRemove.timeoutId);
+            notificationToRemove.timeoutId && clearTimeout(notificationToRemove.timeoutId);
 
-            if (notificationToRemove.callback) {
-                notificationToRemove.callback();
+            if (notificationToRemove.dismiss) {
+                notificationToRemove.dismiss();
             }
         }
 
-        const notificationToRemoveIndex = this.notifications.findIndex(
-            (notification) => {
-                return notification.id === id;
-            },
-        );
+        const notificationToRemoveIndex = this.notifications.findIndex((notification) => {
+            return notification.id === id;
+        });
 
         this.notifications.splice(notificationToRemoveIndex, 1);
     }
 }
 
-export function setNotificationStore(
-    notificationStore = new NotificationStore(),
-) {
+export function setNotificationStore(notificationStore = new NotificationStore()) {
     return setContext<NotificationStore>(CONTEXT_KEY, notificationStore);
 }
 

@@ -5,14 +5,12 @@
 
 <footer class="border-t border-stone-200">
     <div
-        class="mx-auto grid max-w-screen-2xl grid-cols-1 gap-4 p-8 py-20 lg:grid-cols-3 xl:grid-cols-4"
+        class="p-box mx-auto grid max-w-screen-2xl grid-cols-1 gap-4 py-20 lg:grid-cols-3 xl:grid-cols-4"
     >
-        <p class="order-10 font-bold lg:order-1">
-            Made with ❤️ in Hamburg, Germany
-        </p>
+        <p class="order-10 lg:order-1">Made with ❤️ in Hamburg, Germany</p>
 
         <ul class="order-2">
-            <li class="mb-4 font-bold">
+            <li class="mb-4 text-emerald-600">
                 <a href="/help">Help</a>
             </li>
             <li>
@@ -33,7 +31,7 @@
         </ul>
 
         <ul class="order-2">
-            <li class="mb-4 font-bold">
+            <li class="mb-4 text-emerald-600">
                 <a href="/about">About</a>
             </li>
             <li>
@@ -45,7 +43,7 @@
         </ul>
 
         <ul class="order-2">
-            <li class="mb-4 font-bold">
+            <li class="mb-4 text-emerald-600">
                 <a href="/legal">Legal</a>
             </li>
             <li>

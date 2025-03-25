@@ -1,7 +1,7 @@
 <script lang="ts">
-    import type { ClassValue } from 'clsx';
+    import type { AdditionalConfig, Direction } from '@presentation/utils/fly';
+	import type { ClassValue } from 'svelte/elements';
     import type { Snippet } from 'svelte';
-    import type { Direction, AdditionalConfig } from '@presentation/utils/fly';
     import { fly } from 'svelte/transition';
     import { getFly } from '@presentation/utils/fly';
 
@@ -10,7 +10,7 @@
         direction?: Direction;
         index?: AdditionalConfig['index'];
         limit?: AdditionalConfig['limit'];
-        modifier?: ClassValue;
+        class?: ClassValue;
         children: Snippet;
     }
 
@@ -20,7 +20,6 @@
         index = 0,
         limit = 0,
         children,
-        modifier,
         ...props
     }: Props = $props();
 
@@ -78,9 +77,8 @@
     });
 </script>
 
-<div
-    {...props}
-    class={`fly ${modifier}`}
+<div {...props} 
+    class={['fly', props.class]} 
     in:fly={transition.flyIn}
     out:fly={transition.flyOut}
 >

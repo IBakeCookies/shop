@@ -1,19 +1,13 @@
-import { supabase } from '$lib/supabaseClient';
 import type { QueryData } from '@supabase/supabase-js';
+import { supabase } from '$lib/supabaseClient';
 
-export type ReadAllProductsOutput = QueryData<
-    ReturnType<typeof readAllProducts>
->;
+export type ReadAllProductsOutput = QueryData<ReturnType<typeof readAllProducts>>;
 
 export type ReadAllProductsSingleOutput = ReadAllProductsOutput[number];
 
-export type ReadProductBySlugOutput = QueryData<
-    ReturnType<typeof readProductBySlug>
->;
+export type ReadProductBySlugOutput = QueryData<ReturnType<typeof readProductBySlug>>;
 
-export type ReadProductVariantStockById = QueryData<
-    ReturnType<typeof readProductVariantStockById>
->;
+export type ReadProductVariantStockById = QueryData<ReturnType<typeof readProductVariantStockById>>;
 
 // export const readSimilarProducts = (id: number) =>
 // supabase.rpc('get_similar_products', {
@@ -81,7 +75,12 @@ export const readProductBySlug = (slug: string) =>
 						stock,
 						...size_option (
 							sort_order,
-							size_reference (id, name)
+							size (
+								id,
+								size_translation (
+									name
+								)
+							)
 						)
 					)
 				),
@@ -135,10 +134,8 @@ export const readProductBySlug = (slug: string) =>
             'en',
         )
         .eq('attribute_option.attribute_option_translation.language_code', 'en')
-        .eq(
-            'attribute_option.attribute_type.attribute_type_translation.language_code',
-            'en',
-        )
+        .eq('attribute_option.attribute_type.attribute_type_translation.language_code', 'en')
+        .eq('product_item.product_variation.size_option.size.size_translation.language_code', 'en')
         .eq('slug', slug)
         .eq('is_published', true)
         .single();

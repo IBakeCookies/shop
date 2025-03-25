@@ -1,21 +1,21 @@
 <script lang="ts">
-    import type { ClassValue } from 'clsx';
+	import type { ClassValue } from 'svelte/elements';
     import { cn } from '@presentation/utils/style';
 
     type Props = {
         value: string;
-        variant?: 'default' | 'small';
-        modifier?: ClassValue;
+        size?: 'default' | 'small';
+        class?: ClassValue;
     };
 
-    const { variant = 'default', modifier, value, ...props }: Props = $props();
+    const { size = 'default', value, ...props }: Props = $props();
 
     const styles: string = (() => {
-        if (variant === 'default') {
-            return 'w-6 h-6';
+        if (size === 'default') {
+            return 'w-7 h-7';
         }
 
-        return 'w-5 h-5 text-sm';
+        return 'w-5 h-5';
     })();
 </script>
 
@@ -23,8 +23,8 @@
     {...props}
     title={value}
     class={cn(
-        'absolute -top-3 -right-3 flex items-center justify-center border-2 border-stone-200 bg-stone-50 font-bold',
-        modifier,
+        'absolute -top-3 -right-3 flex items-center justify-center border-2 border-stone-200 bg-stone-50 ',
+        props.class,
         styles,
     )}
 >

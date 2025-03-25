@@ -1,4 +1,4 @@
-import type { PageServerLoad, Actions } from './$types';
+import type { Actions, PageServerLoad } from './$types';
 import { getProduct } from '@store/productStore.svelte';
 
 export const load: PageServerLoad = async ({ params }) => {

@@ -1,6 +1,7 @@
 <script lang="ts">
-    import type { ClassValue } from 'clsx';
+    import type { ClassValue } from 'svelte/elements';
     import { cn } from '@presentation/utils/style';
+    import Number from '@atom/number/number.svelte';
 
     interface Props {
         value: number | string;
@@ -8,41 +9,21 @@
         precision?: number;
         currency?: string;
         withCurrency?: boolean;
-        modifier?: ClassValue;
+        class?: ClassValue;
     }
 
     const {
         value,
-        modifier,
         precision = 0,
         currency = '€',
         locale = 'de-DE',
         withCurrency = true,
-        ...restProps
+        ...props
     }: Props = $props();
-
-    function isNumber(item: unknown): item is number {
-        return typeof item === 'number' && !Number.isNaN(item);
-    }
-
-    const valueAsNumber: number = $derived.by(() => {
-        if (isNumber(value)) {
-            return value;
-        }
-
-        return parseFloat(value);
-    });
-
-    const money = $derived.by(() => {
-        return new Intl.NumberFormat(locale, {
-            maximumFractionDigits: precision,
-            minimumFractionDigits: precision,
-        }).format(valueAsNumber);
-    });
 </script>
 
-<money {...restProps} class={cn('a-money', modifier)}>
+<money {...props} class={cn('', props.class)}>
     {#if withCurrency}
-        {currency}&nbsp;
-    {/if}{money}
+        {currency}
+    {/if}<Number {value} {precision} {locale} />
 </money>

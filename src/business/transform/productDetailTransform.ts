@@ -1,7 +1,6 @@
 import type { ReadProductBySlugOutput } from '@data/repository/productRepository';
 
-type ProductComposition =
-    ReadProductBySlugOutput['product_composition'][number];
+type ProductComposition = ReadProductBySlugOutput['product_composition'][number];
 type ProductVariation =
     ReadProductBySlugOutput['product_item'][number]['product_variation'][number] & {
         colorId: number;
@@ -54,9 +53,8 @@ export function transformProductDetailApiToProductDetail(
         ...new Set(
             product.product_composition.map(
                 (composition) =>
-                    composition.fabric_type_variation?.fabric_type?.fabric_type_translation?.at(
-                        0,
-                    )?.care_instructions || '',
+                    composition.fabric_type_variation?.fabric_type?.fabric_type_translation?.at(0)
+                        ?.care_instructions || '',
             ) || [''],
         ),
     ];
@@ -64,8 +62,7 @@ export function transformProductDetailApiToProductDetail(
     return {
         name,
         description: product.product_translation.at(0)?.description || '',
-        careInstructions:
-            product.product_translation.at(0)?.care_instructions || '',
+        careInstructions: product.product_translation.at(0)?.care_instructions || '',
         fabricCareInstructions,
         fabricFeatures: getFabricFeatures(product),
         productComposition: product.product_composition,
@@ -117,13 +114,13 @@ function getSizes(product: ReadProductBySlugOutput): ProductSize[] {
 
     for (const item of product.product_item) {
         for (const variation of item.product_variation) {
-            const sizeName = variation.size_reference.name;
+            const sizeName = variation.size.size_translation.at(0)?.name || ''
 
             if (!seen.has(sizeName)) {
                 seen.add(sizeName);
 
                 result.push({
-                    id: variation.size_reference.id,
+                    id: variation.size.id,
                     name: sizeName,
                 });
             }
@@ -162,8 +159,7 @@ function getFabricFeatures(product: ReadProductBySlugOutput): string[] {
                 continue;
             }
 
-            const feature =
-                featureItem.material_feature_translation.at(0)?.name;
+            const feature = featureItem.material_feature_translation.at(0)?.name;
 
             result.push(feature || '');
         }

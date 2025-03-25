@@ -1,65 +1,32 @@
 <script lang="ts">
+    import type { NotificationInput } from '@store/notificationStore.svelte';
+	import type { ClassValue } from 'svelte/elements';
     import type { Snippet } from 'svelte';
     import type { HTMLAttributes } from 'svelte/elements';
-    import type { ClassValue } from 'clsx';
-    import type { Notification } from '@store/notificationStore.svelte';
-    import { cn } from '@presentation/utils/style';
     import Icon from '@iconify/svelte';
+    import { getNotificationVariantStyle } from '@src/presentation/utils/variant';
+    import { cn } from '@presentation/utils/style';
 
     type Props = {
-        notification: Notification;
+        notification: NotificationInput;
         children?: Snippet;
-        modifier?: ClassValue;
-        dismiss?: (notificationId: number) => void;
+        class?: ClassValue;
+        dismiss: (id: number) => void;
     } & HTMLAttributes<any>;
 
-    const { notification, children, dismiss, modifier, ...props }: Props =
-        $props();
+    const { notification, dismiss, children, ...props }: Props = $props();
 
-    const styles = $derived.by(() => {
-        if (notification.type === 'success') {
-            return {
-                wrapper: 'text-emerald-700',
-                iconAndMessage: 'text-emerald-900',
-            };
-        }
-
-        if (notification.type === 'danger') {
-            return {
-                wrapper: 'text-red-700',
-                iconAndMessage: 'text-red-900',
-            };
-        }
-
-        if (notification.type === 'warning') {
-            return {
-                wrapper: 'text-amber-700',
-                iconAndMessage: 'text-amber-900',
-            };
-        }
-
-        if (notification.type === 'info') {
-            return {
-                wrapper: 'text-sky-700',
-                iconAndMessage: 'text-sky-900',
-            };
-        }
-
-        return {
-            wrapper: 'text-stone-700',
-            iconAndMessage: 'text-stone-900',
-        };
-    });
+    const styles = getNotificationVariantStyle(notification.variant);
 
     const getAnimation = (duration: number) =>
         `animation-duration: ${duration}ms; animation-fill-mode: forwards`;
 
     const icons = {
-        warning: 'mdi:warning',
-        success: 'mdi:check',
-        danger: 'mdi:warning-decagram',
-        info: 'mdi:information-box',
-        state: 'mdi:arrow-top-right-thin-circle-outline',
+        'warning-light-base': 'mdi:warning',
+        'success-light-base': 'mdi:check',
+        'error-light-base': 'mdi:warning-decagram',
+        'info-light-base': 'mdi:information-box',
+        'neutral-light-base': 'mdi:arrow-top-right-thin-circle-outline',
     };
 </script>
 
@@ -67,17 +34,14 @@
     {...props}
     class={cn(
         'notification relative flex items-start bg-stone-50 p-6 shadow-xl',
-        modifier,
-        styles.wrapper,
+        props.class,
+        styles.title,
     )}
 >
-    <Icon
-        class={`mr-6 min-h-6 min-w-6 ${styles.iconAndMessage}`}
-        icon={icons[notification.type]}
-    />
+    <Icon class="mr-6 min-h-6 min-w-6" icon={icons[notification.variant]} />
 
     <div class="mr-6">
-        <div class:mb-2={notification.message} class="font-semibold">
+        <div class:mb-2={notification.message} class="text-lg font-semibold">
             {@render children?.()}
 
             {#if notification.title}
@@ -86,7 +50,7 @@
         </div>
 
         {#if notification.message}
-            <div class="font-semibold {styles.iconAndMessage}">
+            <div class={`font-semibold ${styles.body}`}>
                 {#if notification.message}
                     {@html notification.message}
                 {/if}
@@ -94,16 +58,13 @@
         {/if}
     </div>
 
-    <button
-        class="ml-auto cursor-pointer"
-        onclick={() => dismiss && dismiss(notification.id)}
-    >
+    <button class="ml-auto cursor-pointer" onclick={() => dismiss && dismiss(notification.id)}>
         <Icon icon="mdi:close" />
     </button>
 
     <div
         style={notification.fade ? getAnimation(notification.duration) : ''}
-        class="line absolute left-0 w-full"
+        class="line absolute left-0 w-full bg-current"
     ></div>
 </div>
 
@@ -111,7 +72,6 @@
     .line {
         bottom: -1px;
         height: 3px;
-        background-color: currentColor;
         transform-origin: 0 0;
         transform: scaleX(1);
         animation-name: scaleX;

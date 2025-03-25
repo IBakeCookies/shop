@@ -1,11 +1,6 @@
 import type { FlyParams } from 'svelte/transition';
 
-export type Direction =
-    | 'fromBottom'
-    | 'fromTop'
-    | 'fromLeft'
-    | 'fromRight'
-    | 'opacity';
+export type Direction = 'fromBottom' | 'fromTop' | 'fromLeft' | 'fromRight' | 'opacity';
 
 export interface AdditionalConfig {
     index?: number;
@@ -59,12 +54,7 @@ export function getFly(
     config: FlyParams = {},
     additionalConfig: AdditionalConfig = {},
 ): FlyParams {
-    const {
-        index = 0,
-        limit = 0,
-        interval = delayInterval.default,
-    } = additionalConfig;
-
+    const { index = 0, limit = 0, interval = delayInterval.default } = additionalConfig;
     const loadMoreDelay = (index % (limit + 1)) + 1;
     const delay = limit ? loadMoreDelay * interval : index * interval;
 

@@ -1,5 +1,5 @@
-import { SvelteSet } from 'svelte/reactivity';
 import { getContext, setContext } from 'svelte';
+import { SvelteSet } from 'svelte/reactivity';
 
 const CONTEXT_KEY = Symbol();
 

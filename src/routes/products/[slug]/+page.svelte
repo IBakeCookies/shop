@@ -1,26 +1,28 @@
 <script lang="ts">
     import type { PageProps } from './$types';
+    import Icon from '@iconify/svelte';
     import { enhance } from '$app/forms';
     import { fly } from 'svelte/transition';
+    import { getCartStore } from '@store/cartStore.svelte';
     import { getEventStore } from '@store/eventStore.svelte';
     import { pageStore } from '@store/pageStore.svelte';
-    import { getCartStore } from '@store/cartStore.svelte';
-    import { getNotificationStore } from '@store/notificationStore.svelte';
     import { setProductStore } from '@store/productStore.svelte';
     import { getFly } from '@presentation/utils/fly';
     import Button from '@atom/button/button.svelte';
-    import Radio from '@atom/radio/radio.svelte';
+    import Money from '@atom/money/money.svelte';
+    import Radio from '@src/presentation/component/atom/radio/radio.svelte';
     import Sale from '@atom/sale/sale.svelte';
+	import { page } from '$app/state';
 
     const { data }: PageProps = $props();
     const productStore = setProductStore();
-    const notificationStore = getNotificationStore();
     const eventStore = getEventStore();
     const cartStore = getCartStore();
 
     productStore.product = data.product;
 
-    const isAddingToCart = $derived(eventStore.hasAny(['add-to-cart']));
+    const isAddingToCart = $derived(eventStore.hasAny(['add-item-to-cart']));
+	const slug = $derived(page.params.slug); 
 
     let colorModel = $state(-1);
     let sizeModel = $state(-1);
@@ -31,10 +33,8 @@
         }
 
         return productStore.product.productVariation.find((variation) => {
-            return (
-                variation.colorId === colorModel &&
-                variation.size_reference.id === sizeModel
-            );
+            return variation.colorId === colorModel 
+                && variation.size.id === sizeModel;
         });
     });
 
@@ -55,7 +55,7 @@
 
         productStore.product.productVariation.forEach((variation) => {
             if (variation.colorId === colorModel && variation.stock === 0) {
-                result.add(variation.size_reference.id);
+                result.add(variation.size.id);
             }
         });
 
@@ -70,10 +70,7 @@
         }
 
         productStore.product.productVariation.forEach((variation) => {
-            if (
-                variation.size_reference.id === sizeModel &&
-                variation.stock === 0
-            ) {
+            if (variation.size.id === sizeModel && variation.stock === 0) {
                 result.add(variation.colorId);
             }
         });
@@ -93,13 +90,7 @@
         );
     });
 
-    async function submit({
-        formElement,
-        formData,
-        action,
-        cancel,
-        submitter,
-    }) {
+    async function submit({ formElement, formData, action, cancel, submitter }) {
         if (!selectedVariation) {
             return cancel();
         }
@@ -111,22 +102,16 @@
             price: productStore.product.price,
             salePrice: selectedVariation.salePrice,
             color: selectedVariation.colorName,
-            size: selectedVariation.size_reference.name,
+            size: selectedVariation.size.size_translation.at(0)?.name || '',
             name: productStore.product.name,
+            slug,
         });
 
         if (success) {
-            notificationStore.addNotification({
-                title: success,
-            });
+            // do something?
         }
 
         if (error) {
-            notificationStore.addNotification({
-                title: error,
-                type: 'warning',
-            });
-
             cancel();
         }
 
@@ -134,12 +119,22 @@
             update();
         };
     }
+
+    const icons = {
+        'Regulates warmth': 'mdi:sun-snowflake-variant',
+        Lightweight: 'mdi:feather',
+        'Highly breathable': 'mdi:air-filter',
+        'Fast drying': 'mdi:water-evaporation',
+        Compressible: 'mdi:compress',
+        'Dual surface': 'mdi:layers',
+        'Resists abrasion': 'mdi:shield',
+        'Four-way stretch': 'mdi:arrow-expand-all',
+        'Shape retention': 'mdi:shape-outline',
+        'Superior wicking': 'mdi:water-percent',
+    };
 </script>
 
-<article
-    in:fly={getFly()}
-    class="mx-auto grid max-w-screen-2xl grid-cols-1 xl:grid-cols-6"
->
+<article in:fly={getFly()} class="mx-auto grid max-w-screen-2xl grid-cols-1 xl:grid-cols-6">
     <div class="col-span-3">
         <img
             src={productStore.product.image.src}
@@ -148,28 +143,29 @@
         />
     </div>
 
-    <div class="col-span-3 h-full border-r border-l border-stone-200">
+    <div class="col-span-3 h-full border-r border-l border-stone-200 bg-white">
         <div class="sticky" style="top: {pageStore.navHeight}px">
-            <h2 class="p-8 text-4xl font-bold">
+            <h2 class="p-8 text-4xl">
                 {productStore.product.name}
             </h2>
 
-            <p class="border-t border-stone-200 p-8">
+            <p class="p-box border-t border-stone-200">
                 {productStore.product.description}
 
                 {#if productStore.product.about}
-                    <span class="mt-4 block font-bold italic">
+                    <span class="mt-4 block italic">
                         {productStore.product.about}
                     </span>
                 {/if}
             </p>
 
-            <div class="border-t border-stone-200 p-8">
-                <h4 class="font-bold">Features</h4>
+            <div class="p-box border-t border-stone-200">
+                <h4 class="font-bold text-emerald-600">Features</h4>
 
-                <ul class="mt-4 italic">
+                <ul class="mt-4 space-y-2 italic">
                     {#each productStore.product.fabricFeatures as feature (feature)}
-                        <li>
+                        <li class="flex items-center">
+                            <Icon icon={icons[feature]} class="mr-2 min-h-6 min-w-6" />
                             {feature}
                         </li>
                     {/each}
@@ -178,42 +174,40 @@
 
             <form method="POST" action="?/addItemToCart" use:enhance={submit}>
                 {#if selectedVariation}
-                    <input
-                        type="hidden"
-                        name="productVariationId"
-                        value={selectedVariation.id}
-                    />
+                    <input type="hidden" name="productVariationId" value={selectedVariation.id} />
                 {/if}
 
                 <div class="flex items-center border-t border-stone-200">
-                    <fieldset class="flex gap-4 p-8">
+                    <fieldset class="p-box flex gap-4 flex-wrap">
                         {#each productStore.product.colors as color (color.id)}
                             <Radio
-                                name="color"
-                                value={color.id}
                                 id={`${color.id}`}
-                                required
-                                bind:group={colorModel}
-                                disabled={disabledColors.has(color.id)}
-                                style={`background-color: #${color.hex};`}
+                                name="color"
                                 title={color.name}
+                                value={color.id}
+                                bind:group={colorModel}
+                                size="square"
+                                backgroundColor={`#${color.hex};`}
+                                disabled={disabledColors.has(color.id)}
+                                required
                             >
                                 {#if color.salePrice}
-                                    <Sale value={`€${color.salePrice}`}></Sale>
+                                    <Sale value={`€${color.salePrice}`} />
                                 {/if}
                             </Radio>
                         {/each}
                     </fieldset>
 
-                    <fieldset class="flex gap-4 border-l border-stone-200 p-8">
+                    <fieldset class="p-box flex gap-4 border-l border-stone-200 flex-wrap">
                         {#each productStore.product.sizes as size (size.id)}
                             <Radio
-                                name="size"
-                                value={size.id}
                                 id={`${size.id}`}
-                                required
+                                name="size"
+                                title={size.name}
+                                value={size.id}
                                 bind:group={sizeModel}
                                 disabled={disabledSizes.has(size.id)}
+                                required
                             >
                                 {size.name}
                             </Radio>
@@ -221,35 +215,31 @@
                     </fieldset>
 
                     <!-- {#if availableStock !== null}
-                        <div class="col-span-3 border-l border-stone-200 p-8">
+                        <div class="col-span-3 border-l border-stone-200 p-box">
                             {availableStock} In Stock
                         </div>
                     {/if} -->
                 </div>
 
                 <fieldset class="flex items-center border-t border-stone-200">
-                    <div class="p-8 text-2xl font-bold">
+                    <div class="p-8 text-2xl">
                         {#if salePrice}
-                            <money class="block text-red-500"
-                                >€&nbsp;{salePrice}</money
-                            >
+                            <Money class="block" value={salePrice} />
                         {/if}
 
-                        <money
-                            class:line-through={salePrice}
-                            class:text-stone-600={salePrice}
-                            class:text-base={salePrice}
-                        >
-                            €&nbsp;{productStore.product.price}
-                        </money>
+                        <Money
+                            value={productStore.product.price}
+                            class={{
+                                'text-base text-stone-600 line-through': salePrice,
+                            }}
+                        ></Money>
                     </div>
 
-                    <div class="flex-1 border-l border-stone-200 p-8">
+                    <div class="p-box flex-1 border-l border-stone-200">
                         <Button
-                            modifier="w-full"
+                            class="w-full"
                             isLoading={isAddingToCart}
-                            disabled={availableStock !== null &&
-                                availableStock === 0}
+                            disabled={availableStock !== null && availableStock === 0}
                         >
                             Add to cart
                         </Button>
@@ -257,35 +247,35 @@
                 </fieldset>
             </form>
 
-            <div class="border-t border-stone-200 p-8">
-                <h4 class="font-bold">Size & fit</h4>
+            {#if productStore.product.attributes.length}
+                <div class="p-box border-t border-stone-200">
+                    <h4 class="font-bold text-emerald-600">Size & fit</h4>
 
-                {#if productStore.product.attributes.length}
                     <ul class="mt-4">
-                        {#each productStore.product.attributes as attribute (attribute.attribute)}
+                        {#each productStore.product.attributes as attribute}
                             <li>
                                 {attribute.attribute}:
                                 {attribute.value}
                             </li>
                         {/each}
                     </ul>
-                {/if}
-            </div>
+                </div>
+            {/if}
 
-            <div class="border-t border-stone-200 p-8">
-                <h4 class="font-bold">Care instructions</h4>
+            {#if productStore.product.fabricCareInstructions.length}
+                <div class="p-box border-t border-stone-200">
+                    <h4 class="font-bold text-emerald-600">Care instructions</h4>
 
-                {#if productStore.product.fabricCareInstructions.length}
-                    {#each productStore.product.fabricCareInstructions as careInstructions (careInstructions)}
+                    {#each productStore.product.fabricCareInstructions as careInstructions}
                         <p class="mt-4">
                             {careInstructions}
                         </p>
                     {/each}
-                {/if}
-            </div>
+                </div>
+            {/if}
 
-            <div class="border-t border-stone-200 p-8">
-                <h4 class="font-bold">Materials & Fabrics</h4>
+            <div class="p-box border-t border-stone-200">
+                <h4 class="font-bold text-emerald-600">Materials & Fabrics</h4>
 
                 <ul class="mt-4">
                     {#each productStore.product.productComposition as fabric (fabric.id)}
@@ -304,10 +294,9 @@
                                 {variation.weight}
                                 gsm
 
-                                {#each variation.fabric_type_composition as composition (composition.material_translation.at(0)?.name)}
+                                {#each variation.fabric_type_composition as composition}
                                     ({composition.percentage}%
-                                    {composition.material_translation.at(0)
-                                        ?.name})
+                                    {composition.material_translation.at(0)?.name})
                                 {/each}
                             </li>
                         {/if}
@@ -316,8 +305,8 @@
             </div>
 
             {#if productStore.product.about}
-                <div class="border-t border-stone-200 p-8">
-                    <h4 class="font-bold">About</h4>
+                <div class="p-box border-t border-stone-200">
+                    <h4 class="">About</h4>
 
                     <p class="mt-4">
                         {productStore.product.about}
@@ -328,7 +317,78 @@
     </div>
 </article>
 
-<!-- <section class="bg-stone-900 p-8 text-stone-100">
+<div class="bg-white border-t border-stone-200">
+    <div class="grid grid-cols-3 mx-auto max-w-screen-2xl">
+        {#if productStore.product.attributes.length}
+            <div class="p-box border-x border-stone-200">
+                <h4 class="font-bold text-emerald-600">Size & fit</h4>
+
+                <ul class="mt-4">
+                    {#each productStore.product.attributes as attribute}
+                        <li>
+                            {attribute.attribute}:
+                            {attribute.value}
+                        </li>
+                    {/each}
+                </ul>
+            </div>
+        {/if}
+
+        {#if productStore.product.fabricCareInstructions.length}
+            <div class="p-box border-r border-stone-200">
+                <h4 class="font-bold text-emerald-600">Care instructions</h4>
+
+                {#each productStore.product.fabricCareInstructions as careInstructions}
+                    <p class="mt-4">
+                        {careInstructions}
+                    </p>
+                {/each}
+            </div>
+        {/if}
+
+        <div class="p-box border-r border-stone-200">
+            <h4 class="font-bold text-emerald-600">Materials & Fabrics</h4>
+
+            <ul class="mt-4">
+                {#each productStore.product.productComposition as fabric (fabric.id)}
+                    {@const variation = fabric.fabric_type_variation}
+                    {#if variation}
+                        <li>
+                            {fabric.product_part_translation.at(0)?.name}
+                            made from
+
+                            {#if fabric.percentage !== 100}
+                                {fabric.percentage}%
+                            {/if}
+
+                            {variation.fabric_type?.name}
+                            {variation.name}
+                            {variation.weight}
+                            gsm
+
+                            {#each variation.fabric_type_composition as composition}
+                                ({composition.percentage}%
+                                {composition.material_translation.at(0)?.name})
+                            {/each}
+                        </li>
+                    {/if}
+                {/each}
+            </ul>
+        </div>
+
+        {#if productStore.product.about}
+            <div class="p-box border-t border-stone-200">
+                <h4 class="">About</h4>
+
+                <p class="mt-4">
+                    {productStore.product.about}
+                </p>
+            </div>
+        {/if}    
+    </div>    
+</div>
+
+<!-- <section class="bg-stone-900 p-box text-stone-100">
     <article class="mx-auto max-w-screen-2xl">
         <h2 class="text-3xl">Similar styles</h2>
     </article>

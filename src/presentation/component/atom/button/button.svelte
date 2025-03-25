@@ -1,58 +1,47 @@
 <script lang="ts">
-    import type { ClassValue } from 'clsx';
+    import Icon from '@iconify/svelte';
+    import type { StylePath } from '@src/presentation/utils/variant';
+	import type { ClassValue } from 'svelte/elements';
     import type { Snippet } from 'svelte';
-    import type {
-        HTMLButtonAttributes,
-        HTMLAnchorAttributes,
-    } from 'svelte/elements';
+    import type { HTMLButtonAttributes } from 'svelte/elements';
+    import { getButtonVariantStyle } from '@src/presentation/utils/variant';
     import { cn } from '@presentation/utils/style';
-    import type Icon from '@iconify/svelte';
 
     type Props = {
         href?: string;
         isLoading?: boolean;
-        variant?: 'primary' | 'secondary' | 'anchor' | 'icon';
+        variant?: StylePath;
+        size?: 'default' | 'small' | 'tiny' | 'square';
         disabled?: boolean;
-        modifier?: ClassValue;
+        class?: ClassValue;
         children?: Snippet;
-    } & (HTMLAnchorAttributes | HTMLButtonAttributes);
+        onHoverSnippet?: Snippet;
+    } & HTMLButtonAttributes;
 
     const {
         href,
         isLoading,
-        variant = 'primary',
+        variant = 'neutral-dark-base',
+        size = 'default',
         disabled,
-        modifier,
         children,
+        onHoverSnippet,
         ...props
     }: Props = $props();
 
-    let DynamicIcon: typeof Icon | null = $state(null);
+    let DynamicIcon: typeof Icon | undefined = $state();
 
-    const currentVariant: string = $derived.by(() => {
-        if (variant === 'anchor') {
-            return 'group relative font-bold';
+    const currentSize = $derived.by<string>(() => {
+        switch (size) {
+            case 'default':
+                return 'px-box py-3';
+            case 'small':
+                return 'px-4 py-2';
+            case 'tiny':
+                return 'px-2 py-1';
+            case 'square':
+                return 'min-w-7 min-h-7';
         }
-
-        if (variant === 'primary') {
-            return 'px-8 py-3 border-1 border-transparent bg-stone-900 text-stone-100 hover:bg-stone-700';
-        }
-
-        if (variant === 'secondary') {
-            return 'px-8 py-3 border-1 border-stone-200 text-stone-90 bg-white/70 backdrop-blur-sm hover:bg-stone-200';
-        }
-
-        return '';
-    });
-
-    $effect(() => {
-        if (!isLoading) {
-            return;
-        }
-
-        import('@iconify/svelte').then((module) => {
-            DynamicIcon = module.default;
-        });
     });
 </script>
 
@@ -61,9 +50,10 @@
     {...props}
     {href}
     class={cn(
-        'a-button inline-flex cursor-pointer items-center justify-center transition-colors disabled:bg-zinc-500',
-        currentVariant,
-        modifier,
+        'group relative inline-flex cursor-pointer items-center justify-center border-2 border-transparent transition-colors disabled:opacity-50',
+        getButtonVariantStyle(variant),
+        currentSize,
+        props.class,
         {
             'pointer-events-none': isLoading || disabled,
         },
@@ -72,14 +62,22 @@
 >
     {@render children?.()}
 
-    {#if isLoading && DynamicIcon}
-        <DynamicIcon icon="bi:arrow-repeat" class="ml-4 h-6 w-6 animate-spin" />
+    {#if onHoverSnippet}
+        <div
+            class="absolute right-4 -translate-x-2 opacity-0 transition-all group-hover:translate-x-1/2 group-hover:opacity-100"
+        >
+            {@render onHoverSnippet()}
+        </div>
     {/if}
 
-    {#if href}
+    {#if isLoading}
+        <Icon icon="bi:arrow-repeat" class="ml-icon h-6 w-6 animate-spin" />
+    {/if}
+
+    <!-- {#if variant === 'anchor'}
         <span
             class="absolute top-full left-0 h-[2px] w-full origin-left scale-x-0 bg-stone-900 transition-transform group-hover:scale-x-100"
         >
         </span>
-    {/if}
+    {/if} -->
 </svelte:element>
