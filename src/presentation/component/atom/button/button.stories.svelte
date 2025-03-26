@@ -32,7 +32,7 @@
 <Story
     name="Neutral dark"
     args={{
-        children
+        children,
     }}
 />
 

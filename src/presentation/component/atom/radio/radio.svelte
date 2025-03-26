@@ -1,7 +1,6 @@
 <script lang="ts">
-	import type { ClassValue } from 'svelte/elements';
     import type { Snippet } from 'svelte';
-    import type { HTMLInputAttributes } from 'svelte/elements';
+    import type { ClassValue, HTMLInputAttributes } from 'svelte/elements';
     import { cn } from '@presentation/utils/style';
     import Label from '@atom/label/label.svelte';
 
@@ -44,7 +43,7 @@
     {#snippet text()}
         {@render label?.()}
     {/snippet}
-   
+
     <div
         style={`background-color: ${backgroundColor}`}
         class={`relative flex items-center bg-stone-200 outline-2 outline-offset-2 outline-transparent transition-colors has-checked:outline-stone-600 has-focus-visible:outline-stone-600 ${labelStyleVariant}`}

@@ -10,7 +10,7 @@ export async function getProducts(): Promise<ProductListing[]> {
         if (!data || error) {
             return [];
         }
-
+        
         return data.map(transformProduct);
     } catch (error) {
         console.error(error);

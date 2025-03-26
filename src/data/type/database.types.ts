@@ -381,12 +381,18 @@ export type Database = {
       }
       material_feature: {
         Row: {
+          code: string
+          icon: string
           id: number
         }
         Insert: {
+          code: string
+          icon: string
           id?: number
         }
         Update: {
+          code?: string
+          icon?: string
           id?: number
         }
         Relationships: []
@@ -791,17 +797,20 @@ export type Database = {
         Row: {
           filename: string
           id: number
-          product_item_id: number
+          is_default: boolean | null
+          product_item_id: number | null
         }
         Insert: {
           filename: string
           id?: number
-          product_item_id: number
+          is_default?: boolean | null
+          product_item_id?: number | null
         }
         Update: {
           filename?: string
           id?: number
-          product_item_id?: number
+          is_default?: boolean | null
+          product_item_id?: number | null
         }
         Relationships: [
           {

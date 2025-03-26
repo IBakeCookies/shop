@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { ClassValue } from 'svelte/elements';
+    import type { ClassValue } from 'svelte/elements';
     import { cn } from '@presentation/utils/style';
     import Button from '@atom/button/button.svelte';
     import Input from '@atom/input/input.svelte';
@@ -22,7 +22,7 @@
         props.class,
     )}
 >
-    <img {...image} class="h-full object-cover" />
+    <img {...image} class="h-full object-cover" loading="lazy" />
 
     <div class="px-box py-20">
         <div>
@@ -33,17 +33,15 @@
             </p>
 
             <form>
-                <Input 
-                    name="email" 
-                    type="email" 
-                    placeholder="john.doe@gmail.com" 
-                    required 
+                <Input
+                    name="email"
+                    type="email"
+                    placeholder="john.doe@gmail.com"
+                    required
                     class="mt-8 block w-full"
                 />
 
-                <Button type="submit" class="mt-4" variant="neutral-light-base">
-                    Subscribe
-                </Button>
+                <Button type="submit" class="mt-4" variant="neutral-light-base">Subscribe</Button>
             </form>
         </div>
     </div>

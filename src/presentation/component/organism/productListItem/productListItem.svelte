@@ -1,7 +1,6 @@
 <script lang="ts">
     // import type { ClassValue } from 'clsx';
     import type { ClassValue } from 'svelte/elements';
-
     import { cn } from '@presentation/utils/style';
     import Money from '@atom/money/money.svelte';
     import Sale from '@atom/sale/sale.svelte';
@@ -16,7 +15,7 @@
         variants: {
             salePrice: number;
             colorName: string;
-        }[],
+        }[];
         class?: ClassValue;
     }
 
@@ -28,7 +27,7 @@
 <div
     {...props}
     class={cn(
-        'flex min-h-130 max-h-130 h-full flex-col border border-stone-200 bg-white transition-all hover:-translate-y-1 ',
+        'flex h-full max-h-130 min-h-130 flex-col border border-stone-200 bg-white transition-all hover:-translate-y-1 ',
         props.class,
     )}
     title={name}
@@ -45,16 +44,14 @@
                     style="background-color: {variant.colorName};"
                 >
                     {#if variant.salePrice}
-                        <Sale value={`€${variant.salePrice}`} size="small" /> 
+                        <Sale value={`€${variant.salePrice}`} size="small" />
                     {/if}
                 </li>
             {/each}
-        </ul>     
+        </ul>
 
         {#if hasSale}
-            <div class="absolute top-2 right-4 text-red-600">
-                Sale % 
-            </div>
+            <div class="absolute top-2 right-4 text-red-600">Sale</div>
         {/if}
     </div>
 
@@ -64,9 +61,10 @@
                 {name}
             </h2>
 
-            <Money 
-                value={price} 
-                class="col-span-3 flex items-center justify-center self-stretch border-l border-stone-200 p-4"/>
+            <Money
+                value={price}
+                class="col-span-3 flex items-center justify-center self-stretch border-l border-stone-200 p-4"
+            />
         </div>
     </div>
 </div>

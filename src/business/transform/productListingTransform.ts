@@ -13,12 +13,25 @@ export interface ProductListing {
     image: {
         src: string;
         alt: string;
+        isDefault: boolean;
     };
 }
 
 export function transformProduct(product: ReadAllProductsSingleOutput): ProductListing {
     const name = product.product_translation.at(0)?.name || '';
     const slug = product.slug || '';
+    const image = { src: '', alt: '', isDefault: false };
+
+    for(const item of product.product_item) {
+        for(const imageItem of item.product_image) {
+            if(imageItem.is_default) {
+                image.src = `https://file.garden/Z-Ko2HO6YkiJFqy0/product/${imageItem.filename}`;
+                image.alt = name;
+                image.isDefault = true;
+                break;
+            }
+        }
+    }
 
     return {
         id: product.id,
@@ -32,9 +45,6 @@ export function transformProduct(product: ReadAllProductsSingleOutput): ProductL
                 colorName: item.color.at(0)?.name || '',
             };
         }),
-        image: {
-            src: `/${slug}/index.webp`,
-            alt: name,
-        },
+        image,
     };
 }

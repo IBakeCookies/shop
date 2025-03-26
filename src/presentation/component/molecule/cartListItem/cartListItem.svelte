@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { ClassValue } from 'svelte/elements';
+    import type { ClassValue } from 'svelte/elements';
     import Icon from '@iconify/svelte';
     import { cn } from '@presentation/utils/style';
     import QuantityInput from '@molecule/quantityInput/quantityInput.svelte';
@@ -44,9 +44,9 @@
         props.class,
     )}
 >
-    <a 
-        href={slug} 
-        class="col-span-10 justify-self-start md:col-span-7">
+    <a href={slug} class="col-span-10 flex items-center justify-self-start md:col-span-7">
+        <!-- <img class="max-w-20 mr-4" src={`${slug}/index.webp`} alt="asd" /> -->
+
         {name} - {color} - {size}
     </a>
 

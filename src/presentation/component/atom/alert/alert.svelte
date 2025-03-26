@@ -1,8 +1,7 @@
 <script lang="ts">
     import type { StylePath } from '@src/presentation/utils/variant';
-	import type { ClassValue } from 'svelte/elements';
     import type { Snippet } from 'svelte';
-    import type { HTMLAttributes } from 'svelte/elements';
+    import type { ClassValue, HTMLAttributes } from 'svelte/elements';
     import { getAlertVariantStyle } from '@src/presentation/utils/variant';
     import { cn } from '@presentation/utils/style';
 

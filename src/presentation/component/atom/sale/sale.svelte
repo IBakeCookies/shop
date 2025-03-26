@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { ClassValue } from 'svelte/elements';
+    import type { ClassValue } from 'svelte/elements';
     import { cn } from '@presentation/utils/style';
 
     type Props = {

@@ -7,7 +7,7 @@
     "bracketSpacing": true,
     "bracketSameLine": false,
     "arrowParens": "always",
-    "tailwindAttributes": ["modifier"],
+    "tailwindAttributes": ["class"],
     "tailwindFunctions": ["cn"],
     "plugins": [
         "prettier-plugin-svelte",

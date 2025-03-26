@@ -1,6 +1,6 @@
 <script lang="ts">
-	import type { ClassValue } from 'svelte/elements';
     import type { Snippet } from 'svelte';
+    import type { ClassValue } from 'svelte/elements';
     import Icon from '@iconify/svelte';
     import { cn } from '@presentation/utils/style';
     import Button from '@atom/button/button.svelte';

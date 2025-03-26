@@ -1,8 +1,7 @@
 <script lang="ts">
     import type { NotificationInput } from '@store/notificationStore.svelte';
-	import type { ClassValue } from 'svelte/elements';
     import type { Snippet } from 'svelte';
-    import type { HTMLAttributes } from 'svelte/elements';
+    import type { ClassValue, HTMLAttributes } from 'svelte/elements';
     import Icon from '@iconify/svelte';
     import { getNotificationVariantStyle } from '@src/presentation/utils/variant';
     import { cn } from '@presentation/utils/style';

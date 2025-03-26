@@ -8,13 +8,6 @@ type ProductVariation =
         colorName: string;
     };
 
-interface ProductColor {
-    id: number;
-    name: string;
-    salePrice: number;
-    hex: string;
-}
-
 interface ProductSize {
     id: number;
     name: string;
@@ -25,23 +18,40 @@ interface Attribute {
     value: string;
 }
 
+interface Feature {
+    name: string;
+    icon: string;
+}
+
+interface ProductItem {
+    id: number;
+    color: {
+        id: number;
+        name: string;
+        hex: string;
+    };
+    price: number;
+    salePrice: number;
+    images: {
+        src: string;
+        alt: string;
+    }[];
+}
+
 export interface ProductDetail {
     name: string;
     description: string;
     careInstructions: string;
     fabricCareInstructions: string[];
-    fabricFeatures: string[];
+    fabricFeatures: Feature[];
     productComposition: ProductComposition[];
     about: string;
-    image: {
-        src: string;
-        alt: string;
-    };
-    colors: ProductColor[];
     sizes: ProductSize[];
     price: number;
     attributes: Attribute[];
     productVariation: ProductVariation[];
+    items: ProductItem[];
+    variations: ProductVariation[];
 }
 
 export function transformProductDetailApiToProductDetail(
@@ -62,20 +72,16 @@ export function transformProductDetailApiToProductDetail(
     return {
         name,
         description: product.product_translation.at(0)?.description || '',
+        about: product.product_translation.at(0)?.about || '',
         careInstructions: product.product_translation.at(0)?.care_instructions || '',
         fabricCareInstructions,
+        attributes: getAttributes(product),
         fabricFeatures: getFabricFeatures(product),
         productComposition: product.product_composition,
-        about: product.product_translation.at(0)?.about || '',
-        image: {
-            src: `/${product.slug}/index.webp`,
-            alt: name,
-        },
-        colors: getColors(product),
-        attributes: getAttributes(product),
         sizes: getSizes(product),
         price: product.product_item.at(0)?.price || 0,
-        productVariation: product.product_item
+        items: getItems(product),
+        variations: product.product_item
             .map((item) => {
                 return item.product_variation.map((element) => {
                     return {
@@ -90,22 +96,33 @@ export function transformProductDetailApiToProductDetail(
     };
 }
 
+function getItems(product: ReadProductBySlugOutput): ProductItem[] {
+    return product.product_item.map((item) => {
+        return {
+            id: item.id,
+            color: {
+                id: item.color_id,
+                name: item.color.at(0)?.name || '',
+                hex: item.hex,
+            },
+            price: item.price,
+            salePrice: item.sale_price || 0,
+            images: item.product_image
+                .map((image) => ({
+                    src: `https://file.garden/Z-Ko2HO6YkiJFqy0/product/${image.filename}`,
+                    alt: product.product_translation.at(0)?.name || '',
+                    isDefault: image.is_default,
+                }))
+                .sort((a) => (a.isDefault ? -1 : 1)),
+        };
+    });
+}
+
 function getAttributes(product: ReadProductBySlugOutput): Attribute[] {
     return product.attribute_option.map((option) => ({
         attribute: option.attribute_type_translation.at(0)?.name || '',
         value: option.attribute_option_translation.at(0)?.name || '',
     }));
-}
-
-function getColors(product: ReadProductBySlugOutput): ProductColor[] {
-    return product.product_item
-        .map((item) => ({
-            id: item.color_id,
-            name: item.color.at(0)?.name || '',
-            salePrice: item.sale_price || 0,
-            hex: item.hex,
-        }))
-        .sort((a, b) => `${a.name}`.localeCompare(b.name));
 }
 
 function getSizes(product: ReadProductBySlugOutput): ProductSize[] {
@@ -114,7 +131,7 @@ function getSizes(product: ReadProductBySlugOutput): ProductSize[] {
 
     for (const item of product.product_item) {
         for (const variation of item.product_variation) {
-            const sizeName = variation.size.size_translation.at(0)?.name || ''
+            const sizeName = variation.size.size_translation.at(0)?.name || '';
 
             if (!seen.has(sizeName)) {
                 seen.add(sizeName);
@@ -130,8 +147,8 @@ function getSizes(product: ReadProductBySlugOutput): ProductSize[] {
     return result.sort((a, b) => a.id - b.id);
 }
 
-function getFabricFeatures(product: ReadProductBySlugOutput): string[] {
-    const result: string[] = [];
+function getFabricFeatures(product: ReadProductBySlugOutput): Feature[] {
+    const result: Feature[] = [];
 
     for (let i = 0; i < product.product_composition.length; i++) {
         const composition = product.product_composition.at(i);
@@ -161,7 +178,10 @@ function getFabricFeatures(product: ReadProductBySlugOutput): string[] {
 
             const feature = featureItem.material_feature_translation.at(0)?.name;
 
-            result.push(feature || '');
+            result.push({
+                name: feature || '',
+                icon: featureItem.icon,
+            });
         }
     }
 

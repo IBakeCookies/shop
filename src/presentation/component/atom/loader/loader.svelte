@@ -1,7 +1,7 @@
 <script lang="ts">
+    import type { ClassValue } from 'svelte/elements';
     import Icon from '@iconify/svelte';
     import { getEventStore } from '@store/eventStore.svelte';
-	import type { ClassValue } from 'svelte/elements';
 
     interface Props {
         auto?: boolean;
@@ -14,8 +14,7 @@
 
     const eventStore = getEventStore();
     const isLoading = $derived<boolean>(eventStore && eventStore.hasAny(events));
-    const loaderClasses =
-        'p-box pointer-events-none flex items-center justify-center';
+    const loaderClasses = 'p-box pointer-events-none flex items-center justify-center';
     const additionalClasses = isRelative ? 'relative' : 'absolute w-full h-full top-0 left-0';
 </script>
 

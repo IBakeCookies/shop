@@ -3,7 +3,7 @@
     // import Icon from '@iconify/svelte';
 </script>
 
-<footer class="border-t border-stone-200">
+<footer class="border-t border-stone-200 bg-white">
     <div
         class="p-box mx-auto grid max-w-screen-2xl grid-cols-1 gap-4 py-20 lg:grid-cols-3 xl:grid-cols-4"
     >

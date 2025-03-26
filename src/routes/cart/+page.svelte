@@ -63,8 +63,7 @@
                                 id={item.id}
                                 onRemove={(id) => cartStore.removeItem(id)}
                                 onQuantityChange={(id, quantity) =>
-                                    cartStore.updateItemQuantity(id, quantity)
-                                }
+                                    cartStore.updateItemQuantity(id, quantity)}
                                 class={{
                                     'border-b': i === cartStore.items.length - 1,
                                 }}
@@ -72,7 +71,6 @@
                         </div>
                     {/each}
                 </div>
-
 
                 <div class="col-span-1 border border-stone-200 bg-white">
                     <h2 class="p-8 text-xl">Summary</h2>

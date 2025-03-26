@@ -31,6 +31,10 @@ export const readAllProducts = () =>
 						color:color_translation (
 							name
 						)
+					),
+					product_image (
+						filename,
+						is_default
 					)
 				),
 				product_translation (
@@ -47,7 +51,6 @@ export const readProductBySlug = (slug: string) =>
         .from('product')
         .select(
             `
-				id,
 				slug,
 				attribute_option (
 					attribute_option_translation (
@@ -63,6 +66,10 @@ export const readProductBySlug = (slug: string) =>
 					id,
 					price,
 					sale_price,
+					product_image (
+						filename,
+						is_default
+					),
 					...color_id (
 						hex,
 						color_id:id,
@@ -115,6 +122,7 @@ export const readProductBySlug = (slug: string) =>
 							),	
 							fabric_type_features (
 								...material_feature (
+									icon,
 									material_feature_translation (name)
 								)
 							)

@@ -8,8 +8,8 @@
         title: 'atom/input',
         component: Input,
         args: {
-            name: 'input'
-        }
+            name: 'input',
+        },
     });
 </script>
 
@@ -28,12 +28,12 @@
 
 <Story name="With label top">
     <Label {text}>
-        <Input name='input' />
+        <Input name="input" />
     </Label>
 </Story>
 
 <Story name="With label left">
     <Label position="left" {text}>
-        <Input name='input' />
+        <Input name="input" />
     </Label>
 </Story>

@@ -1,7 +1,7 @@
 <script lang="ts">
     import type { AdditionalConfig, Direction } from '@presentation/utils/fly';
-	import type { ClassValue } from 'svelte/elements';
     import type { Snippet } from 'svelte';
+    import type { ClassValue } from 'svelte/elements';
     import { fly } from 'svelte/transition';
     import { getFly } from '@presentation/utils/fly';
 
@@ -77,10 +77,6 @@
     });
 </script>
 
-<div {...props} 
-    class={['fly', props.class]} 
-    in:fly={transition.flyIn}
-    out:fly={transition.flyOut}
->
+<div {...props} class={['fly', props.class]} in:fly={transition.flyIn} out:fly={transition.flyOut}>
     {@render children()}
 </div>

@@ -1,9 +1,8 @@
 <script lang="ts">
-    import Icon from '@iconify/svelte';
     import type { StylePath } from '@src/presentation/utils/variant';
-	import type { ClassValue } from 'svelte/elements';
     import type { Snippet } from 'svelte';
-    import type { HTMLButtonAttributes } from 'svelte/elements';
+    import type { ClassValue, HTMLButtonAttributes } from 'svelte/elements';
+    import Icon from '@iconify/svelte';
     import { getButtonVariantStyle } from '@src/presentation/utils/variant';
     import { cn } from '@presentation/utils/style';
 

@@ -187,7 +187,7 @@ export class CartStore {
             if (cartItem.quantity + item.quantity > cartItem.stock) {
                 return {
                     success: '',
-                    error: 'You already have the maximum quantity in your cart.',
+                    error: 'Out of stock.',
                 };
             }
 

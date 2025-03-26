@@ -1,4 +1,4 @@
-import type { ProductDetail } from '@src/business/transform/productDetailTransform';
+import type { ProductDetail } from '@business/transform/productDetailTransform';
 import { getContext, setContext } from 'svelte';
 import { transformProductDetailApiToProductDetail } from '@src/business/transform/productDetailTransform';
 import { readProductBySlug } from '@data/repository/productRepository';
@@ -11,15 +11,11 @@ const placeholder: ProductDetail = {
     fabricFeatures: [],
     productComposition: [],
     about: '',
-    image: {
-        src: '',
-        alt: '',
-    },
-    colors: [],
     sizes: [],
     price: 0,
     attributes: [],
     productVariation: [],
+    items: [],
 };
 
 export async function getProduct(slug: string): Promise<ProductDetail> {

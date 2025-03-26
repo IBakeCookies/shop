@@ -1,6 +1,7 @@
 <script lang="ts">
     import type { Component } from 'svelte';
     import '@src/app.css';
+    import Icon from '@iconify/svelte';
     import { ParaglideJS } from '@inlang/paraglide-sveltekit';
     import { i18n } from '$lib/i18n';
     import { onMount } from 'svelte';
@@ -100,6 +101,28 @@
 
     <div class="flex w-full flex-1 flex-col">
         {@render children()}
+    </div>
+
+    <div class="px-box border-y border-stone-200 bg-white">
+        <div class="mx-auto grid max-w-screen-2xl grid-cols-3">
+            <div class="p-box flex flex-col items-center justify-center border-x border-stone-200">
+                <Icon icon="mdi:truck-fast" class="text-3xl text-emerald-600" />
+
+                <h4 class="mt-4 text-xl">Quick shipping</h4>
+            </div>
+
+            <div class="p-box flex flex-col items-center justify-center border-stone-200">
+                <Icon icon="mdi:encryption-secure" class="text-3xl text-emerald-600" />
+
+                <h4 class="mt-4 text-xl">Secure transactions</h4>
+            </div>
+
+            <div class="p-box flex flex-col items-center justify-center border-x border-stone-200">
+                <Icon icon="mdi:freehand-line" class="text-3xl text-emerald-600" />
+
+                <h4 class="mt-4 text-xl">Handmade goods</h4>
+            </div>
+        </div>
     </div>
 
     <Newsletter

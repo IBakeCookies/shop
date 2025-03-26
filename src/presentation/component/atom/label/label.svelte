@@ -1,6 +1,6 @@
 <script lang="ts">
-	import type { ClassValue } from 'svelte/elements';
     import type { Snippet } from 'svelte';
+    import type { ClassValue } from 'svelte/elements';
     import { cn } from '@presentation/utils/style';
 
     interface Props {
