@@ -127,7 +127,7 @@
 
     <Newsletter
         image={{
-            src: '/snow.webp',
+            src: 'https://file.garden/Z-Ko2HO6YkiJFqy0/revar/main/uTPut4rjAjrbTKFw2nWAatJXdcN9mU2s.webp',
             alt: 'snow',
         }}
     />

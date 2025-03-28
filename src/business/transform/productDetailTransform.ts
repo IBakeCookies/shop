@@ -1,58 +1,12 @@
+import type {
+    ProductAttribute,
+    ProductDetail,
+    ProductFeature,
+    ProductItem,
+    ProductSize,
+} from '@business/type/product/productDetail';
 import type { ReadProductBySlugOutput } from '@data/repository/productRepository';
-
-type ProductComposition = ReadProductBySlugOutput['product_composition'][number];
-type ProductVariation =
-    ReadProductBySlugOutput['product_item'][number]['product_variation'][number] & {
-        colorId: number;
-        salePrice: number;
-        colorName: string;
-    };
-
-interface ProductSize {
-    id: number;
-    name: string;
-}
-
-interface Attribute {
-    attribute: string;
-    value: string;
-}
-
-interface Feature {
-    name: string;
-    icon: string;
-}
-
-interface ProductItem {
-    id: number;
-    color: {
-        id: number;
-        name: string;
-        hex: string;
-    };
-    price: number;
-    salePrice: number;
-    images: {
-        src: string;
-        alt: string;
-    }[];
-}
-
-export interface ProductDetail {
-    name: string;
-    description: string;
-    careInstructions: string;
-    fabricCareInstructions: string[];
-    fabricFeatures: Feature[];
-    productComposition: ProductComposition[];
-    about: string;
-    sizes: ProductSize[];
-    price: number;
-    attributes: Attribute[];
-    productVariation: ProductVariation[];
-    items: ProductItem[];
-    variations: ProductVariation[];
-}
+import { getImageUrlFromProduct } from '@business/utils/imageUrl';
 
 export function transformProductDetailApiToProductDetail(
     product: ReadProductBySlugOutput,
@@ -108,17 +62,19 @@ function getItems(product: ReadProductBySlugOutput): ProductItem[] {
             price: item.price,
             salePrice: item.sale_price || 0,
             images: item.product_image
-                .map((image) => ({
-                    src: `https://file.garden/Z-Ko2HO6YkiJFqy0/product/${image.filename}`,
-                    alt: product.product_translation.at(0)?.name || '',
-                    isDefault: image.is_default,
-                }))
-                .sort((a) => (a.isDefault ? -1 : 1)),
+                .map((image) => {
+                    return {
+                        src: getImageUrlFromProduct(image),
+                        alt: image.alt_text,
+                        sortOrder: image.sort_order,
+                    };
+                })
+                .sort((a, b) => a.sortOrder - b.sortOrder),
         };
     });
 }
 
-function getAttributes(product: ReadProductBySlugOutput): Attribute[] {
+function getAttributes(product: ReadProductBySlugOutput): ProductAttribute[] {
     return product.attribute_option.map((option) => ({
         attribute: option.attribute_type_translation.at(0)?.name || '',
         value: option.attribute_option_translation.at(0)?.name || '',
@@ -139,6 +95,7 @@ function getSizes(product: ReadProductBySlugOutput): ProductSize[] {
                 result.push({
                     id: variation.size.id,
                     name: sizeName,
+                    weight: `${variation.weight}${variation.weight_unit_code}`,
                 });
             }
         }
@@ -147,8 +104,8 @@ function getSizes(product: ReadProductBySlugOutput): ProductSize[] {
     return result.sort((a, b) => a.id - b.id);
 }
 
-function getFabricFeatures(product: ReadProductBySlugOutput): Feature[] {
-    const result: Feature[] = [];
+function getFabricFeatures(product: ReadProductBySlugOutput): ProductFeature[] {
+    const result: ProductFeature[] = [];
 
     for (let i = 0; i < product.product_composition.length; i++) {
         const composition = product.product_composition.at(i);

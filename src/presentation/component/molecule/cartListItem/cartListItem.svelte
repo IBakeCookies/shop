@@ -12,9 +12,14 @@
         size: string;
         stock: number;
         quantity: number;
+        isDeleteButtonLoading: (id: number) => boolean;
         salePrice: number;
         price: number;
         id: number;
+        image: {
+            src: string;
+            alt: string;
+        };
         slug: string;
         onRemove: (id: number) => void;
         onQuantityChange: (id: number, quantity: number) => void;
@@ -29,8 +34,10 @@
         quantity,
         stock,
         salePrice,
+        isDeleteButtonLoading,
         price,
         id,
+        image,
         slug,
         onQuantityChange,
         ...props
@@ -45,9 +52,15 @@
     )}
 >
     <a href={slug} class="col-span-10 flex items-center justify-self-start md:col-span-7">
-        <!-- <img class="max-w-20 mr-4" src={`${slug}/index.webp`} alt="asd" /> -->
+        <img class="mr-4 max-w-16" src={image.src} alt={image.alt} />
 
-        {name} - {color} - {size}
+        <div>
+            <h4 class="text-h6 block">{name}</h4>
+
+            <p class="text-stone-500">Color: {color} - Size: {size}</p>
+        </div>
+
+        <!-- {name} - {color} - {size} -->
     </a>
 
     <QuantityInput
@@ -59,16 +72,25 @@
         onChange={(newQuantiy) => onQuantityChange(id, newQuantiy)}
     />
 
-    <Money
-        class="order-4 col-span-2 md:col-span-1"
-        value={salePrice * quantity || price * quantity}
-    />
+    <div class="item-end order-4 col-span-2 flex flex-col md:col-span-1">
+        {#if salePrice}
+            <Money value={salePrice} class="mb-2" />
+        {/if}
+
+        <Money
+            value={price}
+            class={{
+                'line-through': salePrice,
+            }}
+        />
+    </div>
 
     <Button
         size="square"
         variant="neutral-light-base"
         onclick={() => onRemove(id)}
         class="order-2 col-span-2 md:order-5 md:col-span-1"
+        isLoading={isDeleteButtonLoading(id)}
     >
         <Icon icon="mdi:close" class="text-red-500" />
     </Button>

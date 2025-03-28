@@ -15,7 +15,7 @@
     {#if !productStore.products.length}
         <p>No products found</p>
     {:else}
-        <div class="grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-4">
+        <div class="gap-box grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
             {#each productStore.products as product}
                 <a href={`/products/${product.slug}`}>
                     <ProductListItem

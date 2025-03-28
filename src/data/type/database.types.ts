@@ -158,6 +158,38 @@ export type Database = {
           },
         ]
       }
+      bucket: {
+        Row: {
+          created_at: string
+          id: number
+          name: string
+          region: string | null
+          storage_provider_id: number
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          name: string
+          region?: string | null
+          storage_provider_id: number
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          name?: string
+          region?: string | null
+          storage_provider_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bucket_storage_provider_id_fkey"
+            columns: ["storage_provider_id"]
+            isOneToOne: false
+            referencedRelation: "storage_provider"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       color: {
         Row: {
           hex: string
@@ -203,6 +235,32 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "language"
             referencedColumns: ["code"]
+          },
+        ]
+      }
+      directory: {
+        Row: {
+          bucket_id: number
+          id: number
+          path: string
+        }
+        Insert: {
+          bucket_id: number
+          id?: number
+          path: string
+        }
+        Update: {
+          bucket_id?: number
+          id?: number
+          path?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "directory_bucket_id_fkey"
+            columns: ["bucket_id"]
+            isOneToOne: false
+            referencedRelation: "bucket"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -322,22 +380,25 @@ export type Database = {
       }
       fabric_type_variation: {
         Row: {
-          fabric_type_id: number | null
+          fabric_type_id: number
           id: number
           name: string | null
           weight: number | null
+          weight_unit_code: string | null
         }
         Insert: {
-          fabric_type_id?: number | null
+          fabric_type_id: number
           id?: number
           name?: string | null
           weight?: number | null
+          weight_unit_code?: string | null
         }
         Update: {
-          fabric_type_id?: number | null
+          fabric_type_id?: number
           id?: number
           name?: string | null
           weight?: number | null
+          weight_unit_code?: string | null
         }
         Relationships: [
           {
@@ -345,6 +406,54 @@ export type Database = {
             columns: ["fabric_type_id"]
             isOneToOne: false
             referencedRelation: "fabric_type"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fabric_type_variation_weight_unit_code_fkey"
+            columns: ["weight_unit_code"]
+            isOneToOne: false
+            referencedRelation: "weight_unit"
+            referencedColumns: ["code"]
+          },
+        ]
+      }
+      image: {
+        Row: {
+          alt_text: string
+          created_at: string
+          directory_id: number
+          filename: string
+          height: number | null
+          id: number
+          mime_type: string
+          width: number | null
+        }
+        Insert: {
+          alt_text: string
+          created_at?: string
+          directory_id: number
+          filename: string
+          height?: number | null
+          id?: number
+          mime_type: string
+          width?: number | null
+        }
+        Update: {
+          alt_text?: string
+          created_at?: string
+          directory_id?: number
+          filename?: string
+          height?: number | null
+          id?: number
+          mime_type?: string
+          width?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "image_directory_id_fkey"
+            columns: ["directory_id"]
+            isOneToOne: false
+            referencedRelation: "directory"
             referencedColumns: ["id"]
           },
         ]
@@ -502,18 +611,21 @@ export type Database = {
           material_id: number
           name: string | null
           weight: number | null
+          weight_unit_code: string | null
         }
         Insert: {
           id?: number
           material_id: number
           name?: string | null
           weight?: number | null
+          weight_unit_code?: string | null
         }
         Update: {
           id?: number
           material_id?: number
           name?: string | null
           weight?: number | null
+          weight_unit_code?: string | null
         }
         Relationships: [
           {
@@ -522,6 +634,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "material"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "material_variation_weight_unit_code_fkey"
+            columns: ["weight_unit_code"]
+            isOneToOne: false
+            referencedRelation: "weight_unit"
+            referencedColumns: ["code"]
           },
         ]
       }
@@ -602,19 +721,25 @@ export type Database = {
       }
       product_category: {
         Row: {
+          created_at: string
           id: number
           image: string | null
           parent_product_category_id: number | null
+          updated_at: string
         }
         Insert: {
+          created_at?: string
           id?: number
           image?: string | null
           parent_product_category_id?: number | null
+          updated_at?: string
         }
         Update: {
+          created_at?: string
           id?: number
           image?: string | null
           parent_product_category_id?: number | null
+          updated_at?: string
         }
         Relationships: [
           {
@@ -795,24 +920,28 @@ export type Database = {
       }
       product_image: {
         Row: {
-          filename: string
-          id: number
-          is_default: boolean | null
-          product_item_id: number | null
+          image_id: number
+          product_item_id: number
+          sort_order: number
         }
         Insert: {
-          filename: string
-          id?: number
-          is_default?: boolean | null
-          product_item_id?: number | null
+          image_id: number
+          product_item_id: number
+          sort_order: number
         }
         Update: {
-          filename?: string
-          id?: number
-          is_default?: boolean | null
-          product_item_id?: number | null
+          image_id?: number
+          product_item_id?: number
+          sort_order?: number
         }
         Relationships: [
+          {
+            foreignKeyName: "product_image_image_id_fkey"
+            columns: ["image_id"]
+            isOneToOne: false
+            referencedRelation: "image"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "product_image_product_item_id_fkey"
             columns: ["product_item_id"]
@@ -959,22 +1088,34 @@ export type Database = {
       }
       product_variation: {
         Row: {
+          created_at: string
           id: number
           product_item_id: number
           size_option_id: number
           stock: number
+          updated_at: string
+          weight: number
+          weight_unit_code: string
         }
         Insert: {
+          created_at?: string
           id?: number
           product_item_id: number
           size_option_id: number
           stock: number
+          updated_at?: string
+          weight: number
+          weight_unit_code: string
         }
         Update: {
+          created_at?: string
           id?: number
           product_item_id?: number
           size_option_id?: number
           stock?: number
+          updated_at?: string
+          weight?: number
+          weight_unit_code?: string
         }
         Relationships: [
           {
@@ -990,6 +1131,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "size_option"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "product_variation_weight_unit_code_fkey"
+            columns: ["weight_unit_code"]
+            isOneToOne: false
+            referencedRelation: "weight_unit"
+            referencedColumns: ["code"]
           },
         ]
       }
@@ -1223,6 +1371,75 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "size"
             referencedColumns: ["id"]
+          },
+        ]
+      }
+      storage_provider: {
+        Row: {
+          base_url: string
+          created_at: string
+          id: number
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          base_url: string
+          created_at?: string
+          id?: number
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          base_url?: string
+          created_at?: string
+          id?: number
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      weight_unit: {
+        Row: {
+          code: string
+        }
+        Insert: {
+          code: string
+        }
+        Update: {
+          code?: string
+        }
+        Relationships: []
+      }
+      weight_unit_translation: {
+        Row: {
+          language_code: string
+          name: string
+          weight_unit_code: string
+        }
+        Insert: {
+          language_code: string
+          name: string
+          weight_unit_code: string
+        }
+        Update: {
+          language_code?: string
+          name?: string
+          weight_unit_code?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "weight_unit_translation_language_code_fkey"
+            columns: ["language_code"]
+            isOneToOne: false
+            referencedRelation: "language"
+            referencedColumns: ["code"]
+          },
+          {
+            foreignKeyName: "weight_unit_translation_weight_unit_code_fkey"
+            columns: ["weight_unit_code"]
+            isOneToOne: false
+            referencedRelation: "weight_unit"
+            referencedColumns: ["code"]
           },
         ]
       }

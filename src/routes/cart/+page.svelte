@@ -13,6 +13,9 @@
     const cartStore = getCartStore();
     const eventStore = getEventStore();
     const isCartReady = $derived(!eventStore.hasAny(['cartStore.hydration']));
+    const isDeleteButtonLoading = (id: number) => {
+        return eventStore.hasAny([`remove-item-from-cart-${id}`]);
+    };
 
     $inspect(cartStore.items);
 </script>
@@ -61,6 +64,8 @@
                                 price={item.price}
                                 stock={item.stock}
                                 id={item.id}
+                                image={item.image}
+                                {isDeleteButtonLoading}
                                 onRemove={(id) => cartStore.removeItem(id)}
                                 onQuantityChange={(id, quantity) =>
                                     cartStore.updateItemQuantity(id, quantity)}

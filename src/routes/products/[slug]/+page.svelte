@@ -106,6 +106,23 @@
             size: selectedVariation.size.size_translation.at(0)?.name || '',
             name: productStore.product.name,
             slug,
+            image: productStore.product.items.reduce(
+                (result, acc) => {
+                    for (const image of acc.images) {
+                        if (acc.color.id === colorModel) {
+                            result.src = image.src;
+                            result.alt = image.alt;
+                            break;
+                        }
+                    }
+
+                    return result;
+                },
+                {
+                    src: '',
+                    alt: '',
+                },
+            ),
         });
 
         if (success) {
@@ -259,17 +276,12 @@
                             </li>
                         {/each}
                     </ul>
-                </div>
-            {/if}
 
-            {#if productStore.product.fabricCareInstructions.length}
-                <div class="p-box border-t border-stone-200">
-                    <h4 class="font-bold text-emerald-600">Care instructions</h4>
-
-                    {#each productStore.product.fabricCareInstructions as careInstructions}
-                        <p class="mt-4">
-                            {careInstructions}
-                        </p>
+                    <h4 class="mt-4 font-bold text-emerald-600">Weights:</h4>
+                    {#each productStore.product.sizes as size}
+                        <div class="mt-2 text-sm">
+                            {size.name} ~{size.weight}
+                        </div>
                     {/each}
                 </div>
             {/if}
@@ -278,7 +290,7 @@
                 <h4 class="font-bold text-emerald-600">Materials & Fabrics</h4>
 
                 <ul class="mt-4">
-                    {#each productStore.product.productComposition as fabric (fabric.id)}
+                    {#each productStore.product.productComposition as fabric}
                         {@const variation = fabric.fabric_type_variation}
                         {#if variation}
                             <li>
@@ -292,7 +304,7 @@
                                 {variation.fabric_type?.name}
                                 {variation.name}
                                 {variation.weight}
-                                gsm
+                                {variation.weight_unit_code}
 
                                 {#each variation.fabric_type_composition as composition}
                                     ({composition.percentage}%
@@ -303,6 +315,18 @@
                     {/each}
                 </ul>
             </div>
+
+            {#if productStore.product.fabricCareInstructions.length}
+                <div class="p-box border-t border-stone-200">
+                    <h4 class="font-bold text-emerald-600">Care instructions</h4>
+
+                    {#each productStore.product.fabricCareInstructions as careInstructions}
+                        <p class="mt-4">
+                            {careInstructions}
+                        </p>
+                    {/each}
+                </div>
+            {/if}
 
             {#if productStore.product.about}
                 <div class="p-box border-t border-stone-200">

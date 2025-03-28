@@ -1,8 +1,10 @@
 import type { LayoutLoad } from './$types';
 import { loadIcon } from '@iconify/svelte';
 
-const iconName = 'mdi:gamepad-circle-outline';
+const iconNames = ['mdi:gamepad-circle-outline', 'mdi:cart'];
 
 export const load: LayoutLoad = async () => {
-    loadIcon(iconName);
+    iconNames.forEach((iconName) => {
+        loadIcon(iconName);
+    });
 };

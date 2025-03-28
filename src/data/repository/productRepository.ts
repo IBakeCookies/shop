@@ -15,6 +15,24 @@ export type ReadProductVariantStockById = QueryData<ReturnType<typeof readProduc
 //     limit_num: 6,
 // });
 
+const productImage = `product_image (
+						sort_order,
+						...image_id (
+							filename,
+							alt_text,
+							mime_type,
+							...directory_id (
+								path,
+								bucket_id (
+									name,
+									...storage_provider_id (
+										base_url
+									)
+								)
+							)
+						)
+					)`;
+
 export const readAllProducts = () =>
     supabase
         .from('product')
@@ -32,10 +50,7 @@ export const readAllProducts = () =>
 							name
 						)
 					),
-					product_image (
-						filename,
-						is_default
-					)
+					${productImage}
 				),
 				product_translation (
 					name
@@ -66,10 +81,7 @@ export const readProductBySlug = (slug: string) =>
 					id,
 					price,
 					sale_price,
-					product_image (
-						filename,
-						is_default
-					),
+					${productImage},
 					...color_id (
 						hex,
 						color_id:id,
@@ -79,6 +91,8 @@ export const readProductBySlug = (slug: string) =>
 					),
 					product_variation (
 						id,
+						weight,
+						weight_unit_code,
 						stock,
 						...size_option (
 							sort_order,
@@ -106,6 +120,7 @@ export const readProductBySlug = (slug: string) =>
 					),
 					fabric_type_variation (
 						weight,
+						weight_unit_code,
 						name,
 						fabric_type_composition (
 							percentage,
@@ -123,7 +138,9 @@ export const readProductBySlug = (slug: string) =>
 							fabric_type_features (
 								...material_feature (
 									icon,
-									material_feature_translation (name)
+									material_feature_translation (
+										name
+									)
 								)
 							)
 						)

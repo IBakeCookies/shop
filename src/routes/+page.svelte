@@ -13,7 +13,7 @@
     style={`min-height: calc(100vh - (${pageStore.alertHeight}px + ${pageStore.navHeight}px))`}
 >
     <img
-        src="/index.webp"
+        src="https://file.garden/Z-Ko2HO6YkiJFqy0/revar/main/8XRbuWcqw2fiQM6RRQT9233g4hhjcFiu.webp"
         alt="Revar Alpha Clothing"
         class="absolute top-0 left-0 h-full w-full object-cover"
     />
@@ -37,7 +37,7 @@
 
 <section class="relative flex items-end text-white">
     <img
-        src="/index-1.webp"
+        src="https://file.garden/Z-Ko2HO6YkiJFqy0/revar/main/AktscDT7ZBiJHLKb6E5kxjoTBY3jTkrD.webp"
         alt="Revar Alpha Clothing"
         class="absolute top-0 left-0 h-full w-full object-cover"
     />

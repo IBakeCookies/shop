@@ -27,13 +27,13 @@
 <div
     {...props}
     class={cn(
-        'flex h-full max-h-130 min-h-130 flex-col border border-stone-200 bg-white transition-all hover:-translate-y-1 ',
+        'flex h-full flex-col border border-stone-200 bg-white transition-all hover:-translate-y-1 ',
         props.class,
     )}
     title={name}
 >
     <div class="p-box relative h-full">
-        <img src={image.src} alt={image.alt} class="h-full w-full max-w-full object-contain" />
+        <img src={image.src} alt={image.alt} class="h-80 w-full max-w-full object-contain" />
 
         <ul class="absolute bottom-2 left-4 flex w-full items-center">
             {#each variants as variant}
@@ -51,7 +51,7 @@
         </ul>
 
         {#if hasSale}
-            <div class="absolute top-2 right-4 text-red-600">Sale</div>
+            <div class="absolute top-2 right-4 text-red-600">Limited time sale</div>
         {/if}
     </div>
 

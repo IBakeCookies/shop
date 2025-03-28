@@ -1,6 +1,6 @@
-import type { ProductListing } from '@src/business/transform/productListingTransform';
+import type { ProductListing } from '@business/type/product/productListing';
 import { getContext, setContext } from 'svelte';
-import { transformProduct } from '@src/business/transform/productListingTransform';
+import { transformProductApiToProductListing } from '@src/business/transform/productListingTransform';
 import { readAllProducts } from '@data/repository/productRepository';
 
 export async function getProducts(): Promise<ProductListing[]> {
@@ -10,8 +10,8 @@ export async function getProducts(): Promise<ProductListing[]> {
         if (!data || error) {
             return [];
         }
-        
-        return data.map(transformProduct);
+
+        return data.map(transformProductApiToProductListing);
     } catch (error) {
         console.error(error);
 
@@ -25,12 +25,10 @@ class ProductsStore {
     products: ProductListing[] = $state.raw([]);
 
     constructor(products?: ProductListing[]) {
-        if (products) {
-            this.products = products;
-        }
+        this.products = products || [];
     }
 
-    async getProducts() {
+    async getProducts(): Promise<void> {
         const data = await getProducts();
 
         this.products = data;

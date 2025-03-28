@@ -16,6 +16,10 @@ export interface CartItem {
     size: string;
     color: string;
     slug: string;
+    image: {
+        src: string;
+        alt: string;
+    };
 }
 
 interface addCartItemOutput {
@@ -27,6 +31,10 @@ interface Config {
     storage: Storage<CartItem[]>;
     notificationStore: NotificationStore;
     eventStore: EventStore;
+}
+
+async function sleep(ms: number): Promise<void> {
+    return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 export class CartStore {
@@ -96,14 +104,20 @@ export class CartStore {
     // this.#items.push(data);
     // }
 
-    removeItem(id: number) {
+    async removeItem(id: number): Promise<void> {
         if (!confirm('Are you sure that you want to remove this item?')) {
             return;
         }
 
+        this.#eventStore.addEvent(`remove-item-from-cart-${id}`);
+
+        await sleep(500);
+
         this.#items = this.#items.filter((item) => item.id !== id);
         this.#storage.write(this.#items);
         this.#seen.delete(id);
+
+        this.#eventStore.removeEvent(`remove-item-from-cart-${id}`);
     }
 
     removeAllItems() {
