@@ -28,8 +28,6 @@
         ...props
     }: Props = $props();
 
-    let DynamicIcon: typeof Icon | undefined = $state();
-
     const currentSize = $derived.by<string>(() => {
         switch (size) {
             case 'default':

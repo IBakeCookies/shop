@@ -1,11 +1,10 @@
 <script>
+    import * as paraglide from '$lib/paraglide/messages.js';
     import { fly } from 'svelte/transition';
     import { pageStore } from '@store/pageStore.svelte';
     import { getFly } from '@presentation/utils/fly';
     import Button from '@atom/button/button.svelte';
 </script>
-
-<!-- style="margin-top: -{pageStore.navHeight}px; min-height: calc(100vh - {pageStore.alertHeight}px)"> -->
 
 <section
     in:fly={getFly()}
@@ -21,7 +20,9 @@
     <div class="px-box relative mx-auto w-full max-w-screen-2xl py-24">
         <h1 class="text-5xl tracking-wide text-white capitalize">Gear up for adventure</h1>
 
-        <Button class="mt-8" href="/products" variant="neutral-light-base">Show products</Button>
+        <Button class="mt-8" href="/products" variant="neutral-light-base">
+            {paraglide.show_products()}
+        </Button>
     </div>
 </section>
 

@@ -1,5 +1,6 @@
 import type {
     ProductAttribute,
+    ProductCareInstruction,
     ProductDetail,
     ProductFeature,
     ProductItem,
@@ -13,22 +14,11 @@ export function transformProductDetailApiToProductDetail(
 ): ProductDetail {
     const name = product.product_translation.at(0)?.name || '';
 
-    const fabricCareInstructions = [
-        ...new Set(
-            product.product_composition.map(
-                (composition) =>
-                    composition.fabric_type_variation?.fabric_type?.fabric_type_translation?.at(0)
-                        ?.care_instructions || '',
-            ) || [''],
-        ),
-    ];
-
     return {
         name,
         description: product.product_translation.at(0)?.description || '',
         about: product.product_translation.at(0)?.about || '',
-        careInstructions: product.product_translation.at(0)?.care_instructions || '',
-        fabricCareInstructions,
+        careInstructions: getFabricCareInstructions(product),
         attributes: getAttributes(product),
         fabricFeatures: getFabricFeatures(product),
         productComposition: product.product_composition,
@@ -138,6 +128,47 @@ function getFabricFeatures(product: ReadProductBySlugOutput): ProductFeature[] {
             result.push({
                 name: feature || '',
                 icon: featureItem.icon,
+            });
+        }
+    }
+
+    return result;
+}
+
+function getFabricCareInstructions(product: ReadProductBySlugOutput): ProductCareInstruction[] {
+    const result: ProductCareInstruction[] = [];
+
+    for (let i = 0; i < product.product_composition.length; i++) {
+        const composition = product.product_composition.at(i);
+
+        if (!composition) {
+            return result;
+        }
+
+        const variation = composition.fabric_type_variation;
+
+        if (!variation) {
+            return result;
+        }
+
+        const careInstructions = variation.fabric_type?.fabric_type_care_instructions;
+
+        if (!careInstructions) {
+            return result;
+        }
+
+        for (let j = 0; j < careInstructions.length; j++) {
+            const instructionItem = careInstructions.at(j);
+
+            if (!instructionItem) {
+                continue;
+            }
+
+            const instruction = instructionItem.care_instruction_translation.at(0)?.instruction;
+
+            result.push({
+                instruction: instruction || '',
+                icon: instructionItem.icon,
             });
         }
     }

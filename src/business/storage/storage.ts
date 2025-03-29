@@ -1,4 +1,4 @@
-export type StorageKey = 'cart' | 'user';
+export type StorageKey = 'revar-cart' | 'user';
 
 export interface Storage<R> {
     read: () => R | void;

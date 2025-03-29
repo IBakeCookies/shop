@@ -14,7 +14,7 @@
 
     const {
         value,
-        precision = 0,
+        precision = 2,
         currency = '€',
         locale = 'de-DE',
         withCurrency = true,

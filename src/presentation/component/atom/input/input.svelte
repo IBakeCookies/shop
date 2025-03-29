@@ -18,18 +18,10 @@
             | 'datetime-local'
             | 'month'
             | 'week';
-        variant?: 'default';
         class?: ClassValue;
     } & HTMLInputAttributes;
 
-    let {
-        value = $bindable(),
-        variant = 'default',
-        name,
-        type = 'text',
-        children,
-        ...props
-    }: Props = $props();
+    let { value = $bindable(), name, type = 'text', ...props }: Props = $props();
 </script>
 
 <input

@@ -1,34 +1,17 @@
-import type { Storage } from '@storage/storage';
+import type { CartItem, CartItemInput } from '@business/type/cart/cartItem';
 import type { EventStore } from '@store/eventStore.svelte';
 import type { NotificationStore } from '@store/notificationStore.svelte';
+import * as paraglide from '$lib/paraglide/messages.js';
 import { getContext, setContext } from 'svelte';
 import { readProductVariantStockById } from '@data/repository/productRepository';
 
 const CONTEXT_KEY = Symbol();
-
-export interface CartItem {
-    id: number;
-    name: string;
-    quantity: number;
-    stock: number;
-    price: number;
-    salePrice: number;
-    size: string;
-    color: string;
-    slug: string;
-    image: {
-        src: string;
-        alt: string;
-    };
-}
-
-interface addCartItemOutput {
+interface AddCartItemOutput {
     success: string;
     error: string;
 }
 
 interface Config {
-    storage: Storage<CartItem[]>;
     notificationStore: NotificationStore;
     eventStore: EventStore;
 }
@@ -38,10 +21,11 @@ async function sleep(ms: number): Promise<void> {
 }
 
 export class CartStore {
-    #storage: Storage<CartItem[]>;
     #notificationStore: NotificationStore;
     #eventStore: EventStore;
     #items = $state<CartItem[]>([]);
+    #availableItems = $derived<CartItem[]>(this.#items.filter((item) => item.isAvailable));
+    #disabledItems = $derived<CartItem[]>(this.#items.filter((item) => !item.isAvailable));
     #seen = new Set<number>();
     #totalPrice = $derived.by<number>(() => {
         let total = 0;
@@ -56,20 +40,31 @@ export class CartStore {
         let total = 0;
 
         for (const item of this.#items) {
+            if (!item.isAvailable) {
+                continue;
+            }
+
             total += item.quantity;
         }
 
         return total;
     });
 
-    constructor({ storage, notificationStore, eventStore }: Config) {
-        this.#storage = storage;
+    constructor({ notificationStore, eventStore }: Config) {
         this.#notificationStore = notificationStore;
         this.#eventStore = eventStore;
     }
 
     get items(): CartItem[] {
         return this.#items;
+    }
+
+    get availableItems(): CartItem[] {
+        return this.#availableItems;
+    }
+
+    get disabledItems(): CartItem[] {
+        return this.#disabledItems;
     }
 
     get totalItemsCount(): number {
@@ -80,29 +75,28 @@ export class CartStore {
         return this.#totalPrice;
     }
 
-    hydrateFromStorage(): void {
-        const cartStorageItems = this.#storage.read();
+    hydrateStore(items: CartItem[]): void {
+        this.#items = items;
 
-        if (!cartStorageItems) {
-            return;
-        }
-
-        this.#items = cartStorageItems;
-
-        cartStorageItems.forEach((item) => {
+        items.forEach((item) => {
             this.#seen.add(item.id);
         });
     }
 
     // async getCartItem(id: number) {
-    // const { data, error } = await readCartItemByVariantId(id);
-    // console.log(data);
-    // if (!data || error) {
-    //     return;
+    //     const { data, error } = await readCartItemByVariantId(id);
+    //     console.log(data);
+    //     if (!data || error) {
+    //         return;
+    //     }
+    //     console.log(data);
+    //     this.#items.push(data);
     // }
-    // console.log(data);
-    // this.#items.push(data);
-    // }
+
+    #removeItem(id: number): void {
+        this.#items = this.#items.filter((i) => i.id !== id);
+        this.#seen.delete(id);
+    }
 
     async removeItem(id: number): Promise<void> {
         if (!confirm('Are you sure that you want to remove this item?')) {
@@ -113,9 +107,7 @@ export class CartStore {
 
         await sleep(500);
 
-        this.#items = this.#items.filter((item) => item.id !== id);
-        this.#storage.write(this.#items);
-        this.#seen.delete(id);
+        this.#removeItem(id);
 
         this.#eventStore.removeEvent(`remove-item-from-cart-${id}`);
     }
@@ -126,35 +118,30 @@ export class CartStore {
         }
 
         this.#items = [];
-        this.#storage.write(this.#items);
         this.#seen.clear();
     }
 
-    async addItem(item: CartItem) {
+    async addItem(item: CartItemInput) {
         this.#eventStore.addEvent('add-item-to-cart');
 
-        const { success, error } = await this.#addItem(item);
+        const { success, error } = await this.#addItem({
+            ...item,
+            isAvailable: true,
+        });
+
+        this.#eventStore.removeEvent('add-item-to-cart');
 
         if (error) {
             this.#notificationStore.addNotification({
                 title: error,
                 variant: 'warning-light-base',
             });
-
-            this.#eventStore.removeEvent('add-item-to-cart');
-
-            return {
-                success,
-                error,
-            };
+        } else {
+            this.#notificationStore.addNotification({
+                title: success,
+                variant: 'success-light-base',
+            });
         }
-
-        this.#notificationStore.addNotification({
-            title: success,
-            variant: 'success-light-base',
-        });
-
-        this.#eventStore.removeEvent('add-item-to-cart');
 
         return {
             success,
@@ -162,7 +149,7 @@ export class CartStore {
         };
     }
 
-    async #addItem(item: CartItem): Promise<addCartItemOutput> {
+    async #addItem(item: CartItem): Promise<AddCartItemOutput> {
         const { data, error } = await readProductVariantStockById(item.id);
 
         if (error) {
@@ -173,22 +160,27 @@ export class CartStore {
         }
 
         // @sideEffect
-        item.stock = data.stock;
+        this.#items = this.#items.map((cartItem) => {
+            if (cartItem.id === item.id) {
+                cartItem.stock = data.stock;
+            }
 
-        if (item.quantity > item.stock) {
+            return cartItem;
+        });
+
+        if (data.stock === 0) {
             return {
                 success: '',
-                error: 'Item is not in stock anymore.',
+                error: 'Item is out of stock',
             };
         }
 
         if (!this.#seen.has(item.id)) {
             this.#items.push(item);
             this.#seen.add(item.id);
-            this.#storage.write(this.#items);
 
             return {
-                success: 'Item added to your cart.',
+                success: paraglide.cart_item_added(),
                 error: '',
             };
         }
@@ -201,15 +193,15 @@ export class CartStore {
             if (cartItem.quantity + item.quantity > cartItem.stock) {
                 return {
                     success: '',
-                    error: 'Out of stock.',
+                    error: 'Item is out of stock',
                 };
             }
 
             cartItem.quantity += item.quantity;
-            this.#storage.write(this.#items);
+            cartItem.isAvailable = true;
 
             return {
-                success: 'Item added to your cart.',
+                success: paraglide.cart_item_added(),
                 error: '',
             };
         }
@@ -230,20 +222,83 @@ export class CartStore {
 
             return item;
         });
-
-        this.#storage.write(this.#items);
     }
 
-    // validateCart(): void {
-    //     for (const item of this.#items) {
-    //         if (item.quantity > item.stock) {
-    //             this.#notificationStore.addNotification({
-    //                 title: 'Item is not in stock anymore.',
-    //                 variant: 'warning-light-base',
-    //             });
-    //         }
-    //     }
-    // }
+    #addStockNotification(item: CartItem, type: 'unavailable' | 'limited') {
+        const messages = {
+            unavailable: `Item ${item.name} - ${item.color} - ${item.size} is not in stock anymore.`,
+            limited: `Item ${item.name} - ${item.color} - ${item.size} has lower stock than you ordered.`,
+        };
+
+        this.#notificationStore.addNotification({
+            title: messages[type],
+            variant: 'warning-light-base',
+            fade: false,
+        });
+    }
+
+    async validateCart(): Promise<void> {
+        try {
+            this.#eventStore.addEvent('validate-cart');
+
+            const stockUpdates = await Promise.all(
+                this.#items.map(async (item) => {
+                    const { data, error } = await readProductVariantStockById(item.id);
+
+                    if (error) {
+                        return null;
+                    }
+
+                    return data
+                        ? {
+                              id: item.id,
+                              stock: data.stock,
+                          }
+                        : null;
+                }),
+            );
+
+            const stockMap = new Map(
+                stockUpdates.filter(Boolean).map((update) => [update.id, update.stock]),
+            );
+
+            this.#items = this.#items.map((cartItem) => {
+                const currentStock = stockMap.get(cartItem.id);
+
+                if (!currentStock) {
+                    return cartItem;
+                }
+
+                const newItem = {
+                    ...cartItem,
+                    stock: currentStock,
+                };
+
+                if (currentStock === 0) {
+                    this.#addStockNotification(cartItem, 'unavailable');
+
+                    return {
+                        ...newItem,
+                        quantity: 0,
+                        isAvailable: false,
+                    };
+                }
+
+                if (cartItem.quantity > currentStock) {
+                    this.#addStockNotification(cartItem, 'limited');
+
+                    return {
+                        ...newItem,
+                        quantity: currentStock,
+                    };
+                }
+
+                return newItem;
+            });
+        } finally {
+            this.#eventStore.removeEvent('validate-cart');
+        }
+    }
 }
 
 export function setCartStore(cartStore: CartStore): CartStore {

@@ -190,6 +190,57 @@ export type Database = {
           },
         ]
       }
+      care_instruction: {
+        Row: {
+          code: string
+          icon: string
+          id: number
+        }
+        Insert: {
+          code: string
+          icon: string
+          id?: number
+        }
+        Update: {
+          code?: string
+          icon?: string
+          id?: number
+        }
+        Relationships: []
+      }
+      care_instruction_translation: {
+        Row: {
+          care_instruction_id: number
+          instruction: string
+          language_code: string
+        }
+        Insert: {
+          care_instruction_id: number
+          instruction: string
+          language_code: string
+        }
+        Update: {
+          care_instruction_id?: number
+          instruction?: string
+          language_code?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "care_instruction_translation_care_instruction_id_fkey"
+            columns: ["care_instruction_id"]
+            isOneToOne: false
+            referencedRelation: "care_instruction"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "care_instruction_translation_language_code_fkey"
+            columns: ["language_code"]
+            isOneToOne: false
+            referencedRelation: "language"
+            referencedColumns: ["code"]
+          },
+        ]
+      }
       color: {
         Row: {
           hex: string
@@ -279,6 +330,36 @@ export type Database = {
         }
         Relationships: []
       }
+      fabric_type_care_instructions: {
+        Row: {
+          care_instruction_id: number
+          fabric_type_id: number
+        }
+        Insert: {
+          care_instruction_id: number
+          fabric_type_id: number
+        }
+        Update: {
+          care_instruction_id?: number
+          fabric_type_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fabric_type_care_instructions_care_instruction_id_fkey"
+            columns: ["care_instruction_id"]
+            isOneToOne: false
+            referencedRelation: "care_instruction"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fabric_type_care_instructions_fabric_type_id_fkey"
+            columns: ["fabric_type_id"]
+            isOneToOne: false
+            referencedRelation: "fabric_type"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       fabric_type_composition: {
         Row: {
           fabric_type_variation_id: number
@@ -345,19 +426,16 @@ export type Database = {
       fabric_type_translation: {
         Row: {
           about: string | null
-          care_instructions: string
           fabric_type_id: number
           language_code: string
         }
         Insert: {
           about?: string | null
-          care_instructions: string
           fabric_type_id: number
           language_code: string
         }
         Update: {
           about?: string | null
-          care_instructions?: string
           fabric_type_id?: number
           language_code?: string
         }
@@ -488,6 +566,36 @@ export type Database = {
         }
         Relationships: []
       }
+      material_care_instructions: {
+        Row: {
+          care_instruction_id: number
+          material_id: number
+        }
+        Insert: {
+          care_instruction_id: number
+          material_id: number
+        }
+        Update: {
+          care_instruction_id?: number
+          material_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "material_care_instructions_care_instruction_id_fkey"
+            columns: ["care_instruction_id"]
+            isOneToOne: false
+            referencedRelation: "care_instruction"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "material_care_instructions_material_id_fkey"
+            columns: ["material_id"]
+            isOneToOne: false
+            referencedRelation: "material"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       material_feature: {
         Row: {
           code: string
@@ -571,19 +679,16 @@ export type Database = {
       }
       material_translation: {
         Row: {
-          care_instructions: string | null
           language_code: string
           material_id: number
           name: string
         }
         Insert: {
-          care_instructions?: string | null
           language_code: string
           material_id: number
           name: string
         }
         Update: {
-          care_instructions?: string | null
           language_code?: string
           material_id?: number
           name?: string
@@ -712,6 +817,36 @@ export type Database = {
           },
           {
             foreignKeyName: "product_attribute_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "product"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      product_care_instructions: {
+        Row: {
+          care_instruction_id: number
+          product_id: number
+        }
+        Insert: {
+          care_instruction_id: number
+          product_id: number
+        }
+        Update: {
+          care_instruction_id?: number
+          product_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_care_instructions_care_instruction_id_fkey"
+            columns: ["care_instruction_id"]
+            isOneToOne: false
+            referencedRelation: "care_instruction"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "product_care_instructions_product_id_fkey"
             columns: ["product_id"]
             isOneToOne: false
             referencedRelation: "product"

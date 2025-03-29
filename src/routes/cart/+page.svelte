@@ -16,8 +16,7 @@
     const isDeleteButtonLoading = (id: number) => {
         return eventStore.hasAny([`remove-item-from-cart-${id}`]);
     };
-
-    $inspect(cartStore.items);
+    const isCheckoutButtonLoading = $derived(eventStore.hasAny(['validate-cart']));
 </script>
 
 <section
@@ -26,7 +25,7 @@
     class="px-box mx-auto w-full max-w-screen-2xl py-24"
 >
     {#if isCartReady}
-        {#if !cartStore.totalItemsCount}
+        {#if !cartStore.totalItemsCount && !cartStore.disabledItems.length}
             <div class="text-center">
                 <h1 class="mb-6 text-3xl">Cart is empty</h1>
 
@@ -52,7 +51,7 @@
                         </Button>
                     </div>
 
-                    {#each cartStore.items as item, i (item.id)}
+                    {#each cartStore.availableItems as item, i (item.id)}
                         <div transition:slide>
                             <CartListItem
                                 slug={`/products/${item.slug}`}
@@ -75,6 +74,36 @@
                             />
                         </div>
                     {/each}
+
+                    {#if cartStore.disabledItems.length}
+                        <h4 class="mt-8 mb-4">
+                            Some items are out of stock, so we removed them from your cart.
+                        </h4>
+
+                        {#each cartStore.disabledItems as item, i (item.id)}
+                            <div transition:slide class="opacity-60">
+                                <CartListItem
+                                    slug={`/products/${item.slug}`}
+                                    name={item.name}
+                                    color={item.color}
+                                    size={item.size}
+                                    quantity={item.quantity}
+                                    salePrice={item.salePrice}
+                                    price={item.price}
+                                    stock={item.stock}
+                                    id={item.id}
+                                    image={item.image}
+                                    {isDeleteButtonLoading}
+                                    onRemove={(id) => cartStore.removeItem(id)}
+                                    onQuantityChange={(id, quantity) =>
+                                        cartStore.updateItemQuantity(id, quantity)}
+                                    class={{
+                                        'border-b': i === cartStore.disabledItems.length - 1,
+                                    }}
+                                />
+                            </div>
+                        {/each}
+                    {/if}
                 </div>
 
                 <div class="col-span-1 border border-stone-200 bg-white">
@@ -93,7 +122,12 @@
                     </p>
 
                     <form class="p-box border-t border-stone-200">
-                        <Button class="w-full" variant="success-dark-base">
+                        <Button
+                            class="w-full"
+                            variant="success-dark-base"
+                            onclick={() => cartStore.validateCart()}
+                            isLoading={isCheckoutButtonLoading}
+                        >
                             Checkout
 
                             {#snippet onHoverSnippet()}

@@ -6,9 +6,6 @@ import { readProductBySlug } from '@data/repository/productRepository';
 const placeholder: ProductDetail = {
     name: '',
     description: '',
-    weight: '',
-    careInstructions: '',
-    fabricCareInstructions: [],
     fabricFeatures: [],
     productComposition: [],
     about: '',
@@ -16,12 +13,15 @@ const placeholder: ProductDetail = {
     price: 0,
     attributes: [],
     variations: [],
+    careInstructions: [],
     items: [],
 };
 
 export async function getProduct(slug: string): Promise<ProductDetail> {
     try {
         const { data, error } = await readProductBySlug(slug);
+
+        console.log(data);
 
         if (!data || error) {
             return placeholder;

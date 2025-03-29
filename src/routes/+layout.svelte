@@ -1,10 +1,8 @@
 <script lang="ts">
-    import type { Component } from 'svelte';
     import '@src/app.css';
     import Icon from '@iconify/svelte';
-    import { ParaglideJS } from '@inlang/paraglide-sveltekit';
-    import { i18n } from '$lib/i18n';
     import { onMount } from 'svelte';
+    import { scrollY } from 'svelte/reactivity/window';
     import { fly, slide } from 'svelte/transition';
     import { CartStore, setCartStore } from '@store/cartStore.svelte';
     import { setEventStore } from '@store/eventStore.svelte';
@@ -22,7 +20,6 @@
     const eventStore = setEventStore();
     const cartStore = setCartStore(
         new CartStore({
-            storage: cartLocalStorage,
             notificationStore,
             eventStore,
         }),
@@ -30,43 +27,36 @@
 
     let navRef: null | HTMLDivElement = $state(null);
     let alertRef: null | HTMLDivElement = $state(null);
-    let DynamicNotification: Component | undefined = $state();
-
-    $effect(() => {
-        if (!notificationStore.notifications.length) {
-            return;
-        }
-
-        import('@atom/notification/notification.svelte').then((module) => {
-            DynamicNotification = module.default;
-        });
-    });
-
-    $effect(() => {
-        pageStore.navHeight = navRef.scrollHeight || 0;
-        pageStore.alertHeight = alertRef.scrollHeight || 0;
-    });
 
     eventStore.addEvent('cartStore.hydration');
 
     onMount(() => {
-        cartStore.hydrateFromStorage();
+        cartStore.hydrateStore(cartLocalStorage.read() || []);
         eventStore.removeEvent('cartStore.hydration');
+    });
+
+    $effect(() => {
+        cartLocalStorage.write(cartStore.items);
+    });
+
+    $effect(() => {
+        pageStore.navHeight = navRef?.scrollHeight || 0;
+        pageStore.alertHeight = alertRef?.scrollHeight || 0;
     });
 </script>
 
-<ParaglideJS {i18n}>
-    <Alert bind:ref={alertRef} variant="neutral-dark-base" class="text-center">
-        Free shipping on orders over €200 within Germany
-    </Alert>
+<Alert bind:ref={alertRef} variant="neutral-dark-base" class="text-center">
+    Free shipping on orders over €200 within Germany
+</Alert>
 
-    {#if DynamicNotification}
+{#if notificationStore.notifications.length}
+    {#await import('@atom/notification/notification.svelte') then { default: Notification }}
         <div class="px-box fixed top-40 left-1/2 z-(--z-notification) w-full -translate-x-1/2">
             <div class="mx-auto flex max-w-screen-2xl flex-col items-end">
                 {#each notificationStore.notifications as notification (notification.id)}
                     <div transition:fly|global={getFly('fromTop')} class="max-w-notification">
                         <div transition:slide|global class="mb-6">
-                            <DynamicNotification
+                            <Notification
                                 {notification}
                                 dismiss={(id) => notificationStore.removeNotification(id)}
                             />
@@ -75,62 +65,68 @@
                 {/each}
             </div>
         </div>
-    {/if}
+    {/await}
+{/if}
 
-    <div
-        bind:this={navRef}
-        class="p-box sticky top-0 z-(--z-nav) border-b border-stone-200 bg-white"
+<div
+    bind:this={navRef}
+    class={[
+        'px-box sticky top-0 z-(--z-nav) border-b border-stone-200 bg-white transition-all',
+        {
+            'py-4': Number(scrollY.current) > 100,
+            'py-box': Number(scrollY.current) <= 100,
+        },
+    ]}
+>
+    <Nav
+        items={[
+            {
+                title: 'Home',
+                href: '/',
+            },
+            {
+                title: 'Products',
+                href: '/products',
+            },
+        ]}
+        cartItemsCount={cartStore.totalItemsCount}
+        class="mx-auto max-w-screen-2xl"
     >
-        <Nav
-            items={[
-                {
-                    title: 'Home',
-                    href: '/',
-                },
-                {
-                    title: 'Products',
-                    href: '/products',
-                },
-            ]}
-            cartItemsCount={cartStore.totalItemsCount}
-            class="mx-auto max-w-screen-2xl"
-        >
-            REVAR
-        </Nav>
-    </div>
+        REVAR
+    </Nav>
+</div>
 
-    <div class="flex w-full flex-1 flex-col">
-        {@render children()}
-    </div>
+<div class="flex w-full flex-1 flex-col">
+    {@render children()}
+</div>
 
-    <div class="px-box border-y border-stone-200 bg-white">
-        <div class="mx-auto grid max-w-screen-2xl grid-cols-3">
-            <div class="p-box flex flex-col items-center justify-center border-x border-stone-200">
-                <Icon icon="mdi:truck-fast" class="text-3xl text-emerald-600" />
+<div class="px-box border-y border-stone-200 bg-white">
+    <div class="mx-auto grid max-w-screen-2xl grid-cols-3">
+        <div class="p-box flex flex-col items-center justify-center border-x border-stone-200">
+            <Icon icon="mdi:truck-fast" class="text-3xl text-emerald-600" />
 
-                <h4 class="mt-4 text-xl">Quick shipping</h4>
-            </div>
+            <h4 class="mt-4 text-xl">Quick shipping</h4>
+        </div>
 
-            <div class="p-box flex flex-col items-center justify-center border-stone-200">
-                <Icon icon="mdi:encryption-secure" class="text-3xl text-emerald-600" />
+        <div class="p-box flex flex-col items-center justify-center border-stone-200">
+            <Icon icon="mdi:encryption-secure" class="text-3xl text-emerald-600" />
 
-                <h4 class="mt-4 text-xl">Secure transactions</h4>
-            </div>
+            <h4 class="mt-4 text-xl">Secure transactions</h4>
+        </div>
 
-            <div class="p-box flex flex-col items-center justify-center border-x border-stone-200">
-                <Icon icon="mdi:freehand-line" class="text-3xl text-emerald-600" />
+        <div class="p-box flex flex-col items-center justify-center border-x border-stone-200">
+            <Icon icon="mdi:freehand-line" class="text-3xl text-emerald-600" />
 
-                <h4 class="mt-4 text-xl">Handmade goods</h4>
-            </div>
+            <h4 class="mt-4 text-xl">Handmade goods</h4>
         </div>
     </div>
+</div>
 
-    <Newsletter
-        image={{
-            src: 'https://file.garden/Z-Ko2HO6YkiJFqy0/revar/main/uTPut4rjAjrbTKFw2nWAatJXdcN9mU2s.webp',
-            alt: 'snow',
-        }}
-    />
+<Newsletter
+    image={{
+        src: 'https://file.garden/Z-Ko2HO6YkiJFqy0/revar/main/uTPut4rjAjrbTKFw2nWAatJXdcN9mU2s.webp',
+        alt: 'snow',
+    }}
+/>
 
-    <Footer />
-</ParaglideJS>
+<Footer />

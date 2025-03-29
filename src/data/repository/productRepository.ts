@@ -66,96 +66,101 @@ export const readProductBySlug = (slug: string) =>
         .from('product')
         .select(
             `
-				slug,
-				attribute_option (
-					attribute_option_translation (
+			slug,
+			attribute_option (
+				attribute_option_translation (
+					name
+				),
+				...attribute_type (
+					attribute_type_translation (
 						name
-					),
-					...attribute_type (
-						attribute_type_translation (
-							name
-						)
+					)
+				)
+			),
+			product_item (
+				id,
+				price,
+				sale_price,
+				${productImage},
+				...color_id (
+					hex,
+					color_id:id,
+					color:color_translation (
+						name
 					)
 				),
-				product_item (
+				product_variation (
 					id,
-					price,
-					sale_price,
-					${productImage},
-					...color_id (
-						hex,
-						color_id:id,
-						color:color_translation (
-							name
-						)
-					),
-					product_variation (
-						id,
-						weight,
-						weight_unit_code,
-						stock,
-						...size_option (
-							sort_order,
-							size (
-								id,
-								size_translation (
-									name
-								)
+					weight,
+					weight_unit_code,
+					stock,
+					...size_option (
+						sort_order,
+						size (
+							id,
+							size_translation (
+								name
 							)
 						)
 					)
+				)
+			),
+			product_translation (
+				name,
+				description,
+				about
+			),
+			product_composition (
+				percentage,
+				...product_part (
+					product_part_translation (
+						name
+					)
 				),
-				product_translation (
+				fabric_type_variation (
+					weight,
+					weight_unit_code,
 					name,
-					description,
-					about,
-					care_instructions
-				),
-				product_composition (
-					percentage,
-					...product_part (
-						product_part_translation (
-							name
+					fabric_type_composition (
+						percentage,
+						...material (
+							material_translation (
+								name
+							)
 						)
 					),
-					fabric_type_variation (
-						weight,
-						weight_unit_code,
+					fabric_type (
 						name,
-						fabric_type_composition (
-							percentage,
-							...material (
-								material_translation (
-									name
-								)
+						fabric_type_care_instructions (
+							...care_instruction_id (
+								care_instruction_translation (
+									instruction
+								),
+								icon
 							)
 						),
-						fabric_type (
-							name,
-							fabric_type_translation (
-								care_instructions
-							),	
-							fabric_type_features (
-								...material_feature (
-									icon,
-									material_feature_translation (
-										name
-									)
+						fabric_type_features (
+							...material_feature (
+								icon,
+								material_feature_translation (
+									name
 								)
 							)
 						)
 					)
 				)
-			`,
+			)
+		`,
         )
         .eq('product_item.color_id.color_translation.language_code', 'en')
         .eq('product_translation.language_code', 'en')
+        .eq('product_composition.product_part.product_part_translation.language_code', 'en')
         .eq(
-            'product_composition.fabric_type_variation.fabric_type.fabric_type_translation.language_code',
+            'product_composition.fabric_type_variation.fabric_type_composition.material.material_translation.language_code',
             'en',
         )
         .eq(
-            'product_composition.fabric_type_variation.fabric_type_composition.material.material_translation.language_code',
+            'product_composition.fabric_type_variation.fabric_type.fabric_type_care_instructions.care_instruction_id.care_instruction_translation.language_code',
             'en',
         )
         .eq('attribute_option.attribute_option_translation.language_code', 'en')

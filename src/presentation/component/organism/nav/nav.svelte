@@ -4,6 +4,7 @@
     import Icon from '@iconify/svelte';
     import { cn } from '@presentation/utils/style';
     import Button from '@atom/button/button.svelte';
+    import Input from '@atom/input/input.svelte';
 
     interface Item {
         title: string;
@@ -19,15 +20,6 @@
     }
 
     let { cartItemsCount, items, children, ...props }: Props = $props();
-
-    let isScrolled = $state(false);
-
-    $effect(() => {
-        window.addEventListener('scroll', () => {
-            isScrolled = window.scrollY > 100;
-            // @todo remove event listener
-        });
-    });
 </script>
 
 <nav {...props} class={cn('grid grid-cols-3 items-center', props.class)}>
@@ -40,9 +32,9 @@
     </div>
 
     <div class="text-center">
-        <h1 class="text-4xl">
+        <h2 class="text-4xl">
             {@render children?.()}
-        </h1>
+        </h2>
     </div>
 
     <div class="flex items-center justify-end space-x-4">
@@ -57,6 +49,8 @@
         <!-- <Button class="ml-4 flex cursor-pointer" href="/login" variant="anchor">
             <Icon icon="mdi:account" class="h-6 w-6" />
         </Button> -->
+
+        <Input name="search" type="text" placeholder="Search products" />
 
         <a class="flex cursor-pointer items-center" href="/cart">
             {cartItemsCount ? cartItemsCount : ''}

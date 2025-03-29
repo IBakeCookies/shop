@@ -26,6 +26,11 @@ export interface ProductFeature {
     icon: string;
 }
 
+export interface ProductCareInstruction {
+    instruction: string;
+    icon: string;
+}
+
 export interface ProductItem {
     id: number;
     color: {
@@ -41,13 +46,12 @@ export interface ProductItem {
 export interface ProductDetail {
     name: string;
     description: string;
-    careInstructions: string;
-    fabricCareInstructions: string[];
-    fabricFeatures: ProductFeature[];
-    productComposition: ProductComposition[];
     about: string;
-    sizes: ProductSize[];
     price: number;
+    fabricFeatures: ProductFeature[];
+    careInstructions: ProductCareInstruction[];
+    productComposition: ProductComposition[];
+    sizes: ProductSize[];
     attributes: ProductAttribute[];
     items: ProductItem[];
     variations: ProductVariation[];

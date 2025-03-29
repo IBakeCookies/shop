@@ -4,8 +4,8 @@
     import Icon from '@iconify/svelte';
     import { enhance } from '$app/forms';
     import { page } from '$app/state';
+    import * as paraglide from '$lib/paraglide/messages.js';
     import { fly } from 'svelte/transition';
-    import Radio from '@src/presentation/component/atom/radio/radio.svelte';
     import { getCartStore } from '@store/cartStore.svelte';
     import { getEventStore } from '@store/eventStore.svelte';
     import { pageStore } from '@store/pageStore.svelte';
@@ -13,6 +13,7 @@
     import { getFly } from '@presentation/utils/fly';
     import Button from '@atom/button/button.svelte';
     import Money from '@atom/money/money.svelte';
+    import Radio from '@atom/radio/radio.svelte';
     import Sale from '@atom/sale/sale.svelte';
     import Swiper from '@atom/swiper/swiper.svelte';
 
@@ -153,190 +154,213 @@
 
         swiperContainer.swiper.slideTo(indexOfSelectedColor);
     });
+
+    productStore.getProduct(page.params.slug);
 </script>
 
 <article in:fly={getFly()} class="mx-auto grid max-w-screen-2xl grid-cols-1 xl:grid-cols-6">
-    <Swiper bind:container={swiperContainer} class="col-span-3" navigation={true}>
+    <Swiper
+        bind:container={swiperContainer}
+        class="sticky col-span-3 max-h-200"
+        style="top: calc({pageStore.navHeight}px + {pageStore.alertHeight}px);"
+        navigation={true}
+    >
         {#each productStore.product.items as item}
             {#each item.images as image}
                 <swiper-slide id={item.color.id} lazy="true">
-                    <img src={image.src} alt={image.alt} class="max-w-full" loading="lazy" />
+                    <img src={image.src} alt={image.alt} class="mx-auto h-full" loading="lazy" />
                 </swiper-slide>
             {/each}
         {/each}
     </Swiper>
 
     <div class="col-span-3 h-full border-r border-l border-stone-200 bg-white">
-        <div class="sticky" style="top: {pageStore.navHeight}px">
-            <h2 class="p-8 text-4xl">
-                {productStore.product.name}
-            </h2>
+        <h2 class="p-8 text-4xl">
+            {productStore.product.name}
+        </h2>
 
-            <p class="p-box border-t border-stone-200">
-                {productStore.product.description}
+        <p class="p-box border-t border-stone-200">
+            {productStore.product.description}
 
-                {#if productStore.product.about}
-                    <span class="mt-4 block italic">
-                        {productStore.product.about}
-                    </span>
-                {/if}
-            </p>
+            {#if productStore.product.about}
+                <span class="mt-4 block italic">
+                    {productStore.product.about}
+                </span>
+            {/if}
+        </p>
 
+        <div class="p-box border-t border-stone-200">
+            <h4 class="font-bold text-emerald-600">Features</h4>
+
+            <ul class="mt-4 space-y-2 italic">
+                {#each productStore.product.fabricFeatures as { name, icon }}
+                    <li class="flex items-center">
+                        <Icon {icon} class="mr-2 min-h-6 min-w-6" />
+                        {name}
+                    </li>
+                {/each}
+            </ul>
+        </div>
+
+        <form method="POST" action="?/addItemToCart" use:enhance={submit}>
+            {#if selectedVariation}
+                <input type="hidden" name="productVariationId" value={selectedVariation.id} />
+            {/if}
+
+            <div class="flex items-center border-t border-stone-200">
+                <fieldset class="p-box flex flex-wrap gap-4">
+                    {#each productStore.product.items as item}
+                        <Radio
+                            id={`${item.color.id}`}
+                            name="color"
+                            title={item.color.name}
+                            value={item.color.id}
+                            bind:group={colorModel}
+                            size="square"
+                            backgroundColor={`#${item.color.hex};`}
+                            disabled={disabledColors.has(item.color.id)}
+                            required
+                        >
+                            {#if item.salePrice}
+                                <Sale value={`€${item.salePrice}`} />
+                            {/if}
+                        </Radio>
+                    {/each}
+                </fieldset>
+
+                <fieldset class="p-box flex flex-wrap gap-4 border-l border-stone-200">
+                    {#each productStore.product.sizes as size (size.id)}
+                        <Radio
+                            id={`${size.id}`}
+                            name="size"
+                            title={size.name}
+                            value={size.id}
+                            bind:group={sizeModel}
+                            disabled={disabledSizes.has(size.id)}
+                            required
+                        >
+                            {size.name}
+                        </Radio>
+                    {/each}
+                </fieldset>
+            </div>
+
+            <fieldset class="flex items-center border-t border-stone-200">
+                <div class="p-8 text-2xl">
+                    {#if salePrice}
+                        <Money class="block" value={salePrice} />
+                    {/if}
+
+                    <Money
+                        value={productStore.product.price}
+                        class={{
+                            'text-base text-stone-600 line-through': salePrice,
+                        }}
+                    />
+                </div>
+
+                <div class="p-box flex-1 border-l border-stone-200">
+                    <Button
+                        class="w-full"
+                        isLoading={isAddingToCart}
+                        disabled={availableStock !== null && availableStock === 0}
+                    >
+                        Add to cart
+                    </Button>
+                </div>
+            </fieldset>
+        </form>
+
+        {#if productStore.product.attributes.length}
             <div class="p-box border-t border-stone-200">
-                <h4 class="font-bold text-emerald-600">Features</h4>
+                <h4 class="font-bold text-emerald-600">{paraglide.product_size_info()}</h4>
 
-                <ul class="mt-4 space-y-2 italic">
-                    {#each productStore.product.fabricFeatures as { name, icon }}
-                        <li class="flex items-center">
-                            <Icon {icon} class="mr-2 min-h-6 min-w-6" />
-                            {name}
+                <ul class="mt-4">
+                    {#each productStore.product.attributes as attribute}
+                        <li>
+                            {attribute.attribute}:
+                            {attribute.value}
                         </li>
                     {/each}
                 </ul>
             </div>
+        {/if}
 
-            <form method="POST" action="?/addItemToCart" use:enhance={submit}>
-                {#if selectedVariation}
-                    <input type="hidden" name="productVariationId" value={selectedVariation.id} />
-                {/if}
+        <div class="p-box border-t border-stone-200">
+            <h4 class="font-bold text-emerald-600">{paraglide.product_materials_info()}</h4>
 
-                <div class="flex items-center border-t border-stone-200">
-                    <fieldset class="p-box flex flex-wrap gap-4">
-                        {#each productStore.product.items as item}
-                            <Radio
-                                id={`${item.color.id}`}
-                                name="color"
-                                title={item.color.name}
-                                value={item.color.id}
-                                bind:group={colorModel}
-                                size="square"
-                                backgroundColor={`#${item.color.hex};`}
-                                disabled={disabledColors.has(item.color.id)}
-                                required
-                            >
-                                {#if item.salePrice}
-                                    <Sale value={`€${item.salePrice}`} />
-                                {/if}
-                            </Radio>
-                        {/each}
-                    </fieldset>
+            <ul class="mt-4">
+                {#each productStore.product.productComposition as fabric}
+                    {@const variation = fabric.fabric_type_variation}
+                    {#if variation}
+                        <li>
+                            {fabric.product_part_translation.at(0)?.name}
+                            made from
 
-                    <fieldset class="p-box flex flex-wrap gap-4 border-l border-stone-200">
-                        {#each productStore.product.sizes as size (size.id)}
-                            <Radio
-                                id={`${size.id}`}
-                                name="size"
-                                title={size.name}
-                                value={size.id}
-                                bind:group={sizeModel}
-                                disabled={disabledSizes.has(size.id)}
-                                required
-                            >
-                                {size.name}
-                            </Radio>
-                        {/each}
-                    </fieldset>
-                </div>
+                            {#if fabric.percentage !== 100}
+                                {fabric.percentage}%
+                            {/if}
 
-                <fieldset class="flex items-center border-t border-stone-200">
-                    <div class="p-8 text-2xl">
-                        {#if salePrice}
-                            <Money class="block" value={salePrice} />
-                        {/if}
+                            {variation.fabric_type?.name}
+                            {variation.name}
+                            {variation.weight}
+                            {variation.weight_unit_code}
 
-                        <Money
-                            value={productStore.product.price}
-                            class={{
-                                'text-base text-stone-600 line-through': salePrice,
-                            }}
-                        ></Money>
-                    </div>
+                            {#each variation.fabric_type_composition as composition}
+                                ({composition.percentage}%
+                                {composition.material_translation.at(0)?.name})
+                            {/each}
+                        </li>
+                    {/if}
+                {/each}
+            </ul>
+        </div>
 
-                    <div class="p-box flex-1 border-l border-stone-200">
-                        <Button
-                            class="w-full"
-                            isLoading={isAddingToCart}
-                            disabled={availableStock !== null && availableStock === 0}
-                        >
-                            Add to cart
-                        </Button>
-                    </div>
-                </fieldset>
-            </form>
-
-            {#if productStore.product.attributes.length}
-                <div class="p-box border-t border-stone-200">
-                    <h4 class="font-bold text-emerald-600">Size & fit</h4>
-
-                    <ul class="mt-4">
-                        {#each productStore.product.attributes as attribute}
-                            <li>
-                                {attribute.attribute}:
-                                {attribute.value}
-                            </li>
-                        {/each}
-                    </ul>
-
-                    <h4 class="mt-4 font-bold text-emerald-600">Weights:</h4>
-                    {#each productStore.product.sizes as size}
-                        <div class="mt-2 text-sm">
-                            {size.name} ~{size.weight}
-                        </div>
-                    {/each}
-                </div>
-            {/if}
-
+        {#if productStore.product.careInstructions.length}
             <div class="p-box border-t border-stone-200">
-                <h4 class="font-bold text-emerald-600">Materials & Fabrics</h4>
+                <h4 class="font-bold text-emerald-600">Care instructions</h4>
 
-                <ul class="mt-4">
-                    {#each productStore.product.productComposition as fabric}
-                        {@const variation = fabric.fabric_type_variation}
-                        {#if variation}
-                            <li>
-                                {fabric.product_part_translation.at(0)?.name}
-                                made from
+                <ul class="mt-4 space-y-2">
+                    {#each productStore.product.careInstructions as item}
+                        <li class=" flex items-center">
+                            {#if item.icon}
+                                <Icon icon={item.icon} class="mr-2 min-h-6 min-w-6" />
+                            {/if}
 
-                                {#if fabric.percentage !== 100}
-                                    {fabric.percentage}%
-                                {/if}
-
-                                {variation.fabric_type?.name}
-                                {variation.name}
-                                {variation.weight}
-                                {variation.weight_unit_code}
-
-                                {#each variation.fabric_type_composition as composition}
-                                    ({composition.percentage}%
-                                    {composition.material_translation.at(0)?.name})
-                                {/each}
-                            </li>
-                        {/if}
+                            {item.instruction}
+                        </li>
                     {/each}
                 </ul>
             </div>
+        {/if}
 
-            {#if productStore.product.fabricCareInstructions.length}
-                <div class="p-box border-t border-stone-200">
-                    <h4 class="font-bold text-emerald-600">Care instructions</h4>
-
-                    {#each productStore.product.fabricCareInstructions as careInstructions}
-                        <p class="mt-4">
-                            {careInstructions}
-                        </p>
-                    {/each}
-                </div>
-            {/if}
+        <div class="p-box border-t border-stone-200">
+            <h4 class="font-bold text-emerald-600">Additional information</h4>
 
             {#if productStore.product.about}
-                <div class="p-box border-t border-stone-200">
-                    <h4 class="">About</h4>
-
-                    <p class="mt-4">
-                        {productStore.product.about}
-                    </p>
-                </div>
+                <p class="mt-4">
+                    {productStore.product.about}
+                </p>
             {/if}
+
+            <table class="mt-4 w-full border-collapse">
+                <thead>
+                    <tr>
+                        <th class="border border-stone-200 bg-stone-50 p-2 text-left"> Size </th>
+
+                        <th class="border border-stone-200 bg-stone-50 p-2 text-left"> Weight </th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {#each productStore.product.sizes as size}
+                        <tr>
+                            <td class="border border-stone-200 p-2">{size.name}</td>
+                            <td class="border border-stone-200 p-2">{size.weight}</td>
+                        </tr>
+                    {/each}
+                </tbody>
+            </table>
         </div>
     </div>
 </article>
