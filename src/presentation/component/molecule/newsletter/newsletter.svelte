@@ -3,6 +3,7 @@
     import { cn } from '@presentation/utils/style';
     import Button from '@atom/button/button.svelte';
     import Input from '@atom/input/input.svelte';
+    import Label from '@atom/label/label.svelte';
 
     interface Props {
         image: {
@@ -14,6 +15,12 @@
 
     const { image, ...props }: Props = $props();
 </script>
+
+
+{#snippet text()}
+    Email
+{/snippet}
+
 
 <div
     {...props}
@@ -32,15 +39,17 @@
                 We will not spam you inbox. Get only updates about new product.
             </p>
 
-            <form>
-                <Input
-                    name="email"
-                    type="email"
-                    placeholder="john.doe@gmail.com"
-                    required
-                    class="mt-8 block w-full"
-                />
-
+            <form class="mt-8">
+                <Label {text} isRequired>
+                    <Input
+                        name="email"
+                        type="email"
+                        placeholder="john.doe@gmail.com"
+                        required
+                        class="block w-full"
+                    />
+                </Label>
+               
                 <Button type="submit" class="mt-4" variant="neutral-light-base">Subscribe</Button>
             </form>
         </div>

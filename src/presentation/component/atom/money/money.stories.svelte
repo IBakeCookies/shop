@@ -12,7 +12,6 @@
             precision: 2,
             currency: '€',
             withCurrency: true,
-            modifier: '',
         },
     });
 </script>

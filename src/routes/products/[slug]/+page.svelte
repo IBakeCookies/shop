@@ -5,28 +5,33 @@
     import { enhance } from '$app/forms';
     import { page } from '$app/state';
     import * as paraglide from '$lib/paraglide/messages.js';
-    import { fly } from 'svelte/transition';
+    import { fly, slide } from 'svelte/transition';
     import { getCartStore } from '@store/cartStore.svelte';
     import { getEventStore } from '@store/eventStore.svelte';
     import { pageStore } from '@store/pageStore.svelte';
     import { setProductStore } from '@store/productStore.svelte';
     import { getFly } from '@presentation/utils/fly';
     import Button from '@atom/button/button.svelte';
+    import ButtonHoverChild from '@atom/button/buttonHoverChild.svelte';
     import Money from '@atom/money/money.svelte';
     import Radio from '@atom/radio/radio.svelte';
     import Sale from '@atom/sale/sale.svelte';
+    import { useAccordion } from '@presentation/utils/accordion.svelte';
+    import AccordionItems from '@atom/accordion/accordionItems.svelte';
+    import AccordionLabel from '@atom/accordion/accordionLabel.svelte';
     import Swiper from '@atom/swiper/swiper.svelte';
 
     const { data }: PageProps = $props();
-    const productStore = setProductStore();
+    const productStore = setProductStore(data.product);
     const eventStore = getEventStore();
     const cartStore = getCartStore();
-
-    productStore.product = data.product;
+    const careAccordion = useAccordion();
+    const infoAccordion = useAccordion();
 
     let colorModel = $state(-1);
     let sizeModel = $state(-1);
     let swiperContainer: SwiperContainer | undefined = $state();
+    let swiperThumbContainer: SwiperContainer | undefined = $state();
 
     const isAddingToCart = $derived(eventStore.hasAny(['add-item-to-cart']));
     const slug = $derived(page.params.slug);
@@ -64,7 +69,7 @@
 
         return result;
     });
-
+    
     const disabledColors = $derived.by(() => {
         const result = new Set();
 
@@ -155,26 +160,63 @@
         swiperContainer.swiper.slideTo(indexOfSelectedColor);
     });
 
-    productStore.getProduct(page.params.slug);
+    // $effect(() => {
+    //     if(!swiperContainer) {
+    //         return;
+    //     }    
+
+        // swiperContainer.style.cssText = `top: calc(${pageStore.navHeight}px);`
+        // `top-[${pageStore?.navHeight}px]`
+    // });
 </script>
 
-<article in:fly={getFly()} class="mx-auto grid max-w-screen-2xl grid-cols-1 xl:grid-cols-6">
-    <Swiper
-        bind:container={swiperContainer}
-        class="sticky col-span-3 max-h-200"
-        style="top: calc({pageStore.navHeight}px + {pageStore.alertHeight}px);"
-        navigation={true}
-    >
-        {#each productStore.product.items as item}
-            {#each item.images as image}
-                <swiper-slide id={item.color.id} lazy="true">
-                    <img src={image.src} alt={image.alt} class="mx-auto h-full" loading="lazy" />
-                </swiper-slide>
-            {/each}
-        {/each}
-    </Swiper>
+<article in:fly={getFly()} class="mx-auto grid max-w-screen-2xl grid-cols-1 xl:grid-cols-12">
+    <div class="xl:sticky col-span-6">
+        {#if swiperThumbContainer}
+            <Swiper
+                bind:container={swiperContainer}
+                class="overflow-hidden"
+                navigation={true}
+                loop
+                thumbs={{ swiper: ".thumbs" }}
+            >
+                {#each productStore.product.items as item}
+                    {#each item.images as image}
+                        <swiper-slide id={item.color.id} lazy="true">
+                            <img 
+                                src={image.src} 
+                                alt={image.alt} 
+                                class="mx-auto h-200" loading="lazy" />
+                        </swiper-slide>
+                    {/each}
+                {/each}
+            </Swiper>
+        {/if}
 
-    <div class="col-span-3 h-full border-r border-l border-stone-200 bg-white">
+        <Swiper
+            bind:container={swiperThumbContainer}
+            class={["thumbs mt-4", !swiperContainer && 'opacity-0']} 
+            loop 
+            slides-per-view={5}  
+            space-between={10}
+        >
+            {#each productStore.product.items as item}
+                {#each item.images as image}
+                    <swiper-slide 
+                        id={item.color.id} 
+                        lazy="true" 
+                        class="p-2 border border-stone-200 bg-white">
+                        <img 
+                            src={image.src} alt={image.alt} 
+                            class="cursor-pointer w-full object-contain h-20" 
+                            loading="lazy" />
+                    </swiper-slide>
+                {/each}
+            {/each}
+        </Swiper>
+    </div>
+   
+    <div class="col-span-6 h-full border-r border-l border-stone-200 bg-white">
         <h2 class="p-8 text-4xl">
             {productStore.product.name}
         </h2>
@@ -265,7 +307,13 @@
                         isLoading={isAddingToCart}
                         disabled={availableStock !== null && availableStock === 0}
                     >
-                        Add to cart
+                        <ButtonHoverChild>
+                            Add to cart
+
+                            {#snippet child()}
+                                <Icon icon="mdi:cart" />
+                            {/snippet}
+                        </ButtonHoverChild>
                     </Button>
                 </div>
             </fieldset>
@@ -273,9 +321,11 @@
 
         {#if productStore.product.attributes.length}
             <div class="p-box border-t border-stone-200">
-                <h4 class="font-bold text-emerald-600">{paraglide.product_size_info()}</h4>
+                <h4 class="flex items-center font-bold text-emerald-600">
+                    Attributes
+                </h4>
 
-                <ul class="mt-4">
+                <ul class="pt-4" transition:slide>
                     {#each productStore.product.attributes as attribute}
                         <li>
                             {attribute.attribute}:
@@ -304,11 +354,13 @@
                             {variation.fabric_type?.name}
                             {variation.name}
                             {variation.weight}
-                            {variation.weight_unit_code}
+                            {variation.weight_unit_code}.
 
                             {#each variation.fabric_type_composition as composition}
-                                ({composition.percentage}%
-                                {composition.material_translation.at(0)?.name})
+                                <p class="ml-4">
+                                    - {composition.percentage}%
+                                    {composition.material_translation.at(0)?.name}
+                                </p>
                             {/each}
                         </li>
                     {/if}
@@ -316,51 +368,67 @@
             </ul>
         </div>
 
-        {#if productStore.product.careInstructions.length}
-            <div class="p-box border-t border-stone-200">
-                <h4 class="font-bold text-emerald-600">Care instructions</h4>
+        <div class="p-box border-t border-stone-200">
+            <AccordionLabel
+                isOpen={careAccordion.isOpen}
+                onclick={careAccordion.toggleAccordion}
+                class="font-bold text-emerald-600"
+            >
+                Care instructions
+            </AccordionLabel>
 
-                <ul class="mt-4 space-y-2">
-                    {#each productStore.product.careInstructions as item}
-                        <li class=" flex items-center">
-                            {#if item.icon}
-                                <Icon icon={item.icon} class="mr-2 min-h-6 min-w-6" />
-                            {/if}
+            <AccordionItems isOpen={careAccordion.isOpen} class="space-y-2">
+                {#each productStore.product.careInstructions as item}
+                    <li class="flex items-start">
+                        {#if item.icon}
+                            <Icon icon={item.icon} class="mr-2 min-h-6 min-w-6" />
+                        {/if}
 
-                            {item.instruction}
-                        </li>
-                    {/each}
-                </ul>
-            </div>
-        {/if}
+                        {item.instruction}
+                    </li>
+                {/each}
+            </AccordionItems>
+        </div>
 
         <div class="p-box border-t border-stone-200">
-            <h4 class="font-bold text-emerald-600">Additional information</h4>
+            <AccordionLabel
+                isOpen={infoAccordion.isOpen}
+                onclick={infoAccordion.toggleAccordion}
+                class="font-bold text-emerald-600"
+            >
+                Additional information
+            </AccordionLabel>
 
-            {#if productStore.product.about}
-                <p class="mt-4">
-                    {productStore.product.about}
-                </p>
-            {/if}
+            <AccordionItems isOpen={infoAccordion.isOpen}>
+                {#if productStore.product.about}
+                    <li class="mb-4">
+                        {productStore.product.about}
+                    </li>
+                {/if}
 
-            <table class="mt-4 w-full border-collapse">
-                <thead>
-                    <tr>
-                        <th class="border border-stone-200 bg-stone-50 p-2 text-left"> Size </th>
-
-                        <th class="border border-stone-200 bg-stone-50 p-2 text-left"> Weight </th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                    {#each productStore.product.sizes as size}
+                <table class="w-full border-collapse">
+                    <thead>
                         <tr>
-                            <td class="border border-stone-200 p-2">{size.name}</td>
-                            <td class="border border-stone-200 p-2">{size.weight}</td>
+                            <th class="border border-stone-200 bg-stone-50 p-2 text-left">
+                                Size
+                            </th>
+
+                            <th class="border border-stone-200 bg-stone-50 p-2 text-left">
+                                Weight
+                            </th>
                         </tr>
-                    {/each}
-                </tbody>
-            </table>
+                    </thead>
+
+                    <tbody>
+                        {#each productStore.product.sizes as size}
+                            <tr>
+                                <td class="border border-stone-200 p-2">{size.name}</td>
+                                <td class="border border-stone-200 p-2">{size.weight}</td>
+                            </tr>
+                        {/each}
+                    </tbody>
+                </table>
+            </AccordionItems>
         </div>
     </div>
 </article>

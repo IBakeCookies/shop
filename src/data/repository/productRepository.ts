@@ -171,4 +171,17 @@ export const readProductBySlug = (slug: string) =>
         .single();
 
 export const readProductVariantStockById = (id: number) =>
-    supabase.from('product_variation').select('stock').eq('id', id).single();
+    supabase
+        .from('product_variation')
+        .select(
+            `
+			stock,
+			product_item (
+				id,
+				price,
+				sale_price
+			)
+			`,
+        )
+        .eq('id', id)
+        .single();

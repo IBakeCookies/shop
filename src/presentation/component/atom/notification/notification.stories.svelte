@@ -6,10 +6,6 @@
     const { Story } = defineMeta({
         title: 'atom/notification',
         component: Notification,
-
-        args: {
-            modifier: '',
-        },
     });
 
     const notification = {

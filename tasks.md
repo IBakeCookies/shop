@@ -3,18 +3,10 @@
 ## Index
 
 - Add more sections use https://www.artilectperformance.com/en-eu as a reference
-- Make it beautiful
 
 ## Product Listing
 
 - Image should change on hover
-- Color circles should show a label with the color name on hover :done:
-
-## Product Detail
-
-- Add a carousel for the images
-- Allow adding items to cart
-- save cart state in local storage and hydrate the store from it.
 
 ## Testing
 
@@ -24,7 +16,6 @@
 
 ## Storybook
 
-- add story for every component.
 - try to do story UI testing.
 
 ## Other pages in the footer
@@ -50,5 +41,3 @@
 - Add a lazy loading to the images
 
 ## Security
-
-- dont allow store hydration on the server

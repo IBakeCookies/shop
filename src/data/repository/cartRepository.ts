@@ -33,3 +33,7 @@ export const readCartItemByVariantId = (id: number) =>
         .eq('product_item.product.product_translation.language_code', 'en')
         .eq('product_item.size_option_id.size.size_translation.language_code', 'en')
         .single();
+
+export const createUserCart = () => {
+    return supabase.from('user_cart').insert();
+};

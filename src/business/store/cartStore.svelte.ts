@@ -4,6 +4,7 @@ import type { NotificationStore } from '@store/notificationStore.svelte';
 import * as paraglide from '$lib/paraglide/messages.js';
 import { getContext, setContext } from 'svelte';
 import { readProductVariantStockById } from '@data/repository/productRepository';
+import { createUserCart } from '@data/repository/cartRepository';
 
 const CONTEXT_KEY = Symbol();
 interface AddCartItemOutput {
@@ -75,6 +76,17 @@ export class CartStore {
         return this.#totalPrice;
     }
 
+    async createCartSession(): Promise<void> {
+        try {
+            await createUserCart();
+        } catch (error) {
+            this.#notificationStore.addNotification({
+                title: 'Error creating cart session',
+                variant: 'warning-light-base',
+            });
+        }
+    }
+
     hydrateStore(items: CartItem[]): void {
         this.#items = items;
 
@@ -112,10 +124,16 @@ export class CartStore {
         this.#eventStore.removeEvent(`remove-item-from-cart-${id}`);
     }
 
-    removeAllItems() {
+    async removeAllItems() {
         if (!confirm('Are you sure that you want to remove all items?')) {
             return;
         }
+
+        this.#eventStore.addEvent('remove-all-cart-items');
+
+        await sleep(1000);
+
+        this.#eventStore.removeEvent('remove-all-cart-items');
 
         this.#items = [];
         this.#seen.clear();
@@ -226,8 +244,8 @@ export class CartStore {
 
     #addStockNotification(item: CartItem, type: 'unavailable' | 'limited') {
         const messages = {
-            unavailable: `Item ${item.name} - ${item.color} - ${item.size} is not in stock anymore.`,
-            limited: `Item ${item.name} - ${item.color} - ${item.size} has lower stock than you ordered.`,
+            unavailable: `${item.name} - ${item.color} - ${item.size} is not in stock anymore.`,
+            limited: `${item.name} - ${item.color} - ${item.size} has lower stock than what you had. We reduced the quantity to the max stock available.`,
         };
 
         this.#notificationStore.addNotification({
@@ -263,22 +281,23 @@ export class CartStore {
             );
 
             this.#items = this.#items.map((cartItem) => {
-                const currentStock = stockMap.get(cartItem.id);
-
-                if (!currentStock) {
+                if (!cartItem.isAvailable) {
                     return cartItem;
                 }
 
-                const newItem = {
-                    ...cartItem,
-                    stock: currentStock,
-                };
+                const currentStock = stockMap.get(cartItem.id);
+
+                if (currentStock === undefined) {
+                    return cartItem;
+                }
+
+                cartItem.stock = currentStock;
 
                 if (currentStock === 0) {
                     this.#addStockNotification(cartItem, 'unavailable');
 
                     return {
-                        ...newItem,
+                        ...cartItem,
                         quantity: 0,
                         isAvailable: false,
                     };
@@ -288,12 +307,12 @@ export class CartStore {
                     this.#addStockNotification(cartItem, 'limited');
 
                     return {
-                        ...newItem,
+                        ...cartItem,
                         quantity: currentStock,
                     };
                 }
 
-                return newItem;
+                return cartItem;
             });
         } finally {
             this.#eventStore.removeEvent('validate-cart');

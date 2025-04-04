@@ -40,9 +40,11 @@
 </script>
 
 <Label {title} {disabled} class={props.class}>
-    {#snippet text()}
-        {@render label?.()}
-    {/snippet}
+    {#if label}
+        {#snippet text()}
+            {@render label?.()}
+        {/snippet}
+    {/if}
 
     <div
         style={`background-color: ${backgroundColor}`}

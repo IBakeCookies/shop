@@ -11,7 +11,6 @@
             direction: 'fromBottom',
             index: 0,
             limit: 0,
-            modifier: '',
         },
     });
 </script>

@@ -5,6 +5,7 @@
 
     interface Props {
         title?: string;
+        isRequired?: boolean;
         position?: 'top' | 'left';
         disabled?: boolean;
         class?: ClassValue;
@@ -12,7 +13,7 @@
         children?: Snippet;
     }
 
-    let { title, children, disabled, position = 'top', text, ...props }: Props = $props();
+    let { title, isRequired, children, disabled, position = 'top', text, ...props }: Props = $props();
 
     const styles = (() => {
         if (position === 'top') {
@@ -38,6 +39,10 @@
     {#if text}
         <div class={styles.label}>
             {@render text()}
+            
+            {#if isRequired}
+                *
+            {/if}
         </div>
     {/if}
 

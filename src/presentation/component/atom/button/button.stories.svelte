@@ -8,7 +8,6 @@
         args: {
             isLoading: false,
             disabled: false,
-            modifier: '',
         },
         argTypes: {
             size: {

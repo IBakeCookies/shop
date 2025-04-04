@@ -5,7 +5,6 @@
     const { Story } = defineMeta({
         title: 'atom/loader',
         component: Loader,
-
         args: {
             isRelative: false,
         },

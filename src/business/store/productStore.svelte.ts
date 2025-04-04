@@ -40,6 +40,10 @@ const CONTEXT_KEY = Symbol();
 class ProductStore {
     product = $state.raw<ProductDetail>(placeholder);
 
+    constructor(product?: ProductDetail) {
+        this.product = product || placeholder;
+    }
+
     async getProduct(slug: string) {
         const data = await getProduct(slug);
 
@@ -47,8 +51,8 @@ class ProductStore {
     }
 }
 
-export function setProductStore() {
-    return setContext<ProductStore>(CONTEXT_KEY, new ProductStore());
+export function setProductStore(product: ProductDetail) {
+    return setContext<ProductStore>(CONTEXT_KEY, new ProductStore(product));
 }
 
 export function getProductStore() {

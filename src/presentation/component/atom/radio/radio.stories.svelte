@@ -11,7 +11,6 @@
             value: '125',
             variant: 'default',
             title: 'title',
-            modifier: '',
         },
     });
 </script>

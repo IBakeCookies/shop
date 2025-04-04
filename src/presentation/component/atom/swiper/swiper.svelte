@@ -19,6 +19,6 @@
     register();
 </script>
 
-<swiper-container class={['swiper', props.class]} {...props} bind:this={container} loop>
+<swiper-container class={['swiper', props.class]} {...props} bind:this={container}>
     {@render children?.()}
 </swiper-container>

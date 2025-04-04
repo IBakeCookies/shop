@@ -14,7 +14,8 @@
     import Nav from '@organism/nav/nav.svelte';
     import Newsletter from '@molecule/newsletter/newsletter.svelte';
     import Alert from '@atom/alert/alert.svelte';
-
+    import { browser } from '$app/environment';
+    
     const { children } = $props();
     const notificationStore = setNotificationStore();
     const eventStore = setEventStore();
@@ -31,23 +32,29 @@
     eventStore.addEvent('cartStore.hydration');
 
     onMount(() => {
-        cartStore.hydrateStore(cartLocalStorage.read() || []);
-        eventStore.removeEvent('cartStore.hydration');
+        // cartStore.hydrateStore(cartLocalStorage.read() || []);
+        // eventStore.removeEvent('cartStore.hydration');
+
+        // cartStore.createCartSession();
     });
 
-    $effect(() => {
-        cartLocalStorage.write(cartStore.items);
-    });
+    // $effect(() => {
+    //     cartLocalStorage.write(cartStore.items);
+    // });
 
     $effect(() => {
         pageStore.navHeight = navRef?.scrollHeight || 0;
         pageStore.alertHeight = alertRef?.scrollHeight || 0;
     });
+
+    // Revar Alpha Pants 60 price_1R8MedBC9hnWQxBpA8aj1FCI
 </script>
 
-<Alert bind:ref={alertRef} variant="neutral-dark-base" class="text-center">
-    Free shipping on orders over €200 within Germany
-</Alert>
+{#if browser}
+    <Alert bind:ref={alertRef} variant="neutral-dark-base" class="text-center">
+        Free shipping on orders over €200 within Germany
+    </Alert>
+{/if}
 
 {#if notificationStore.notifications.length}
     {#await import('@atom/notification/notification.svelte') then { default: Notification }}
@@ -71,10 +78,9 @@
 <div
     bind:this={navRef}
     class={[
-        'px-box sticky top-0 z-(--z-nav) border-b border-stone-200 bg-white transition-all',
+        'p-box sticky top-0 z-(--z-nav) border-b border-stone-200 bg-white transition-all',
         {
-            'py-4': Number(scrollY.current) > 100,
-            'py-box': Number(scrollY.current) <= 100,
+            'py-4': Number(scrollY.current) > 0,
         },
     ]}
 >
@@ -130,3 +136,15 @@
 />
 
 <Footer />
+
+<style>
+    @font-face {
+        font-family: 'IBM Plex Sans', sans-serif;
+        src: url('font/IBM_Plex_Sans/IBMPlexSans-VariableFont_wdth,wght.ttf');
+    }
+
+    @font-face {
+        font-family: 'Recursive', sans-serif;
+        src: url('font/Recursive/Recursive-VariableFont_CASL,CRSV,MONO,slnt,wght.ttf');
+    }
+</style>

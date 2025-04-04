@@ -47,7 +47,7 @@
     {...props}
     {href}
     class={cn(
-        'group relative inline-flex cursor-pointer items-center justify-center border-2 border-transparent transition-colors disabled:opacity-50',
+        'group inline-flex cursor-pointer items-center justify-center border-2 border-transparent transition-colors disabled:opacity-50',
         getButtonVariantStyle(variant),
         currentSize,
         props.class,
@@ -58,14 +58,6 @@
     disabled={isLoading || disabled}
 >
     {@render children?.()}
-
-    {#if onHoverSnippet}
-        <div
-            class="absolute right-4 -translate-x-2 opacity-0 transition-all group-hover:translate-x-1/2 group-hover:opacity-100"
-        >
-            {@render onHoverSnippet()}
-        </div>
-    {/if}
 
     {#if isLoading}
         <Icon icon="bi:arrow-repeat" class="ml-icon h-6 w-6 animate-spin" />

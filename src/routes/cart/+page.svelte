@@ -13,10 +13,25 @@
     const cartStore = getCartStore();
     const eventStore = getEventStore();
     const isCartReady = $derived(!eventStore.hasAny(['cartStore.hydration']));
+    const isCheckoutButtonLoading = $derived(eventStore.hasAny(['validate-cart']));
+    const isClearCartButtonLoading = $derived(eventStore.hasAny(['remove-all-cart-items']));
     const isDeleteButtonLoading = (id: number) => {
         return eventStore.hasAny([`remove-item-from-cart-${id}`]);
     };
-    const isCheckoutButtonLoading = $derived(eventStore.hasAny(['validate-cart']));
+
+    async function onCheckout() {
+        await cartStore.validateCart();
+
+        // const res = await fetch('/api/v1/stripe/create-intent', {
+        //     method: 'POST',
+        //     body: JSON.stringify([]),
+        //     headers: {
+        //         'Content-Type': 'application/json',
+        //     },
+        // });
+
+        // console.log(res);
+    }
 </script>
 
 <section
@@ -45,6 +60,7 @@
                             variant="error-light-outline"
                             size="tiny"
                             class="ml-4 self-end"
+                            isLoading={isClearCartButtonLoading}
                             onclick={() => cartStore.removeAllItems()}
                         >
                             Clear cart
@@ -121,11 +137,11 @@
                         Total: <Money value={cartStore.totalPrice} /> + shipping
                     </p>
 
-                    <form class="p-box border-t border-stone-200">
+                    <div class="p-box border-t border-stone-200">
                         <Button
                             class="w-full"
                             variant="success-dark-base"
-                            onclick={() => cartStore.validateCart()}
+                            onclick={onCheckout}
                             isLoading={isCheckoutButtonLoading}
                         >
                             Checkout
@@ -134,7 +150,7 @@
                                 <Icon icon="mdi:arrow-right" />
                             {/snippet}
                         </Button>
-                    </form>
+                    </div>
 
                     <div class="px-box border-t border-stone-200 py-4 text-sm text-stone-500">
                         <p>

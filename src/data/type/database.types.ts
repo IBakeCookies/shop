@@ -241,6 +241,45 @@ export type Database = {
           },
         ]
       }
+      cart_item: {
+        Row: {
+          added_at: string
+          price: number
+          product_variation_id: number
+          quantity: number
+          user_cart_id: string
+        }
+        Insert: {
+          added_at?: string
+          price: number
+          product_variation_id: number
+          quantity: number
+          user_cart_id: string
+        }
+        Update: {
+          added_at?: string
+          price?: number
+          product_variation_id?: number
+          quantity?: number
+          user_cart_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cart_item_product_variation_id_fkey"
+            columns: ["product_variation_id"]
+            isOneToOne: false
+            referencedRelation: "product_variation"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cart_item_user_cart_id_fkey"
+            columns: ["user_cart_id"]
+            isOneToOne: false
+            referencedRelation: "user_cart"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       color: {
         Row: {
           hex: string
@@ -1529,6 +1568,27 @@ export type Database = {
           created_at?: string
           id?: number
           name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      user_cart: {
+        Row: {
+          created_at: string
+          expires_at: string
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at: string
+          id?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string
+          id?: string
           updated_at?: string
         }
         Relationships: []
