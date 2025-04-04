@@ -29,7 +29,7 @@
     let navRef: null | HTMLDivElement = $state(null);
     let alertRef: null | HTMLDivElement = $state(null);
 
-    eventStore.addEvent('cartStore.hydration');
+    // eventStore.addEvent('cartStore.hydration');
 
     onMount(() => {
         // cartStore.hydrateStore(cartLocalStorage.read() || []);
@@ -95,6 +95,7 @@
                 href: '/products',
             },
         ]}
+        totalPrice={cartStore.totalPrice}
         cartItemsCount={cartStore.totalItemsCount}
         class="mx-auto max-w-screen-2xl"
     >

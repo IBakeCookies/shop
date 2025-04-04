@@ -21,7 +21,7 @@ export async function getProduct(slug: string): Promise<ProductDetail> {
     try {
         const { data, error } = await readProductBySlug(slug);
 
-        console.log(data);
+        // console.log(data);
 
         if (!data || error) {
             return placeholder;

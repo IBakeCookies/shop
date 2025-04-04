@@ -3,6 +3,7 @@
     import type { ClassValue } from 'svelte/elements';
     import Icon from '@iconify/svelte';
     import { cn } from '@presentation/utils/style';
+    import Money from '@atom/money/money.svelte';
     // import Button from '@atom/button/button.svelte';
     // import Input from '@atom/input/input.svelte';
     // import { useAccordion } from '@atom/accordion/accordion.svelte';
@@ -18,11 +19,12 @@
         ref?: null | HTMLElement;
         items: Item[];
         cartItemsCount: number;
+        totalPrice: number;
         class?: ClassValue;
         children?: Snippet;
     }
 
-    let { cartItemsCount, items, children, ...props }: Props = $props();
+    let { totalPrice, cartItemsCount, items, children, ...props }: Props = $props();
 
     // const productAccordion = useAccordion();
 </script>
@@ -36,7 +38,7 @@
         {/each}
 
         <!-- <div>
-            <AccordionLabel   onclick={productAccordion.toggleAccordion}>
+            <AccordionLabel onclick={productAccordion.toggleAccordion}>
                 Products
             </AccordionLabel>
     
@@ -75,9 +77,19 @@
         <!-- <Input name="search" type="text" placeholder="Search products" /> -->
 
         <a class="flex cursor-pointer items-center" href="/cart" title="cart">
-            {cartItemsCount ? cartItemsCount : ''}
+            <div class="relative flex items-center">
+                {#if cartItemsCount}
+                    <span class="-translate-y-1/2 -translate-x-1/2 absolute top-0 left-full bg-white rounded-full border border-stone-300 w-6 h-6 flex items-center justify-center">
+                        {cartItemsCount} 
+                    </span>        
+                {/if}
 
-            <Icon icon="mdi:cart" class="h-6 w-6 {cartItemsCount ? 'ml-2' : ''}" />
+                <Icon icon="mdi:cart" class="h-6 w-6" />
+            </div>      
+            
+            {#if totalPrice}
+                <Money value={totalPrice} class="ml-4" />
+            {/if}
         </a>
     </div>
 </nav>

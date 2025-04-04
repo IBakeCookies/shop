@@ -122,7 +122,7 @@
                     {/if}
                 </div>
 
-                <div class="col-span-1 border border-stone-200 bg-white">
+                <div class="col-span-1 border border-stone-200 bg-white sticky top-30">
                     <h2 class="p-8 text-xl">Summary</h2>
 
                     <div class="p-box border-t border-stone-200">
