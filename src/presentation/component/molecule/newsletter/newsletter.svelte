@@ -16,11 +16,9 @@
     const { image, ...props }: Props = $props();
 </script>
 
-
 {#snippet text()}
     Email
 {/snippet}
-
 
 <div
     {...props}
@@ -49,7 +47,7 @@
                         class="block w-full"
                     />
                 </Label>
-               
+
                 <Button type="submit" class="mt-4" variant="neutral-light-base">Subscribe</Button>
             </form>
         </div>

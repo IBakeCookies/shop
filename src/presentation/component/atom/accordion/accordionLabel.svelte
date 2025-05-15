@@ -14,7 +14,14 @@
         children: Snippet;
     }
 
-    const { icon ='mdi:arrow-right', variant = 'default', isOpen, withIcon = true, children, ...props }: Props = $props();
+    const {
+        icon = 'mdi:arrow-right',
+        variant = 'default',
+        isOpen,
+        withIcon = true,
+        children,
+        ...props
+    }: Props = $props();
 
     const style = {
         default: '',
@@ -26,14 +33,17 @@
     {...props}
     class={cn('flex cursor-pointer items-center text-left', style[variant], props.class)}
 >
-    <div class="w-full">    
+    <div class="w-full">
         {@render children()}
     </div>
 
     {#if withIcon}
-        <Icon 
-            {icon} 
-            class={cn("ml-2 min-h-6 min-w-6 -rotate-z-45 transition-transform",
-            isOpen && 'rotate-z-45')}  />
+        <Icon
+            {icon}
+            class={cn(
+                'ml-2 min-h-6 min-w-6 -rotate-z-45 transition-transform',
+                isOpen && 'rotate-z-45',
+            )}
+        />
     {/if}
 </button>

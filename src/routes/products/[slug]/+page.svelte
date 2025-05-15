@@ -1,30 +1,28 @@
 <script lang="ts">
-    import type { PageProps } from './$types';
+    import type { PageProps, SubmitFunction } from './$types';
     import type { SwiperContainer } from 'swiper/element/bundle';
     import Icon from '@iconify/svelte';
     import { enhance } from '$app/forms';
-    import { page } from '$app/state';
     import * as paraglide from '$lib/paraglide/messages.js';
     import { fly, slide } from 'svelte/transition';
-    import { getCartStore } from '@store/cartStore.svelte';
     import { getEventStore } from '@store/eventStore.svelte';
-    import { pageStore } from '@store/pageStore.svelte';
+    import { getNotificationStore } from '@store/notificationStore.svelte';
     import { setProductStore } from '@store/productStore.svelte';
+    import { useAccordion } from '@presentation/utils/accordion.svelte';
     import { getFly } from '@presentation/utils/fly';
+    import AccordionItems from '@atom/accordion/accordionItems.svelte';
+    import AccordionLabel from '@atom/accordion/accordionLabel.svelte';
     import Button from '@atom/button/button.svelte';
     import ButtonHoverChild from '@atom/button/buttonHoverChild.svelte';
     import Money from '@atom/money/money.svelte';
     import Radio from '@atom/radio/radio.svelte';
     import Sale from '@atom/sale/sale.svelte';
-    import { useAccordion } from '@presentation/utils/accordion.svelte';
-    import AccordionItems from '@atom/accordion/accordionItems.svelte';
-    import AccordionLabel from '@atom/accordion/accordionLabel.svelte';
     import Swiper from '@atom/swiper/swiper.svelte';
 
     const { data }: PageProps = $props();
     const productStore = setProductStore(data.product);
     const eventStore = getEventStore();
-    const cartStore = getCartStore();
+    const notificationStore = getNotificationStore();
     const careAccordion = useAccordion();
     const infoAccordion = useAccordion();
 
@@ -34,7 +32,6 @@
     let swiperThumbContainer: SwiperContainer | undefined = $state();
 
     const isAddingToCart = $derived(eventStore.hasAny(['add-item-to-cart']));
-    const slug = $derived(page.params.slug);
 
     const selectedVariation = $derived.by(() => {
         if (!colorModel || !sizeModel) {
@@ -69,7 +66,7 @@
 
         return result;
     });
-    
+
     const disabledColors = $derived.by(() => {
         const result = new Set();
 
@@ -97,52 +94,33 @@
         );
     });
 
-    async function submit({ formElement, formData, action, cancel, submitter }) {
+    const submit: SubmitFunction = ({ cancel }) => {
         if (!selectedVariation) {
             return cancel();
         }
 
-        const { success, error } = await cartStore.addItem({
-            id: selectedVariation.id,
-            stock: selectedVariation.stock,
-            quantity: 1,
-            price: productStore.product.price,
-            salePrice: selectedVariation.salePrice,
-            color: selectedVariation.colorName,
-            size: selectedVariation.size.size_translation.at(0)?.name || '',
-            name: productStore.product.name,
-            slug,
-            image: productStore.product.items.reduce(
-                (result, acc) => {
-                    for (const image of acc.images) {
-                        if (acc.color.id === colorModel) {
-                            result.src = image.src;
-                            result.alt = image.alt;
-                            break;
-                        }
-                    }
-
-                    return result;
-                },
-                {
-                    src: '',
-                    alt: '',
-                },
-            ),
-        });
-
-        if (success) {
-            // do something?
-        }
-
-        if (error) {
-            cancel();
-        }
+        eventStore.addEvent('add-item-to-cart');
 
         return async ({ result, update }) => {
+            eventStore.removeEvent('add-item-to-cart');
+
             update();
+
+            if (result.type === 'success' && result.data) {
+                return notificationStore.addNotification({
+                    title: result.data.message,
+                    variant: 'success-light-base',
+                });
+            }
+
+            if (result.type === 'failure' && result.data) {
+                notificationStore.addNotification({
+                    title: result.data.message,
+                    variant: 'warning-light-base',
+                });
+            }
         };
-    }
+    };
 
     $effect(() => {
         if (!swiperContainer || !swiperContainer.swiper) {
@@ -163,30 +141,34 @@
     // $effect(() => {
     //     if(!swiperContainer) {
     //         return;
-    //     }    
+    //     }
 
-        // swiperContainer.style.cssText = `top: calc(${pageStore.navHeight}px);`
-        // `top-[${pageStore?.navHeight}px]`
+    // swiperContainer.style.cssText = `top: calc(${pageStore.navHeight}px);`
+    // `top-[${pageStore?.navHeight}px]`
     // });
 </script>
 
 <article in:fly={getFly()} class="mx-auto grid max-w-screen-2xl grid-cols-1 xl:grid-cols-12">
-    <div class="xl:sticky col-span-6">
+    <div class="col-span-6 xl:sticky">
         {#if swiperThumbContainer}
             <Swiper
                 bind:container={swiperContainer}
                 class="overflow-hidden"
                 navigation={true}
                 loop
-                thumbs={{ swiper: ".thumbs" }}
+                thumbs={{
+                    swiper: '.thumbs',
+                }}
             >
                 {#each productStore.product.items as item}
                     {#each item.images as image}
                         <swiper-slide id={item.color.id} lazy="true">
-                            <img 
-                                src={image.src} 
-                                alt={image.alt} 
-                                class="mx-auto h-200" loading="lazy" />
+                            <img
+                                src={image.src}
+                                alt={image.alt}
+                                class="mx-auto h-200"
+                                loading="lazy"
+                            />
                         </swiper-slide>
                     {/each}
                 {/each}
@@ -195,27 +177,30 @@
 
         <Swiper
             bind:container={swiperThumbContainer}
-            class={["thumbs mt-4", !swiperContainer && 'opacity-0']} 
-            loop 
-            slides-per-view={5}  
+            class={['thumbs mt-4', !swiperContainer && 'opacity-0']}
+            loop
+            slides-per-view={5}
             space-between={10}
         >
             {#each productStore.product.items as item}
                 {#each item.images as image}
-                    <swiper-slide 
-                        id={item.color.id} 
-                        lazy="true" 
-                        class="p-2 border border-stone-200 bg-white">
-                        <img 
-                            src={image.src} alt={image.alt} 
-                            class="cursor-pointer w-full object-contain h-20" 
-                            loading="lazy" />
+                    <swiper-slide
+                        id={item.color.id}
+                        lazy="true"
+                        class="border border-stone-200 bg-white p-2"
+                    >
+                        <img
+                            src={image.src}
+                            alt={image.alt}
+                            class="h-20 w-full cursor-pointer object-contain"
+                            loading="lazy"
+                        />
                     </swiper-slide>
                 {/each}
             {/each}
         </Swiper>
     </div>
-   
+
     <div class="col-span-6 h-full border-r border-l border-stone-200 bg-white">
         <h2 class="p-8 text-4xl">
             {productStore.product.name}
@@ -321,9 +306,7 @@
 
         {#if productStore.product.attributes.length}
             <div class="p-box border-t border-stone-200">
-                <h4 class="flex items-center font-bold text-emerald-600">
-                    Attributes
-                </h4>
+                <h4 class="flex items-center font-bold text-emerald-600">Attributes</h4>
 
                 <ul class="pt-4" transition:slide>
                     {#each productStore.product.attributes as attribute}

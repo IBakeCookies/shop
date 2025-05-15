@@ -1,6 +1,7 @@
 import { getContext, setContext } from 'svelte';
 import { SvelteSet } from 'svelte/reactivity';
 
+const isDev = import.meta.env.DEV;
 const CONTEXT_KEY = Symbol();
 
 interface HistoryEvent {
@@ -16,21 +17,23 @@ export class EventStore {
     addEvent(event: string) {
         this.events.add(event);
 
-        this.history.push({
-            date: new Date(),
-            name: event,
-            removedDate: null,
-        });
+        isDev &&
+            this.history.push({
+                date: new Date(),
+                name: event,
+                removedDate: null,
+            });
     }
 
     removeEvent(event: string) {
         this.events.delete(event);
 
-        this.history.forEach((historyItem) => {
-            if (historyItem.name === event) {
-                historyItem.removedDate = new Date();
-            }
-        });
+        isDev &&
+            this.history.forEach((historyItem) => {
+                if (historyItem.name === event) {
+                    historyItem.removedDate = new Date();
+                }
+            });
     }
 
     hasAny(events: string[]) {

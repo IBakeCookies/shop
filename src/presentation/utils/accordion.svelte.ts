@@ -11,7 +11,7 @@ interface UseAccordionOutput {
 export function useAccordion(config?: UseAccordionInput): UseAccordionOutput {
     const { isOpen = false } = config || {};
     let isOpenLocal = $state(isOpen);
-    let value = $state('');
+    const value = $state('');
 
     function toggleAccordion() {
         isOpenLocal = !isOpenLocal;

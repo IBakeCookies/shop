@@ -32,7 +32,7 @@
 <div
     {...props}
     class={cn(
-        'notification relative flex items-start bg-stone-50 p-6 shadow-xl',
+        'notification relative flex items-start border border-stone-200 bg-stone-50 p-6 shadow-xl',
         props.class,
         styles.title,
     )}

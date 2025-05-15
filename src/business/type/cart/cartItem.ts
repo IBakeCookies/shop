@@ -1,4 +1,4 @@
-export interface CartItemInput {
+export interface CartItem {
     id: number;
     name: string;
     quantity: number;
@@ -12,8 +12,4 @@ export interface CartItemInput {
         src: string;
         alt: string;
     };
-}
-
-export interface CartItem extends CartItemInput {
-    isAvailable: boolean;
 }

@@ -48,7 +48,7 @@
 
     <div
         style={`background-color: ${backgroundColor}`}
-        class={`relative flex items-center bg-stone-200 outline-2 outline-offset-2 outline-transparent transition-colors has-checked:outline-stone-600 has-focus-visible:outline-stone-600 ${labelStyleVariant}`}
+        class={`relative flex items-center border border-stone-200 outline-2 outline-offset-2 outline-transparent transition-colors has-checked:outline-stone-600 has-focus-visible:outline-stone-600 ${labelStyleVariant}`}
     >
         <input
             {...props}

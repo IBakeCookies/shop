@@ -1,6 +1,8 @@
 <script lang="ts">
+    import type { SubmitFunction } from './$types';
     import type { ClassValue } from 'svelte/elements';
     import Icon from '@iconify/svelte';
+    import { enhance } from '$app/forms';
     import { cn } from '@presentation/utils/style';
     import QuantityInput from '@molecule/quantityInput/quantityInput.svelte';
     import Button from '@atom/button/button.svelte';
@@ -12,7 +14,6 @@
         size: string;
         stock: number;
         quantity: number;
-        isDeleteButtonLoading: (id: number) => boolean;
         salePrice: number;
         price: number;
         id: number;
@@ -21,13 +22,16 @@
             alt: string;
         };
         slug: string;
-        onRemove: (id: number) => void;
-        onQuantityChange: (id: number, quantity: number) => void;
+        formActionRemoveItem: string;
+        formActionQuantityChange: string;
+        onRemoveItem: SubmitFunction;
+        onQuantityChange: SubmitFunction;
         class?: ClassValue;
+        isDeleteButtonLoading: (id: number) => boolean;
+        isQuantityButtonLoading: (id: number) => boolean;
     }
 
     let {
-        onRemove,
         name,
         color,
         size,
@@ -35,11 +39,15 @@
         stock,
         salePrice,
         isDeleteButtonLoading,
+        isQuantityButtonLoading,
         price,
         id,
         image,
         slug,
+        formActionQuantityChange,
+        formActionRemoveItem,
         onQuantityChange,
+        onRemoveItem,
         ...props
     }: Props = $props();
 </script>
@@ -52,9 +60,9 @@
     )}
 >
     <a href={slug} class="col-span-10 flex items-center justify-self-start md:col-span-7">
-        <img class="mr-4 max-w-16" src={image.src} alt={image.alt} />
+        <img class="max-h-20" src={image.src} alt={image.alt} />
 
-        <div>
+        <div class="ml-4">
             <h4 class="text-h6 block">{name}</h4>
 
             <p class="text-stone-500">Color: {color} - Size: {size}</p>
@@ -63,14 +71,29 @@
         <!-- {name} - {color} - {size} -->
     </a>
 
-    <QuantityInput
-        min={1}
-        max={stock}
-        name="quantity"
-        bind:value={quantity}
-        class="order-3 col-span-10 justify-self-start md:col-span-3 md:justify-self-end"
-        onChange={(newQuantiy) => onQuantityChange(id, newQuantiy)}
-    />
+    <form 
+        class="flex order-3 col-span-10 justify-self-start md:col-span-3 md:justify-self-end" 
+        method="POST" action={formActionQuantityChange} 
+        use:enhance={onQuantityChange}>
+
+        <input type="hidden" name="id" value={id} />
+
+        <QuantityInput
+            min={1}
+            max={stock}
+            name="quantity"
+            bind:value={quantity}
+        />
+
+        <Button 
+            isLoading={isQuantityButtonLoading(id)} 
+            class="ml-4" 
+            type="submit"
+            variant="neutral-light-base" 
+            size="small">
+            Update
+        </Button>
+    </form>
 
     <div class="item-end order-4 col-span-2 flex flex-col md:col-span-1">
         {#if salePrice}
@@ -85,13 +108,17 @@
         />
     </div>
 
-    <Button
-        size="square"
-        variant="neutral-light-base"
-        onclick={() => onRemove(id)}
-        class="order-2 col-span-2 md:order-5 md:col-span-1"
-        isLoading={isDeleteButtonLoading(id)}
-    >
-        <Icon icon="mdi:close" class="text-red-500" />
-    </Button>
+    <form method="POST" action={formActionRemoveItem} use:enhance={onRemoveItem}
+        class="order-2 col-span-2 md:order-5 md:col-span-1">
+        <input type="hidden" name="id" value={id} />
+
+        <Button
+            type="submit"
+            size="square"
+            variant="neutral-light-base"
+            isLoading={isDeleteButtonLoading(id)}
+        >
+            <Icon icon="mdi:close" class="text-red-500" />
+        </Button>
+    </form>
 </div>

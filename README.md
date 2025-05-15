@@ -1,5 +1,9 @@
 # sv
 
+## Docker
+
+docker run -p 3000:3000 -v $(pwd):/app shop-dev
+
 Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
 
 ## Creating a project

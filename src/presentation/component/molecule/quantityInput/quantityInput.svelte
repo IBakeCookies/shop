@@ -13,7 +13,7 @@
         max: number;
         variant?: 'default';
         class?: ClassValue;
-        onChange: (newQuantiy: number) => void;
+        onChange?: (newQuantiy: number) => void;
         children?: Snippet;
     };
 
@@ -37,7 +37,7 @@
 
         value++;
 
-        onChange(value);
+        onChange && onChange(value);
     }
 
     function decrement(): void {
@@ -47,7 +47,7 @@
 
         value--;
 
-        onChange(value);
+        onChange && onChange(value);
     }
 
     function handleValue() {
@@ -57,7 +57,7 @@
             value = max;
         }
 
-        onChange(value);
+        onChange && onChange(value);
     }
 </script>
 
@@ -66,10 +66,13 @@
         variant="neutral-light-outline"
         size="small"
         onclick={decrement}
-        disabled={value === min}
+        type="button"
+        disabled={value <= min}
     >
         -
     </Button>
+
+    <input  type="hidden" name={name} value={value} />
 
     <Input disabled bind:value {name} type="number" {min} {max} oninput={handleValue} />
 
@@ -77,7 +80,8 @@
         variant="neutral-light-outline"
         size="small"
         onclick={increment}
-        disabled={value === max}
+        type="button"
+        disabled={value >= max}
     >
         +
     </Button>

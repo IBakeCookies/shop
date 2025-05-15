@@ -1,60 +1,52 @@
 <script lang="ts">
+    import type { LayoutProps } from './$types';
     import '@src/app.css';
     import Icon from '@iconify/svelte';
-    import { onMount } from 'svelte';
     import { scrollY } from 'svelte/reactivity/window';
     import { fly, slide } from 'svelte/transition';
     import { CartStore, setCartStore } from '@store/cartStore.svelte';
     import { setEventStore } from '@store/eventStore.svelte';
     import { setNotificationStore } from '@store/notificationStore.svelte';
     import { pageStore } from '@store/pageStore.svelte';
-    import { cartLocalStorage } from '@storage/cartStorage';
     import { getFly } from '@presentation/utils/fly';
     import Footer from '@organism/footer/footer.svelte';
     import Nav from '@organism/nav/nav.svelte';
     import Newsletter from '@molecule/newsletter/newsletter.svelte';
     import Alert from '@atom/alert/alert.svelte';
-    import { browser } from '$app/environment';
-    
-    const { children } = $props();
+
+    const { data, children }: LayoutProps = $props();
     const notificationStore = setNotificationStore();
     const eventStore = setEventStore();
-    const cartStore = setCartStore(
-        new CartStore({
-            notificationStore,
-            eventStore,
-        }),
-    );
+    const cartStore = setCartStore();
 
     let navRef: null | HTMLDivElement = $state(null);
     let alertRef: null | HTMLDivElement = $state(null);
-
-    // eventStore.addEvent('cartStore.hydration');
-
-    onMount(() => {
-        // cartStore.hydrateStore(cartLocalStorage.read() || []);
-        // eventStore.removeEvent('cartStore.hydration');
-
-        // cartStore.createCartSession();
-    });
-
-    // $effect(() => {
-    //     cartLocalStorage.write(cartStore.items);
-    // });
+    
+    if (data.notifications) {
+        data.notifications.forEach(({ message, variant }) => {
+            notificationStore.addNotification({
+                title: message,
+                variant: variant,
+                fade: false,
+            });
+        });
+    }
 
     $effect(() => {
         pageStore.navHeight = navRef?.scrollHeight || 0;
         pageStore.alertHeight = alertRef?.scrollHeight || 0;
     });
 
+    $effect(() => {
+        cartStore.hydrateStore(data.cartItems || []);
+    });
     // Revar Alpha Pants 60 price_1R8MedBC9hnWQxBpA8aj1FCI
 </script>
 
-{#if browser}
-    <Alert bind:ref={alertRef} variant="neutral-dark-base" class="text-center">
-        Free shipping on orders over €200 within Germany
-    </Alert>
-{/if}
+
+<Alert bind:ref={alertRef} variant="neutral-dark-base" class="text-center">
+    Free shipping on orders over €200 within Germany
+</Alert>
 
 {#if notificationStore.notifications.length}
     {#await import('@atom/notification/notification.svelte') then { default: Notification }}
@@ -147,5 +139,10 @@
     @font-face {
         font-family: 'Recursive', sans-serif;
         src: url('font/Recursive/Recursive-VariableFont_CASL,CRSV,MONO,slnt,wght.ttf');
+    }
+
+    .selector {
+        transform: translateX(-100%);
+        animation: tktk 0.5s ease-in-out;
     }
 </style>

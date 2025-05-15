@@ -3,22 +3,17 @@ import { getContext, setContext } from 'svelte';
 
 export interface NotificationInput {
     title: string;
-    message?: string;
     variant: StylePath;
+    message?: string;
     fade?: boolean;
     duration?: number;
     dismiss?: () => void;
 }
 
-export interface Notification extends NotificationInput {
+export type Notification = {
     id: number;
     timeoutId: null | ReturnType<typeof setTimeout>;
-
-    // overwrite
-    duration: number;
-    variant: StylePath;
-    fade: boolean;
-}
+} & Omit<NotificationInput, 'duration' | 'fade'> & Required<Pick<NotificationInput, 'duration' | 'fade'>>
 
 const getNewId = (() => {
     let id = -1;

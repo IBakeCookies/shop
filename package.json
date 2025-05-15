@@ -43,6 +43,7 @@
         "@storybook/sveltekit": "^8.6.4",
         "@storybook/test": "^8.6.4",
         "@storybook/test-runner": "^0.22.0",
+        "@sveltejs/adapter-node": "^5.2.12",
         "@sveltejs/adapter-vercel": "^5.6.3",
         "@sveltejs/kit": "^2.18.0",
         "@sveltejs/vite-plugin-svelte": "^5.0.3",

@@ -13,7 +13,15 @@
         children?: Snippet;
     }
 
-    let { title, isRequired, children, disabled, position = 'top', text, ...props }: Props = $props();
+    let {
+        title,
+        isRequired,
+        children,
+        disabled,
+        position = 'top',
+        text,
+        ...props
+    }: Props = $props();
 
     const styles = (() => {
         if (position === 'top') {
@@ -39,7 +47,7 @@
     {#if text}
         <div class={styles.label}>
             {@render text()}
-            
+
             {#if isRequired}
                 *
             {/if}

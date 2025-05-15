@@ -1,27 +1,38 @@
 <script lang="ts">
+    import type { SubmitFunction } from './$types';
     import Icon from '@iconify/svelte';
+    import { onMount } from 'svelte';
     import { fly, slide } from 'svelte/transition';
     import { getCartStore } from '@store/cartStore.svelte';
     import { getEventStore } from '@store/eventStore.svelte';
+    import { getNotificationStore } from '@store/notificationStore.svelte';
     import { pageStore } from '@store/pageStore.svelte';
     import { getFly } from '@presentation/utils/fly';
     import CartListItem from '@molecule/cartListItem/cartListItem.svelte';
     import Button from '@atom/button/button.svelte';
     import Loader from '@atom/loader/loader.svelte';
     import Money from '@atom/money/money.svelte';
+    import { enhance } from '$app/forms';
 
     const cartStore = getCartStore();
     const eventStore = getEventStore();
-    const isCartReady = $derived(!eventStore.hasAny(['cartStore.hydration']));
+    const notificationStore = getNotificationStore();
+
+    let isMounted = $state(false);
+
     const isCheckoutButtonLoading = $derived(eventStore.hasAny(['validate-cart']));
     const isClearCartButtonLoading = $derived(eventStore.hasAny(['remove-all-cart-items']));
-    const isDeleteButtonLoading = (id: number) => {
+
+    function isDeleteButtonLoading(id: number) {
         return eventStore.hasAny([`remove-item-from-cart-${id}`]);
-    };
+    }
+
+    function isQuantityButtonLoading(id: number) {
+        return eventStore.hasAny([`update-item-quantity-${id}`]);
+    }
 
     async function onCheckout() {
-        await cartStore.validateCart();
-
+        // await cartStore.validateCart();
         // const res = await fetch('/api/v1/stripe/create-intent', {
         //     method: 'POST',
         //     body: JSON.stringify([]),
@@ -29,9 +40,75 @@
         //         'Content-Type': 'application/json',
         //     },
         // });
-
         // console.log(res);
     }
+
+    const onRemoveSubmit: SubmitFunction = ({ formData }) => {
+        const id = formData.get('id');
+
+        eventStore.addEvent(`remove-item-from-cart-${id}`);
+
+        return async ({ result, update }) => {            
+            eventStore.removeEvent(`remove-item-from-cart-${id}`);
+
+            update();
+
+            if (result.type === 'success' && result.data) {
+                return notificationStore.addNotification({
+                    title: result.data.message,
+                    variant: 'success-light-base',
+                });
+            }
+
+            if (result.type === 'failure' && result.data) {
+                notificationStore.addNotification({
+                    title: result.data.message,
+                    variant: 'warning-light-base',
+                });
+            }
+        };
+    };
+
+    const onQuantityChangeSubmit: SubmitFunction = ({ formData }) => {
+        const id = formData.get('id');
+        // const quantity = formData.get('quantity');
+
+        eventStore.addEvent(`update-item-quantity-${id}`);
+
+        return async ({ result, update }) => {            
+            eventStore.removeEvent(`update-item-quantity-${id}`);
+
+            update();
+
+            if (result.type === 'success' && result.data) {
+                return notificationStore.addNotification({
+                    title: result.data.message,
+                    variant: 'success-light-base',
+                });
+            }
+
+            if (result.type === 'failure' && result.data) {
+                notificationStore.addNotification({
+                    title: result.data.message,
+                    variant: 'warning-light-base',
+                });
+            }
+        };
+    };
+
+    const onRemoveAllItemsSubmit: SubmitFunction = () => {
+        eventStore.addEvent('remove-all-cart-items');
+
+        return async ({ update }) => {            
+            eventStore.removeEvent('remove-all-cart-items');
+
+            update();
+        };
+    };
+    
+    onMount(() => {
+        isMounted = true;
+    });
 </script>
 
 <section
@@ -39,7 +116,7 @@
     in:fly={getFly()}
     class="px-box mx-auto w-full max-w-screen-2xl py-24"
 >
-    {#if isCartReady}
+    {#if isMounted}
         {#if !cartStore.totalItemsCount && !cartStore.disabledItems.length}
             <div class="text-center">
                 <h1 class="mb-6 text-3xl">Cart is empty</h1>
@@ -56,20 +133,29 @@
                             <p>Your cart contains {cartStore.totalItemsCount} items</p>
                         </div>
 
-                        <Button
-                            variant="error-light-outline"
-                            size="tiny"
-                            class="ml-4 self-end"
-                            isLoading={isClearCartButtonLoading}
-                            onclick={() => cartStore.removeAllItems()}
+                        <form 
+                            class="ml-4 self-end" 
+                            method="POST" 
+                            action="?/removeAllItems" 
+                            use:enhance={onRemoveAllItemsSubmit}
                         >
-                            Clear cart
-                        </Button>
+                            <Button
+                                variant="error-light-outline"
+                                size="tiny"
+                                isLoading={isClearCartButtonLoading}
+                            >
+                                Clear cart
+                            </Button>
+                        </form>
                     </div>
 
                     {#each cartStore.availableItems as item, i (item.id)}
                         <div transition:slide>
                             <CartListItem
+                                formActionQuantityChange="?/updateItemQuantity"
+                                formActionRemoveItem="?/removeItemFromCart"
+                                onRemoveItem={onRemoveSubmit}
+                                onQuantityChange={onQuantityChangeSubmit}
                                 slug={`/products/${item.slug}`}
                                 name={item.name}
                                 color={item.color}
@@ -81,11 +167,9 @@
                                 id={item.id}
                                 image={item.image}
                                 {isDeleteButtonLoading}
-                                onRemove={(id) => cartStore.removeItem(id)}
-                                onQuantityChange={(id, quantity) =>
-                                    cartStore.updateItemQuantity(id, quantity)}
+                                {isQuantityButtonLoading}
                                 class={{
-                                    'border-b': i === cartStore.items.length - 1,
+                                    'border-b': i === cartStore.availableItems.length - 1,
                                 }}
                             />
                         </div>
@@ -99,6 +183,10 @@
                         {#each cartStore.disabledItems as item, i (item.id)}
                             <div transition:slide class="opacity-60">
                                 <CartListItem
+                                    formActionQuantityChange="?/updateItemQuantity"
+                                    formActionRemoveItem="?/removeItemFromCart"
+                                    onRemoveItem={onRemoveSubmit}
+                                    onQuantityChange={onQuantityChangeSubmit}
                                     slug={`/products/${item.slug}`}
                                     name={item.name}
                                     color={item.color}
@@ -110,19 +198,17 @@
                                     id={item.id}
                                     image={item.image}
                                     {isDeleteButtonLoading}
-                                    onRemove={(id) => cartStore.removeItem(id)}
-                                    onQuantityChange={(id, quantity) =>
-                                        cartStore.updateItemQuantity(id, quantity)}
+                                    {isQuantityButtonLoading}
                                     class={{
                                         'border-b': i === cartStore.disabledItems.length - 1,
                                     }}
-                                />
+                            />
                             </div>
                         {/each}
                     {/if}
                 </div>
 
-                <div class="col-span-1 border border-stone-200 bg-white sticky top-30">
+                <div class="sticky top-30 col-span-1 border border-stone-200 bg-white">
                     <h2 class="p-8 text-xl">Summary</h2>
 
                     <div class="p-box border-t border-stone-200">

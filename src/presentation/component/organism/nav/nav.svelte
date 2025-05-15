@@ -4,6 +4,7 @@
     import Icon from '@iconify/svelte';
     import { cn } from '@presentation/utils/style';
     import Money from '@atom/money/money.svelte';
+
     // import Button from '@atom/button/button.svelte';
     // import Input from '@atom/input/input.svelte';
     // import { useAccordion } from '@atom/accordion/accordion.svelte';
@@ -79,14 +80,16 @@
         <a class="flex cursor-pointer items-center" href="/cart" title="cart">
             <div class="relative flex items-center">
                 {#if cartItemsCount}
-                    <span class="-translate-y-1/2 -translate-x-1/2 absolute top-0 left-full bg-white rounded-full border border-stone-300 w-6 h-6 flex items-center justify-center">
-                        {cartItemsCount} 
-                    </span>        
+                    <span
+                        class="absolute top-0 left-full flex h-6 w-6 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-stone-300 bg-white"
+                    >
+                        {cartItemsCount}
+                    </span>
                 {/if}
 
                 <Icon icon="mdi:cart" class="h-6 w-6" />
-            </div>      
-            
+            </div>
+
             {#if totalPrice}
                 <Money value={totalPrice} class="ml-4" />
             {/if}
