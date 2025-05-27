@@ -61,4 +61,6 @@ export const readCartItems = (cartId: string) =>
         .eq('product_variation.product_item.color.color_translation.language_code', 'en')
         .eq('product_variation.size_option_id.size.size_translation.language_code', 'en')
         .eq('product_variation.product_item.product.product_translation.language_code', 'en')
-        .order('product_variation(id)', { ascending: true });
+        .order('product_variation(id)', {
+            ascending: true,
+        });

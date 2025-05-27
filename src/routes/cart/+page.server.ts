@@ -126,6 +126,8 @@ export const actions = {
             });
         }
 
-        cookies.delete('cartId', { path: '/' });
+        cookies.delete('cartId', {
+            path: '/',
+        });
     },
 } satisfies Actions;

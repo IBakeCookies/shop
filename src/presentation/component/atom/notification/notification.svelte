@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type { NotificationInput } from '@store/notificationStore.svelte';
+    import type { Notification } from '@store/notificationStore.svelte';
     import type { Snippet } from 'svelte';
     import type { ClassValue, HTMLAttributes } from 'svelte/elements';
     import Icon from '@iconify/svelte';
@@ -7,7 +7,7 @@
     import { cn } from '@presentation/utils/style';
 
     type Props = {
-        notification: NotificationInput;
+        notification: Notification;
         children?: Snippet;
         class?: ClassValue;
         dismiss: (id: number) => void;
@@ -17,8 +17,9 @@
 
     const styles = getNotificationVariantStyle(notification.variant);
 
-    const getAnimation = (duration: number) =>
-        `animation-duration: ${duration}ms; animation-fill-mode: forwards`;
+    function getAnimation(duration: number): string {
+        return `animation-duration: ${duration}ms; animation-fill-mode: forwards`;
+    }
 
     const icons = {
         'warning-light-base': 'mdi:warning',

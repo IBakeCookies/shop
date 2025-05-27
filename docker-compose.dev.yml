@@ -1,0 +1,11 @@
+services:
+    app-dev:
+        container_name: web-dev
+        build:
+            context: .
+            dockerfile: Dockerfile.dev
+        ports:
+            - '3000:3000'
+        volumes:
+            - .:/app
+        restart: unless-stopped

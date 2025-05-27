@@ -1,6 +1,7 @@
 <script lang="ts">
     import type { SubmitFunction } from './$types';
     import Icon from '@iconify/svelte';
+    import { enhance } from '$app/forms';
     import { onMount } from 'svelte';
     import { fly, slide } from 'svelte/transition';
     import { getCartStore } from '@store/cartStore.svelte';
@@ -12,7 +13,6 @@
     import Button from '@atom/button/button.svelte';
     import Loader from '@atom/loader/loader.svelte';
     import Money from '@atom/money/money.svelte';
-    import { enhance } from '$app/forms';
 
     const cartStore = getCartStore();
     const eventStore = getEventStore();
@@ -48,7 +48,7 @@
 
         eventStore.addEvent(`remove-item-from-cart-${id}`);
 
-        return async ({ result, update }) => {            
+        return async ({ result, update }) => {
             eventStore.removeEvent(`remove-item-from-cart-${id}`);
 
             update();
@@ -75,7 +75,7 @@
 
         eventStore.addEvent(`update-item-quantity-${id}`);
 
-        return async ({ result, update }) => {            
+        return async ({ result, update }) => {
             eventStore.removeEvent(`update-item-quantity-${id}`);
 
             update();
@@ -99,13 +99,13 @@
     const onRemoveAllItemsSubmit: SubmitFunction = () => {
         eventStore.addEvent('remove-all-cart-items');
 
-        return async ({ update }) => {            
+        return async ({ update }) => {
             eventStore.removeEvent('remove-all-cart-items');
 
             update();
         };
     };
-    
+
     onMount(() => {
         isMounted = true;
     });
@@ -133,10 +133,10 @@
                             <p>Your cart contains {cartStore.totalItemsCount} items</p>
                         </div>
 
-                        <form 
-                            class="ml-4 self-end" 
-                            method="POST" 
-                            action="?/removeAllItems" 
+                        <form
+                            class="ml-4 self-end"
+                            method="POST"
+                            action="?/removeAllItems"
                             use:enhance={onRemoveAllItemsSubmit}
                         >
                             <Button
@@ -202,7 +202,7 @@
                                     class={{
                                         'border-b': i === cartStore.disabledItems.length - 1,
                                     }}
-                            />
+                                />
                             </div>
                         {/each}
                     {/if}

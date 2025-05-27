@@ -1,13 +1,13 @@
 <script lang="ts">
     import type { Snippet } from 'svelte';
     import type { ClassValue, HTMLInputAttributes } from 'svelte/elements';
-    import { cn } from '@presentation/utils/style';
+    // import { cn } from '@presentation/utils/style';
     import Label from '@atom/label/label.svelte';
 
     type Props = {
         group: string;
         title?: string;
-        variant?: 'default';
+        // variant?: 'default';
         size?: 'default' | 'square';
         class?: ClassValue;
         disabled?: boolean;
@@ -19,7 +19,7 @@
     let {
         title,
         group = $bindable(),
-        variant = 'default',
+        // variant = 'default',
         size = 'default',
         disabled,
         backgroundColor,
@@ -40,11 +40,11 @@
 </script>
 
 <Label {title} {disabled} class={props.class}>
-    {#if label}
-        {#snippet text()}
-            {@render label?.()}
-        {/snippet}
-    {/if}
+    <!-- {#if label} -->
+    {#snippet text()}
+        {@render label?.()}
+    {/snippet}
+    <!-- {/if} -->
 
     <div
         style={`background-color: ${backgroundColor}`}

@@ -1,7 +1,4 @@
-import type { StringLength } from 'type-fest/source/internal';
-import { matrix2 } from '../../../kata-machine/src/__tests__/graph';
-import axios, { isAxiosError } from 'axios';
-import { use } from 'react';
+// import axios, { isAxiosError } from 'axios';
 
 // interface CatFactResponse {
 //     fact: string;
@@ -64,7 +61,7 @@ interface GenericError {
     message: string;
 }
 
-type UseErrorAsValueReturn<R> = R extends unknown
+export type UseErrorAsValueReturn<R> = R extends unknown
     ? {
           response: null;
           error: Error | GenericError | unknown;
@@ -79,7 +76,7 @@ type UseErrorAsValueReturn<R> = R extends unknown
 //     error: E;
 // }
 
-async function useErrorAsValue<R>(cb: () => Promise<R>) {
+export async function useErrorAsValue<R>(cb: () => Promise<R>) {
     try {
         const response = await cb();
 
@@ -95,7 +92,7 @@ async function useErrorAsValue<R>(cb: () => Promise<R>) {
     }
 }
 
-function getError(a: boolean): number | GenericError {
+export function getError(a: boolean): number | GenericError {
     if (a) {
         return 123;
     }

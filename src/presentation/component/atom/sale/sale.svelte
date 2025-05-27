@@ -3,7 +3,7 @@
     import { cn } from '@presentation/utils/style';
 
     type Props = {
-        value: string;
+        value: string | number;
         size?: 'default' | 'small';
         class?: ClassValue;
     };
@@ -21,7 +21,7 @@
 
 <span
     {...props}
-    title={value}
+    title={`${value}`}
     class={cn(
         'absolute -top-3 -right-3 flex items-center justify-center border-2 border-stone-200 bg-stone-50 ',
         props.class,

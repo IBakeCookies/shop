@@ -17,12 +17,15 @@ export class EventStore {
     addEvent(event: string) {
         this.events.add(event);
 
-        isDev &&
-            this.history.push({
-                date: new Date(),
-                name: event,
-                removedDate: null,
-            });
+        if (!isDev) {
+            return;
+        }
+
+        this.history.push({
+            date: new Date(),
+            name: event,
+            removedDate: null,
+        });
     }
 
     removeEvent(event: string) {

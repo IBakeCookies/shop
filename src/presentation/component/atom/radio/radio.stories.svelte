@@ -1,6 +1,5 @@
 <script module>
     import { defineMeta } from '@storybook/addon-svelte-csf';
-    import { fn } from '@storybook/test';
     import Radio from '@src/presentation/component/atom/radio/radio.svelte';
 
     const { Story } = defineMeta({

@@ -9,7 +9,7 @@ interface Notification {
     message: string;
 }
 
-export const load: LayoutServerLoad = async ({ cookies, depends }) => {
+export const load: LayoutServerLoad = async ({ cookies }) => {
     const existingCartId = cookies.get('cartId');
     const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
 
@@ -77,9 +77,10 @@ export const load: LayoutServerLoad = async ({ cookies, depends }) => {
             expires_at: expiresAt,
         })
         .eq('id', cartId);
-    
+
     if (updateError) {
         console.error('Error updating cart expiration:', updateError);
+
         return;
     }
 
@@ -107,11 +108,7 @@ export const load: LayoutServerLoad = async ({ cookies, depends }) => {
         const color = variation.product_item.color_translation.at(0)?.name;
         const size = item.product_variation.size_translation.at(0)?.name;
 
-        // item.isAvailable = true;
-
         if (variation.stock === 0) {
-            // item.isAvailable = false;
-
             notifications.push({
                 variant: 'error-light-base',
                 message: `${name} - ${color} / ${size} is out of stock`,

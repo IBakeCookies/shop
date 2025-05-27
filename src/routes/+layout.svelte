@@ -4,7 +4,7 @@
     import Icon from '@iconify/svelte';
     import { scrollY } from 'svelte/reactivity/window';
     import { fly, slide } from 'svelte/transition';
-    import { CartStore, setCartStore } from '@store/cartStore.svelte';
+    import { setCartStore } from '@store/cartStore.svelte';
     import { setEventStore } from '@store/eventStore.svelte';
     import { setNotificationStore } from '@store/notificationStore.svelte';
     import { pageStore } from '@store/pageStore.svelte';
@@ -16,12 +16,13 @@
 
     const { data, children }: LayoutProps = $props();
     const notificationStore = setNotificationStore();
-    const eventStore = setEventStore();
     const cartStore = setCartStore();
+
+    setEventStore();
 
     let navRef: null | HTMLDivElement = $state(null);
     let alertRef: null | HTMLDivElement = $state(null);
-    
+
     if (data.notifications) {
         data.notifications.forEach(({ message, variant }) => {
             notificationStore.addNotification({
@@ -42,7 +43,6 @@
     });
     // Revar Alpha Pants 60 price_1R8MedBC9hnWQxBpA8aj1FCI
 </script>
-
 
 <Alert bind:ref={alertRef} variant="neutral-dark-base" class="text-center">
     Free shipping on orders over €200 within Germany
@@ -130,7 +130,7 @@
 
 <Footer />
 
-<style>
+<!-- <style>
     @font-face {
         font-family: 'IBM Plex Sans', sans-serif;
         src: url('font/IBM_Plex_Sans/IBMPlexSans-VariableFont_wdth,wght.ttf');
@@ -140,9 +140,4 @@
         font-family: 'Recursive', sans-serif;
         src: url('font/Recursive/Recursive-VariableFont_CASL,CRSV,MONO,slnt,wght.ttf');
     }
-
-    .selector {
-        transform: translateX(-100%);
-        animation: tktk 0.5s ease-in-out;
-    }
-</style>
+</style> -->

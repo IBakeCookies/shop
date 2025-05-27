@@ -13,6 +13,9 @@
         title: 'Notification',
         message: 'This is a notification',
         dismiss: fn(),
+        timeoutId: setTimeout(() => {}, 0),
+        duration: 1000,
+        fade: true,
     };
 </script>
 

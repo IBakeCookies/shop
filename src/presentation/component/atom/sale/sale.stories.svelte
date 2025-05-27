@@ -1,6 +1,5 @@
 <script module>
     import { defineMeta } from '@storybook/addon-svelte-csf';
-    import { fn } from '@storybook/test';
     import Sale from '@atom/sale/sale.svelte';
 
     const { Story } = defineMeta({

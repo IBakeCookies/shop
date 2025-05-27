@@ -71,26 +71,23 @@
         <!-- {name} - {color} - {size} -->
     </a>
 
-    <form 
-        class="flex order-3 col-span-10 justify-self-start md:col-span-3 md:justify-self-end" 
-        method="POST" action={formActionQuantityChange} 
-        use:enhance={onQuantityChange}>
-
+    <form
+        class="order-3 col-span-10 flex justify-self-start md:col-span-3 md:justify-self-end"
+        method="POST"
+        action={formActionQuantityChange}
+        use:enhance={onQuantityChange}
+    >
         <input type="hidden" name="id" value={id} />
 
-        <QuantityInput
-            min={1}
-            max={stock}
-            name="quantity"
-            bind:value={quantity}
-        />
+        <QuantityInput min={1} max={stock} name="quantity" bind:value={quantity} />
 
-        <Button 
-            isLoading={isQuantityButtonLoading(id)} 
-            class="ml-4" 
+        <Button
+            isLoading={isQuantityButtonLoading(id)}
+            class="ml-4"
             type="submit"
-            variant="neutral-light-base" 
-            size="small">
+            variant="neutral-light-base"
+            size="small"
+        >
             Update
         </Button>
     </form>
@@ -108,8 +105,12 @@
         />
     </div>
 
-    <form method="POST" action={formActionRemoveItem} use:enhance={onRemoveItem}
-        class="order-2 col-span-2 md:order-5 md:col-span-1">
+    <form
+        method="POST"
+        action={formActionRemoveItem}
+        use:enhance={onRemoveItem}
+        class="order-2 col-span-2 md:order-5 md:col-span-1"
+    >
         <input type="hidden" name="id" value={id} />
 
         <Button

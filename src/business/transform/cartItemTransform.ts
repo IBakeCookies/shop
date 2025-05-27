@@ -20,6 +20,5 @@ export function transformCartItemApiToCartItemApp(cartApi: ReadCartItem): CartIt
             src: image ? getImageUrlFromProduct(image) : '',
             alt: image?.alt_text || '',
         },
-        isAvailable: cartApi.isAvailable,
     };
 }

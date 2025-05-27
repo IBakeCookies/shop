@@ -13,7 +13,8 @@ export interface NotificationInput {
 export type Notification = {
     id: number;
     timeoutId: null | ReturnType<typeof setTimeout>;
-} & Omit<NotificationInput, 'duration' | 'fade'> & Required<Pick<NotificationInput, 'duration' | 'fade'>>
+} & Omit<NotificationInput, 'duration' | 'fade'> &
+    Required<Pick<NotificationInput, 'duration' | 'fade'>>;
 
 const getNewId = (() => {
     let id = -1;
@@ -40,7 +41,7 @@ export class NotificationStore {
     }: NotificationInput): void {
         const id = getNewId();
         const minDuration = 2000;
-        const dynamicDuration = duration || minDuration + message?.length * 20 + title.length * 20;
+        const dynamicDuration = duration || minDuration + message.length * 20 + title.length * 20;
         let timeoutId: null | ReturnType<typeof setTimeout> = null;
 
         if (fade) {
@@ -75,7 +76,9 @@ export class NotificationStore {
         );
 
         if (notificationToRemove) {
-            notificationToRemove.timeoutId && clearTimeout(notificationToRemove.timeoutId);
+            if (notificationToRemove.timeoutId) {
+                clearTimeout(notificationToRemove.timeoutId);
+            }
 
             if (notificationToRemove.dismiss) {
                 notificationToRemove.dismiss();

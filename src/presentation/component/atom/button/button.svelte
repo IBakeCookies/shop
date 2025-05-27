@@ -14,7 +14,7 @@
         disabled?: boolean;
         class?: ClassValue;
         children?: Snippet;
-        onHoverSnippet?: Snippet;
+        // onHoverSnippet?: Snippet;
     } & HTMLButtonAttributes;
 
     const {
@@ -24,7 +24,7 @@
         size = 'default',
         disabled,
         children,
-        onHoverSnippet,
+        // onHoverSnippet,
         ...props
     }: Props = $props();
 

@@ -72,7 +72,7 @@
         -
     </Button>
 
-    <input  type="hidden" name={name} value={value} />
+    <input type="hidden" {name} {value} />
 
     <Input disabled bind:value {name} type="number" {min} {max} oninput={handleValue} />
 
