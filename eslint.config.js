@@ -1,20 +1,22 @@
+// For more info, see https://github.com/storybookjs/eslint-plugin-storybook#configuration-flat-config-format
 import { fileURLToPath } from 'node:url';
+import svelteConfig from './svelte.config.js';
 import { includeIgnoreFile } from '@eslint/compat';
 import eslint from '@eslint/js';
 import prettier from 'eslint-config-prettier';
+import storybook from 'eslint-plugin-storybook';
 import svelte from 'eslint-plugin-svelte';
 import globals from 'globals';
-import ts from 'typescript-eslint';
+import tseslint from 'typescript-eslint';
 
 const gitignorePath = fileURLToPath(new URL('./.gitignore', import.meta.url));
 
-export default ts.config(
+export default tseslint.config(
     includeIgnoreFile(gitignorePath),
     eslint.configs.recommended,
-    ...ts.configs.recommended,
-    ...svelte.configs['flat/recommended'],
+    ...tseslint.configs.recommended,
+    ...svelte.configs.recommended,
     prettier,
-    ...svelte.configs['flat/prettier'],
     {
         ignores: ['src/paraglide/**'],
     },
@@ -27,10 +29,13 @@ export default ts.config(
         },
     },
     {
-        files: ['**/*.svelte'],
+        files: ['**/*.svelte', '**/*.svelte.js', '**/*.svelte.ts'],
         languageOptions: {
             parserOptions: {
-                parser: ts.parser,
+                projectService: true,
+                extraFileExtensions: ['.svelte'],
+                parser: tseslint.parser,
+                svelteConfig,
             },
         },
     },
@@ -163,4 +168,5 @@ export default ts.config(
             ],
         },
     },
+    storybook.configs['flat/recommended'],
 );

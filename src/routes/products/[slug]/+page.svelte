@@ -10,7 +10,7 @@
     import { setProductStore } from '@store/productStore.svelte';
     import { useAccordion } from '@presentation/utils/accordion.svelte';
     import { getFly } from '@presentation/utils/fly';
-    import AccordionItems from '@atom/accordion/accordionItems.svelte';
+    import AccordionBody from '@atom/accordion/accordionBody.svelte';
     import AccordionLabel from '@atom/accordion/accordionLabel.svelte';
     import Button from '@atom/button/button.svelte';
     import ButtonHoverChild from '@atom/button/buttonHoverChild.svelte';
@@ -148,7 +148,7 @@
     // });
 </script>
 
-<article in:fly={getFly()} class="mx-auto grid max-w-screen-2xl grid-cols-1 xl:grid-cols-12">
+<section in:fly={getFly()} class="mx-auto grid max-w-screen-2xl grid-cols-1 xl:grid-cols-12">
     <div class="col-span-6 xl:sticky">
         {#if swiperThumbContainer}
             <Swiper
@@ -360,7 +360,7 @@
                 Care instructions
             </AccordionLabel>
 
-            <AccordionItems isOpen={careAccordion.isOpen} class="space-y-2">
+            <AccordionBody isOpen={careAccordion.isOpen} class="space-y-2">
                 {#each productStore.product.careInstructions as item}
                     <li class="flex items-start">
                         {#if item.icon}
@@ -370,7 +370,7 @@
                         {item.instruction}
                     </li>
                 {/each}
-            </AccordionItems>
+            </AccordionBody>
         </div>
 
         <div class="p-box border-t border-stone-200">
@@ -382,7 +382,7 @@
                 Additional information
             </AccordionLabel>
 
-            <AccordionItems isOpen={infoAccordion.isOpen}>
+            <AccordionBody isOpen={infoAccordion.isOpen}>
                 {#if productStore.product.about}
                     <li class="mb-4">
                         {productStore.product.about}
@@ -411,10 +411,10 @@
                         {/each}
                     </tbody>
                 </table>
-            </AccordionItems>
+            </AccordionBody>
         </div>
     </div>
-</article>
+</section>
 
 <!-- {#if availableStock !== null}
                         <div class="col-span-3 border-l border-stone-200 p-box">

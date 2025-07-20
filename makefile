@@ -1,13 +1,11 @@
 .PHONY: dev-up dev-down prod-up prod-down clean help dev-logs dev-shell prune
 
-# Development
 dev-up:
 	docker compose -f docker-compose.dev.yml up --build -d
 
 dev-down:
 	docker compose -f docker-compose.dev.yml down
 
-# Production
 prod-up:
 	docker compose -f docker-compose.prod.yml up --build -d
 

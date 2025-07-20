@@ -27,7 +27,7 @@
 </script>
 
 {#if isOpen}
-    <ul {...props} class={cn('mt-4', style[variant], props.class)} transition:slide>
+    <div {...props} class={cn('mt-4', style[variant], props.class)} transition:slide>
         {@render children()}
-    </ul>
+    </div>
 {/if}

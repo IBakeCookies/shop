@@ -1,6 +1,6 @@
 <script module>
     import { defineMeta } from '@storybook/addon-svelte-csf';
-    import { fn } from '@storybook/test';
+    import { fn } from 'storybook/test';
     import Notification from '@atom/notification/notification.svelte';
 
     const { Story } = defineMeta({

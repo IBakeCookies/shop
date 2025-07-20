@@ -61,60 +61,68 @@ interface GenericError {
     message: string;
 }
 
-export type UseErrorAsValueReturn<R> = R extends unknown
-    ? {
-          response: null;
-          error: Error | GenericError | unknown;
-      }
-    : {
-          response: R;
-          error: null;
-      };
+export type UseErrorAsValueSuccessReturn<R> = {
+    response: R | Awaited<R>;
+    error: null;
+};
 
-// interface UseErrorAsValueReturn<R = unknown, E = unknown> {
-//     response: R;
-//     error: E;
-// }
+export type UseErrorAsValueErrorReturn = {
+    response: null;
+    error: {
+        cause: Error | GenericError | unknown;
+        message?: string;
+        code?: number;
+    };
+};
 
-export async function useErrorAsValue<R>(cb: () => Promise<R>) {
+export async function useErrorAsValue<R>(
+    cb: () => R | Promise<R>,
+): Promise<UseErrorAsValueErrorReturn | UseErrorAsValueSuccessReturn<R>> {
     try {
-        const response = await cb();
+        const response: R | Awaited<R> = await cb();
 
         return {
-            response: response,
+            response,
             error: null,
         };
-    } catch (error: GenericError | Error | unknown) {
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            return {
+                response: null,
+                error: {
+                    cause: error,
+                },
+            };
+        }
+
         return {
             response: null,
-            error: error,
+            error: {
+                message: 'An unknown error occurred',
+                cause: error as GenericError | unknown,
+            },
         };
     }
 }
 
-export function getError(a: boolean): number | GenericError {
-    if (a) {
+export function getNumWithThrowChance(): number {
+    if (Math.random() > 0.5) {
         return 123;
     }
 
-    return {
-        message: 'ERROR',
-    };
+    throw new Error('An error occurred');
 }
 
 (async () => {
-    const result = await useErrorAsValue(async () => {
-        return getError(false);
-    });
+    const { response, error } = await useErrorAsValue(getNumWithThrowChance);
 
-    // Check using the object's properties
-    if (result.error === null) {
-        // TypeScript now knows response is number here
-        console.log('result', result.response);
+    if (error === null) {
+        console.log('result', response);
+
+        return;
     }
 
-    // TypeScript knows response is null here
-    console.log('error', result.error);
+    console.log('error', error);
 
     return;
 })();

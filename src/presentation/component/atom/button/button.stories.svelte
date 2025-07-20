@@ -194,13 +194,3 @@
         children: icon,
     }}
 />
-
-<Story
-    name="With icon on hover"
-    args={{
-        children,
-        onHoverSnippet: icon,
-    }}
->
-    <Button {children} onHoverSnippet={icon} />
-</Story>

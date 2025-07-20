@@ -4,7 +4,26 @@
     import { pageStore } from '@store/pageStore.svelte';
     import { getFly } from '@presentation/utils/fly';
     import Button from '@atom/button/button.svelte';
+    import { getButtonVariantStyle } from '@presentation/utils/variant';
+    import { createReactiveData } from '@business/fetcher.svelte';
+
+    const fetchCatFact = createReactiveData(async () => {
+        const response = await fetch('https://catfact.ninja/fact');
+        
+        return response.json();
+    });
+
+    const { data } = fetchCatFact();
+    
+    $effect(() => {
+        // setInterval(() => {
+        //     console.log(123, data);
+        // }, 1000); 
+    });
 </script>
+
+
+<div>{data?.fact}</div>
 
 <section
     in:fly={getFly()}
@@ -23,6 +42,8 @@
         <Button class="mt-8" href="/products" variant="neutral-light-base">
             {paraglide.show_products()}
         </Button>
+
+        <button class={getButtonVariantStyle('neutral-light-base')}>normal button</button>
     </div>
 </section>
 

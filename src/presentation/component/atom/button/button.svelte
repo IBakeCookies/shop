@@ -1,9 +1,9 @@
 <script lang="ts">
-    import type { StylePath } from '@src/presentation/utils/variant';
+    import type { StylePath } from '@presentation/utils/variant';
     import type { Snippet } from 'svelte';
     import type { ClassValue, HTMLButtonAttributes } from 'svelte/elements';
     import Icon from '@iconify/svelte';
-    import { getButtonVariantStyle } from '@src/presentation/utils/variant';
+    import { getButtonVariantStyle } from '@presentation/utils/variant';
     import { cn } from '@presentation/utils/style';
 
     type Props = {
@@ -17,6 +17,11 @@
         // onHoverSnippet?: Snippet;
     } & HTMLButtonAttributes;
 
+    interface Config {
+        size: Props['size'];
+        variant: StylePath;
+    }
+
     const {
         href,
         isLoading,
@@ -28,7 +33,7 @@
         ...props
     }: Props = $props();
 
-    const currentSize = $derived.by<string>(() => {
+    function getSizeStyle(size: Props['size']): string {
         switch (size) {
             case 'default':
                 return 'px-box py-3';
@@ -39,7 +44,17 @@
             case 'square':
                 return 'min-w-7 min-h-7';
         }
-    });
+        
+        return 'px-box py-3';
+    }
+
+    function getButtonStyle(config: Config): string {
+        const { size, variant } = config;
+        const colorStyles = getButtonVariantStyle(variant);
+        const sizeStyle = getSizeStyle(size);
+
+        return `group inline-flex cursor-pointer items-center justify-center border-2 border-transparent transition-colors disabled:opacity-50 ${colorStyles} ${sizeStyle}`
+    }
 </script>
 
 <svelte:element
@@ -47,9 +62,7 @@
     {...props}
     {href}
     class={cn(
-        'group inline-flex cursor-pointer items-center justify-center border-2 border-transparent transition-colors disabled:opacity-50',
-        getButtonVariantStyle(variant),
-        currentSize,
+        getButtonStyle({ size, variant }),
         props.class,
         {
             'pointer-events-none': isLoading || disabled,

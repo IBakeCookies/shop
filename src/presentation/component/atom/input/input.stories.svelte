@@ -1,6 +1,6 @@
 <script module>
     import { defineMeta } from '@storybook/addon-svelte-csf';
-    import { userEvent, within } from '@storybook/test';
+    import { userEvent, within } from 'storybook/test';
     import Input from '@atom/input/input.svelte';
     import Label from '@atom/label/label.svelte';
 
@@ -27,13 +27,17 @@
 />
 
 <Story name="With label top">
-    <Label {text}>
-        <Input name="input" />
-    </Label>
+    {#snippet template()}
+        <Label {text}>
+            <Input name="input" />
+        </Label>
+    {/snippet}
 </Story>
 
 <Story name="With label left">
-    <Label position="left" {text}>
-        <Input name="input" />
-    </Label>
+    {#snippet template()}
+        <Label position="left" {text}>
+            <Input name="input" />
+        </Label>
+    {/snippet}
 </Story>
