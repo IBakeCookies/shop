@@ -1,6 +1,7 @@
 <script lang="ts">
     import type { LayoutProps } from './$types';
     import '@src/app.css';
+    import '@src/main.css';
     import Icon from '@iconify/svelte';
     import { scrollY } from 'svelte/reactivity/window';
     import { fly, slide } from 'svelte/transition';
@@ -57,7 +58,7 @@
                         <div transition:slide|global class="mb-6">
                             <Notification
                                 {notification}
-                                dismiss={(id) => notificationStore.removeNotification(id)}
+                                onDismiss={(id) => notificationStore.removeNotification(id)}
                             />
                         </div>
                     </div>
@@ -99,21 +100,23 @@
     {@render children()}
 </div>
 
-<div class="px-box border-y border-stone-200 bg-white">
-    <div class="mx-auto grid max-w-screen-2xl grid-cols-3">
-        <div class="p-box flex flex-col items-center justify-center border-x border-stone-200">
+<div class=" border-y border-stone-200 bg-white">
+    <div class="mx-auto grid max-w-screen-2xl lg:grid-cols-3">
+        <div class="p-box flex flex-col items-center justify-center border-stone-200 lg:border-x">
             <Icon icon="mdi:truck-fast" class="text-3xl text-emerald-600" />
 
             <h4 class="mt-4 text-xl">Quick shipping</h4>
         </div>
 
-        <div class="p-box flex flex-col items-center justify-center border-stone-200">
+        <div
+            class="p-box flex flex-col items-center justify-center border-y border-stone-200 lg:border-0"
+        >
             <Icon icon="mdi:encryption-secure" class="text-3xl text-emerald-600" />
 
             <h4 class="mt-4 text-xl">Secure transactions</h4>
         </div>
 
-        <div class="p-box flex flex-col items-center justify-center border-x border-stone-200">
+        <div class="p-box flex flex-col items-center justify-center border-stone-200 lg:border-x">
             <Icon icon="mdi:freehand-line" class="text-3xl text-emerald-600" />
 
             <h4 class="mt-4 text-xl">Handmade goods</h4>

@@ -1,11 +1,40 @@
 <script lang="ts">
     import type { PageProps } from './$types';
     import { fly } from 'svelte/transition';
-    import { setProductsStore } from '@store/productsStore.svelte';
+    import { getProducts, setProductsStore } from '@store/productsStore.svelte';
     import { getFly } from '@presentation/utils/fly';
     import ProductListItem from '@organism/productListItem/productListItem.svelte';
+    import Intersection from './intersection.svelte';
 
     let { data }: PageProps = $props();
+    
+    const size = 3;
+
+    let isAllLoaded = $state(false);
+    let start = 4;
+    let end = start + size - 1;
+
+    async function handleLoadMore() {
+        const products = await getProducts({ 
+            from: start,
+            to: end,
+        });
+
+        productStore.products = [
+            ...productStore.products,
+            ...products,
+        ]
+        
+        if(products.length < size) {
+            isAllLoaded = true;
+            
+            return;
+        }
+
+        start += size;
+        end += size;
+    }
+
     const productStore = setProductsStore(data.products);
 </script>
 
@@ -27,5 +56,9 @@
                 </a>
             {/each}
         </div>
+    {/if}
+
+    {#if !isAllLoaded}
+        <Intersection onIntersection={handleLoadMore} />
     {/if}
 </section>

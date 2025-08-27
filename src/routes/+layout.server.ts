@@ -15,6 +15,7 @@ export const load: LayoutServerLoad = async ({ cookies }) => {
 
     async function getCartId() {
         if (existingCartId) {
+            // fetch it to make sure its still valid, otherwise its expired
             const { data, error } = await supabase
                 .from('cart')
                 .select('id')

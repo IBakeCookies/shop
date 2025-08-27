@@ -7,7 +7,7 @@ export interface NotificationInput {
     message?: string;
     fade?: boolean;
     duration?: number;
-    dismiss?: () => void;
+    onDismiss?: () => void;
 }
 
 export type Notification = {
@@ -37,7 +37,7 @@ export class NotificationStore {
         variant = 'success-light-base',
         fade = true,
         duration,
-        dismiss,
+        onDismiss,
     }: NotificationInput): void {
         const id = getNewId();
         const minDuration = 2000;
@@ -52,8 +52,8 @@ export class NotificationStore {
 
                 this.notifications.splice(notificationToRemoveIndex, 1);
 
-                if (dismiss) {
-                    dismiss();
+                if (onDismiss) {
+                    onDismiss();
                 }
             }, dynamicDuration);
         }
@@ -65,7 +65,7 @@ export class NotificationStore {
             message,
             fade,
             duration: dynamicDuration,
-            dismiss,
+            onDismiss,
             timeoutId,
         });
     }
@@ -80,8 +80,8 @@ export class NotificationStore {
                 clearTimeout(notificationToRemove.timeoutId);
             }
 
-            if (notificationToRemove.dismiss) {
-                notificationToRemove.dismiss();
+            if (notificationToRemove.onDismiss) {
+                notificationToRemove.onDismiss();
             }
         }
 

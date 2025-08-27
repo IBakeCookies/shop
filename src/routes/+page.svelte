@@ -1,29 +1,34 @@
 <script>
     import * as paraglide from '$lib/paraglide/messages.js';
     import { fly } from 'svelte/transition';
+    import { createReactiveData } from '@business/fetcher.svelte';
     import { pageStore } from '@store/pageStore.svelte';
     import { getFly } from '@presentation/utils/fly';
-    import Button from '@atom/button/button.svelte';
     import { getButtonVariantStyle } from '@presentation/utils/variant';
-    import { createReactiveData } from '@business/fetcher.svelte';
+    import Button from '@atom/button/button.svelte';
+    import { onMount } from 'svelte';
 
     const fetchCatFact = createReactiveData(async () => {
         const response = await fetch('https://catfact.ninja/fact');
-        
+
         return response.json();
     });
 
-    const { data } = fetchCatFact();
-    
-    $effect(() => {
-        // setInterval(() => {
-        //     console.log(123, data);
-        // }, 1000); 
-    });
+    let catFactReturn = $state({}); 
+
+    onMount(() => {
+        catFactReturn = fetchCatFact();
+    })
+
+
+    // $effect(() => {
+    //     setInterval(() => {
+    //         catFactReturn.refresh();
+    //     }, 5000);
+    // });
 </script>
 
-
-<div>{data?.fact}</div>
+<div>{catFactReturn?.data?.fact}</div>
 
 <section
     in:fly={getFly()}

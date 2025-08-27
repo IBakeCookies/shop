@@ -5,3 +5,6 @@ yarn.lock
 
 # Auto generated
 database.types.ts
+
+# Graphs
+.d2

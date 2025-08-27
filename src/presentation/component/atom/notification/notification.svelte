@@ -10,10 +10,10 @@
         notification: Notification;
         children?: Snippet;
         class?: ClassValue;
-        dismiss: (id: number) => void;
+        onDismiss: (id: number) => void;
     } & HTMLAttributes<any>;
 
-    const { notification, dismiss, children, ...props }: Props = $props();
+    const { notification, onDismiss, children, ...props }: Props = $props();
 
     const styles = getNotificationVariantStyle(notification.variant);
 
@@ -58,7 +58,7 @@
         {/if}
     </div>
 
-    <button class="ml-auto cursor-pointer" onclick={() => dismiss && dismiss(notification.id)}>
+    <button class="ml-auto cursor-pointer" onclick={() => onDismiss && onDismiss(notification.id)}>
         <Icon icon="mdi:close" />
     </button>
 

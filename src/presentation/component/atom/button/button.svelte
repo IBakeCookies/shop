@@ -3,8 +3,8 @@
     import type { Snippet } from 'svelte';
     import type { ClassValue, HTMLButtonAttributes } from 'svelte/elements';
     import Icon from '@iconify/svelte';
-    import { getButtonVariantStyle } from '@presentation/utils/variant';
     import { cn } from '@presentation/utils/style';
+    import { getButtonVariantStyle } from '@presentation/utils/variant';
 
     type Props = {
         href?: string;
@@ -44,7 +44,7 @@
             case 'square':
                 return 'min-w-7 min-h-7';
         }
-        
+
         return 'px-box py-3';
     }
 
@@ -53,7 +53,7 @@
         const colorStyles = getButtonVariantStyle(variant);
         const sizeStyle = getSizeStyle(size);
 
-        return `group inline-flex cursor-pointer items-center justify-center border-2 border-transparent transition-colors disabled:opacity-50 ${colorStyles} ${sizeStyle}`
+        return `group inline-flex cursor-pointer items-center justify-center border-2 border-transparent transition-colors disabled:opacity-50 ${colorStyles} ${sizeStyle}`;
     }
 </script>
 
@@ -61,13 +61,9 @@
     this={href ? 'a' : 'button'}
     {...props}
     {href}
-    class={cn(
-        getButtonStyle({ size, variant }),
-        props.class,
-        {
-            'pointer-events-none': isLoading || disabled,
-        },
-    )}
+    class={cn(getButtonStyle({ size, variant }), props.class, {
+        'pointer-events-none': isLoading || disabled,
+    })}
     disabled={isLoading || disabled}
 >
     {@render children?.()}

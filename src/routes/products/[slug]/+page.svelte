@@ -292,12 +292,9 @@
                         isLoading={isAddingToCart}
                         disabled={availableStock !== null && availableStock === 0}
                     >
+                        Add to cart
                         <ButtonHoverChild>
-                            Add to cart
-
-                            {#snippet child()}
-                                <Icon icon="mdi:cart" />
-                            {/snippet}
+                            <Icon icon="mdi:cart" />
                         </ButtonHoverChild>
                     </Button>
                 </div>
