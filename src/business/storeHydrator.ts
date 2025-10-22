@@ -5,9 +5,7 @@ export function hydrateStore<T>(store: T, data: T): void {
         return;
     }
 
-    const keys = Object.getOwnPropertyNames(store);
-
-    console.log(keys);
+    // const keys = Object.getOwnPropertyNames(store);
 
     for (const key in store) {
         store[key] = data[key];

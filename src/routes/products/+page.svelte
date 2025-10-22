@@ -1,13 +1,13 @@
 <script lang="ts">
     import type { PageProps } from './$types';
+    import Intersection from './intersection.svelte';
     import { fly } from 'svelte/transition';
     import { getProducts, setProductsStore } from '@store/productsStore.svelte';
     import { getFly } from '@presentation/utils/fly';
     import ProductListItem from '@organism/productListItem/productListItem.svelte';
-    import Intersection from './intersection.svelte';
 
     let { data }: PageProps = $props();
-    
+
     const size = 3;
 
     let isAllLoaded = $state(false);
@@ -15,19 +15,16 @@
     let end = start + size - 1;
 
     async function handleLoadMore() {
-        const products = await getProducts({ 
+        const products = await getProducts({
             from: start,
             to: end,
         });
 
-        productStore.products = [
-            ...productStore.products,
-            ...products,
-        ]
-        
-        if(products.length < size) {
+        productStore.products = [...productStore.products, ...products];
+
+        if (products.length < size) {
             isAllLoaded = true;
-            
+
             return;
         }
 

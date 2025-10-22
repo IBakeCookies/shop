@@ -42,6 +42,7 @@
     $effect(() => {
         cartStore.hydrateStore(data.cartItems || []);
     });
+
     // Revar Alpha Pants 60 price_1R8MedBC9hnWQxBpA8aj1FCI
 </script>
 

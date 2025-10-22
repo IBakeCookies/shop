@@ -31,12 +31,13 @@ export class EventStore {
     removeEvent(event: string) {
         this.events.delete(event);
 
-        isDev &&
+        if (isDev) {
             this.history.forEach((historyItem) => {
                 if (historyItem.name === event) {
                     historyItem.removedDate = new Date();
                 }
             });
+        }
     }
 
     hasAny(events: string[]) {

@@ -1,12 +1,12 @@
 <script>
     import * as paraglide from '$lib/paraglide/messages.js';
+    import { onMount } from 'svelte';
     import { fly } from 'svelte/transition';
     import { createReactiveData } from '@business/fetcher.svelte';
     import { pageStore } from '@store/pageStore.svelte';
     import { getFly } from '@presentation/utils/fly';
     import { getButtonVariantStyle } from '@presentation/utils/variant';
     import Button from '@atom/button/button.svelte';
-    import { onMount } from 'svelte';
 
     const fetchCatFact = createReactiveData(async () => {
         const response = await fetch('https://catfact.ninja/fact');
@@ -14,12 +14,11 @@
         return response.json();
     });
 
-    let catFactReturn = $state({}); 
+    let catFactReturn = $state({});
 
-    onMount(() => {
-        catFactReturn = fetchCatFact();
-    })
-
+    // onMount(() => {
+    //     catFactReturn = fetchCatFact();
+    // })
 
     // $effect(() => {
     //     setInterval(() => {
@@ -28,7 +27,7 @@
     // });
 </script>
 
-<div>{catFactReturn?.data?.fact}</div>
+<!-- <div>{catFactReturn?.data?.fact}</div> -->
 
 <section
     in:fly={getFly()}

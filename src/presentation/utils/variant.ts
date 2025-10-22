@@ -13,10 +13,10 @@ interface ColorStyle {
 
 type ColorConfig = Record<SemanticColor, Record<ColorVariant, Record<StyleType, ColorStyle>>>;
 
-const seperator = '-';
+const separator = '-';
 
 export type StylePath =
-    `${SemanticColor}${typeof seperator}${ColorVariant}${typeof seperator}${StyleType}`;
+    `${SemanticColor}${typeof separator}${ColorVariant}${typeof separator}${StyleType}`;
 
 const lightText = {
     title: 'text-stone-100',
@@ -201,7 +201,7 @@ const colorConfig: ColorConfig = {
 };
 
 function getStateVariantStyle(path: StylePath): ColorStyle {
-    const [color, variant, type] = path.split(seperator) as [
+    const [color, variant, type] = path.split(separator) as [
         SemanticColor,
         ColorVariant,
         StyleType,

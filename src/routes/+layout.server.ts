@@ -13,7 +13,7 @@ export const load: LayoutServerLoad = async ({ cookies }) => {
     const existingCartId = cookies.get('cartId');
     const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
 
-    async function getCartId() {
+    async function getCartId(): Promise<string | undefined> {
         if (existingCartId) {
             // fetch it to make sure its still valid, otherwise its expired
             const { data, error } = await supabase

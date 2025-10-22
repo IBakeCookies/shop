@@ -3,7 +3,12 @@ import { getContext, setContext } from 'svelte';
 import { transformProductApiToProductListing } from '@src/business/transform/productListingTransform';
 import { readAllProducts } from '@data/repository/productRepository';
 
-export async function getProducts(input = { from: 0, to: 20 }): Promise<ProductListing[]> {
+export async function getProducts(
+    input = {
+        from: 0,
+        to: 20,
+    },
+): Promise<ProductListing[]> {
     try {
         const { data, error } = await readAllProducts(input);
 

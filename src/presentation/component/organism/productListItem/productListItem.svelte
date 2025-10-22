@@ -1,5 +1,4 @@
 <script lang="ts">
-    // import type { ClassValue } from 'clsx';
     import type { ClassValue } from 'svelte/elements';
     import { cn } from '@presentation/utils/style';
     import Money from '@atom/money/money.svelte';

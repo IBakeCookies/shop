@@ -33,11 +33,16 @@ const productImage = `product_image (
 						)
 					)`;
 
-export const readAllProducts = (input = { from: 0, to: 20 }) => {
-	return supabase
-		.from('product')
-		.select(
-			`
+export const readAllProducts = (
+    input = {
+        from: 0,
+        to: 20,
+    },
+) => {
+    return supabase
+        .from('product')
+        .select(
+            `
 				id,
 				slug,
 				...brand_id (brand:name),
@@ -56,12 +61,12 @@ export const readAllProducts = (input = { from: 0, to: 20 }) => {
 					name
 				)
 			`,
-		)
-		.eq('product_item.color_id.color_translation.language_code', 'en')
-		.eq('product_translation.language_code', 'en')
-		.eq('is_published', true)
-		.range(input.from, input.to);
-}
+        )
+        .eq('product_item.color_id.color_translation.language_code', 'en')
+        .eq('product_translation.language_code', 'en')
+        .eq('is_published', true)
+        .range(input.from, input.to);
+};
 
 export const readProductBySlug = (slug: string) =>
     supabase
