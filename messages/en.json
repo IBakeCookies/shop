@@ -31,5 +31,6 @@
     "cart_subtotal": "Subtotal",
     "cart_tax": "Tax",
     "cart_shipping": "Shipping",
-    "cart_discount": "Discount"
+    "cart_discount": "Discount",
+    "hello_world": "Hello, {name} from en!"
 }

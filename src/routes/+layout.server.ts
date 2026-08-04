@@ -69,7 +69,9 @@ export const load: LayoutServerLoad = async ({ cookies }) => {
     const cartId = await getCartId();
 
     if (!cartId) {
-        return;
+        return fail(422, {
+            description: 'Something went wrong',
+        });
     }
 
     const { error: updateError } = await supabase

@@ -40,7 +40,7 @@
             case 'small':
                 return 'px-4 py-2';
             case 'tiny':
-                return 'px-2 py-1';
+                return 'px-2 py-1'; 
             case 'square':
                 return 'min-w-7 min-h-7';
         }
@@ -61,9 +61,16 @@
     this={href ? 'a' : 'button'}
     {...props}
     {href}
-    class={cn(getButtonStyle({ size, variant }), props.class, {
-        'pointer-events-none': isLoading || disabled,
-    })}
+    class={cn(
+        getButtonStyle({
+            size,
+            variant,
+        }),
+        props.class,
+        {
+            'pointer-events-none': isLoading || disabled,
+        },
+    )}
     disabled={isLoading || disabled}
 >
     {@render children?.()}

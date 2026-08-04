@@ -28,13 +28,32 @@ const CONTEXT_KEY = Symbol();
 
 class ProductsStore {
     products: ProductListing[] = $state.raw([]);
+    #isAllLoaded = $state(false);
+    #size = 3;
+    #start = 4;
+    #end = this.#start + this.#size - 1;
 
     constructor(products?: ProductListing[]) {
         this.products = products || [];
     }
 
+    get isAllLoaded(): boolean {
+        return this.#isAllLoaded;
+    }
+
     async getProducts(): Promise<void> {
-        this.products = await getProducts();
+        const products = await getProducts({
+            from: this.#start,
+            to: this.#end,
+        });
+
+        if (products.length < this.#size) {
+            this.#isAllLoaded = true;
+        }
+
+        this.products = [... this.products, ...products];
+        this.#start += this.#size;
+        this.#end += this.#size;  
     }
 }
 
